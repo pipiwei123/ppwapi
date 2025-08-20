@@ -161,7 +161,7 @@ const UsersTable = () => {
       },
     },
     {
-      title: t('提交时间'),
+      title: t('注册时间'),
       dataIndex: 'created_at',
       render: (text, record, index) => {
         return <div>{renderTimestamp(text)}</div>;
