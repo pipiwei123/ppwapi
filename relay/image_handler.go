@@ -98,6 +98,12 @@ func getAndValidImageRequest(c *gin.Context, info *relaycommon.RelayInfo) (*dto.
 		}
 	}
 
+	// 验证新增的参数
+	err := validateNewImageParams(imageRequest)
+	if err != nil {
+		return nil, err
+	}
+
 	if setting.ShouldCheckPromptSensitive() {
 		words, err := service.CheckSensitiveInput(imageRequest.Prompt)
 		if err != nil {
@@ -244,4 +250,72 @@ func ImageHelper(c *gin.Context) (newAPIError *types.NewAPIError) {
 	logContent := fmt.Sprintf("大小 %s, 品质 %s", imageRequest.Size, quality)
 	postConsumeQuota(c, relayInfo, usage.(*dto.Usage), preConsumedQuota, userQuota, priceData, logContent)
 	return nil
+}
+
+// validateNewImageParams 验证新增的图像生成参数
+func validateNewImageParams(imageRequest *dto.ImageRequest) error {
+	// 验证长宽比格式
+	if imageRequest.AspectRatio != "" {
+		if !isValidAspectRatio(imageRequest.AspectRatio) {
+			return errors.New("aspect_ratio must be in format like '1:1', '16:9', '4:3', '3:4', '9:16'")
+		}
+	}
+
+	// 验证种子值范围
+	if imageRequest.Seed != nil {
+		if *imageRequest.Seed < 0 || *imageRequest.Seed > 4294967295 {
+			return errors.New("seed must be between 0 and 4294967295")
+		}
+	}
+
+	// 验证安全容忍度
+	if imageRequest.SafetyTolerance != nil {
+		if *imageRequest.SafetyTolerance < 0 || *imageRequest.SafetyTolerance > 6 {
+			return errors.New("safety_tolerance must be between 0 and 6")
+		}
+	}
+
+	// 验证Webhook URL格式
+	if imageRequest.WebhookUrl != "" && imageRequest.WebhookUrl != "null" {
+		if !strings.HasPrefix(imageRequest.WebhookUrl, "http://") && !strings.HasPrefix(imageRequest.WebhookUrl, "https://") {
+			return errors.New("webhook_url must be a valid HTTP or HTTPS URL")
+		}
+	}
+
+	return nil
+}
+
+// isValidAspectRatio 检查长宽比格式是否有效
+func isValidAspectRatio(aspectRatio string) bool {
+	// 常见的长宽比格式
+	validRatios := []string{
+		"1:1", "4:3", "3:4", "16:9", "9:16", "21:9", "9:21",
+		"2:3", "3:2", "5:4", "4:5", "3:1", "1:3", "2:1", "1:2",
+	}
+	
+	for _, ratio := range validRatios {
+		if aspectRatio == ratio {
+			return true
+		}
+	}
+	
+	// 也支持自定义格式，如 width:height，确保是数字:数字的格式
+	parts := strings.Split(aspectRatio, ":")
+	if len(parts) != 2 {
+		return false
+	}
+	
+	// 简单验证是否为数字
+	for _, part := range parts {
+		if len(part) == 0 || len(part) > 4 {
+			return false
+		}
+		for _, char := range part {
+			if char < '0' || char > '9' {
+				return false
+			}
+		}
+	}
+	
+	return true
 }
