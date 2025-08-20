@@ -57,6 +57,7 @@ type MidjourneyDto struct {
 	StartTime   int64       `json:"startTime"`
 	FinishTime  int64       `json:"finishTime"`
 	ImageUrl    string      `json:"imageUrl"`
+	ImageUrls   []ImgUrls   `json:"imageUrls"` // 新增：支持多图片数组
 	VideoUrl    string      `json:"videoUrl"`
 	VideoUrls   []ImgUrls   `json:"videoUrls"`
 	Status      string      `json:"status"`
@@ -102,6 +103,16 @@ type ActionButton struct {
 }
 
 type Properties struct {
-	FinalPrompt   string `json:"finalPrompt"`
-	FinalZhPrompt string `json:"finalZhPrompt"`
+	FinalPrompt       string `json:"finalPrompt"`
+	FinalZhPrompt     string `json:"finalZhPrompt"`
+	CustomId          string `json:"customId,omitempty"`
+	DiscordChannelId  string `json:"discordChannelId,omitempty"`
+	DiscordInstanceId string `json:"discordInstanceId,omitempty"`
+	Flags             int    `json:"flags,omitempty"`
+	MessageContent    string `json:"messageContent,omitempty"`
+	MessageHash       string `json:"messageHash,omitempty"`
+	MessageId         string `json:"messageId,omitempty"`
+	Nonce             string `json:"nonce,omitempty"`
+	NotifyHook        string `json:"notifyHook,omitempty"`
+	ProgressMessageId string `json:"progressMessageId,omitempty"`
 }

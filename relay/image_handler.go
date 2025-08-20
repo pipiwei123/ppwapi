@@ -292,19 +292,19 @@ func isValidAspectRatio(aspectRatio string) bool {
 		"1:1", "4:3", "3:4", "16:9", "9:16", "21:9", "9:21",
 		"2:3", "3:2", "5:4", "4:5", "3:1", "1:3", "2:1", "1:2",
 	}
-	
+
 	for _, ratio := range validRatios {
 		if aspectRatio == ratio {
 			return true
 		}
 	}
-	
+
 	// 也支持自定义格式，如 width:height，确保是数字:数字的格式
 	parts := strings.Split(aspectRatio, ":")
 	if len(parts) != 2 {
 		return false
 	}
-	
+
 	// 简单验证是否为数字
 	for _, part := range parts {
 		if len(part) == 0 || len(part) > 4 {
@@ -316,6 +316,6 @@ func isValidAspectRatio(aspectRatio string) bool {
 			}
 		}
 	}
-	
+
 	return true
 }

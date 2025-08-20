@@ -25,6 +25,7 @@ import {
   Loader,
   AlertCircle,
   Hash,
+  Video,
 } from 'lucide-react';
 import {
   API,
@@ -517,6 +518,35 @@ const LogsTable = () => {
       title: t('结果图片'),
       dataIndex: 'image_url',
       render: (text, record, index) => {
+        // 尝试解析image_urls字段
+        let imageUrls = [];
+        if (record.image_urls) {
+          try {
+            imageUrls = JSON.parse(record.image_urls);
+          } catch (e) {
+            console.warn('Failed to parse image_urls:', e);
+          }
+        }
+        
+        // 如果有多张图片，显示多图片按钮
+        if (imageUrls && imageUrls.length > 0) {
+          return (
+            <div className="flex gap-1">
+              <Button
+                size="small"
+                onClick={() => {
+                  setModalImageUrls(imageUrls);
+                  setIsMultiImageModal(true);
+                  setIsModalOpenurl(true);
+                }}
+              >
+                {t('查看图片')} ({imageUrls.length})
+              </Button>
+            </div>
+          );
+        }
+        
+        // 回退到单张图片
         if (!text) {
           return t('无');
         }
@@ -525,6 +555,7 @@ const LogsTable = () => {
             size="small"
             onClick={() => {
               setModalImageUrl(text);
+              setIsMultiImageModal(false);
               setIsModalOpenurl(true);
             }}
           >
@@ -620,6 +651,8 @@ const LogsTable = () => {
 
   // 定义模态框图片URL的状态和更新函数
   const [modalImageUrl, setModalImageUrl] = useState('');
+  const [modalImageUrls, setModalImageUrls] = useState([]);
+  const [isMultiImageModal, setIsMultiImageModal] = useState(false);
   let now = new Date();
 
   // Form 初始值
@@ -969,11 +1002,46 @@ const LogsTable = () => {
         >
           <p style={{ whiteSpace: 'pre-line' }}>{modalContent}</p>
         </Modal>
-        <ImagePreview
-          src={modalImageUrl}
-          visible={isModalOpenurl}
-          onVisibleChange={(visible) => setIsModalOpenurl(visible)}
-        />
+        {/* 多图片模态框 */}
+        {isMultiImageModal ? (
+          <Modal
+            visible={isModalOpenurl}
+            onCancel={() => setIsModalOpenurl(false)}
+            footer={null}
+            width="90%"
+            style={{ maxWidth: '1200px' }}
+            title={t('图片预览')}
+          >
+            <div className="grid grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto">
+              {modalImageUrls.map((imgItem, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={imgItem.url}
+                    alt={`图片 ${index + 1}`}
+                    className="w-full h-auto rounded-lg shadow-lg cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      // 点击单张图片时切换到单图预览
+                      setModalImageUrl(imgItem.url);
+                      setIsMultiImageModal(false);
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
+                    {index + 1}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Modal>
+        ) : (
+          <ImagePreview
+            src={modalImageUrl}
+            visible={isModalOpenurl}
+            onVisibleChange={(visible) => setIsModalOpenurl(visible)}
+          />
+        )}
       </Layout>
     </>
   );
