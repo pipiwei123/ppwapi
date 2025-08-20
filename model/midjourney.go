@@ -4,6 +4,7 @@ type Midjourney struct {
 	Id          int    `json:"id"`
 	Code        int    `json:"code"`
 	UserId      int    `json:"user_id" gorm:"index"`
+	TokenId     int    `json:"token_id" gorm:"index"`
 	Action      string `json:"action" gorm:"type:varchar(40);index"`
 	MjId        string `json:"mj_id" gorm:"index"`
 	Prompt      string `json:"prompt"`
@@ -23,6 +24,13 @@ type Midjourney struct {
 	Quota       int    `json:"quota"`
 	Buttons     string `json:"buttons"`
 	Properties  string `json:"properties"`
+}
+
+type MidjourneyWithExtra struct {
+	Midjourney
+
+	Username  string `json:"username" gorm:"column:username"`
+	TokenName string `json:"token_name" gorm:"column:token_name"`
 }
 
 // TaskQueryParams 用于包含所有搜索条件的结构体，可以根据需求添加更多字段
@@ -60,12 +68,15 @@ func GetAllUserTask(userId int, startIdx int, num int, queryParams TaskQueryPara
 	return tasks
 }
 
-func GetAllTasks(startIdx int, num int, queryParams TaskQueryParams) []*Midjourney {
-	var tasks []*Midjourney
+func GetAllTasks(startIdx int, num int, queryParams TaskQueryParams) []*MidjourneyWithExtra {
+	var tasks []*MidjourneyWithExtra
 	var err error
 
 	// 初始化查询构建器
-	query := DB
+	query := DB.Model(&Midjourney{}).
+		Select("midjourneys.*, users.username as username, tokens.name as token_name").
+		Joins("LEFT JOIN users ON users.id = midjourneys.user_id").
+		Joins("LEFT JOIN tokens ON tokens.id = midjourneys.token_id")
 
 	// 添加过滤条件
 	if queryParams.ChannelID != "" {
@@ -82,7 +93,7 @@ func GetAllTasks(startIdx int, num int, queryParams TaskQueryParams) []*Midjourn
 	}
 
 	// 获取数据
-	err = query.Order("id desc").Limit(num).Offset(startIdx).Find(&tasks).Error
+	err = query.Order("id desc").Limit(num).Offset(startIdx).Scan(&tasks).Error
 	if err != nil {
 		return nil
 	}

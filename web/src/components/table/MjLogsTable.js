@@ -29,13 +29,14 @@ import {
 import {
   API,
   copy,
-  isAdmin,
+  isAdmin, renderNumber, renderQuota,
   showError,
-  showSuccess,
+  showSuccess, stringToColor,
   timestamp2string
 } from '../../helpers';
 
 import {
+  Avatar,
   Button,
   Card,
   Checkbox,
@@ -85,6 +86,8 @@ const colors = [
 // 定义列键值常量
 const COLUMN_KEYS = {
   SUBMIT_TIME: 'submit_time',
+  USERNAME: 'username',
+  TOKEN_NAME: 'token_name',
   DURATION: 'duration',
   CHANNEL: 'channel',
   TYPE: 'type',
@@ -132,6 +135,8 @@ const LogsTable = () => {
     return {
       [COLUMN_KEYS.SUBMIT_TIME]: true,
       [COLUMN_KEYS.DURATION]: true,
+      [COLUMN_KEYS.USERNAME]: isAdminUser,
+      [COLUMN_KEYS.TOKEN_NAME]: true,
       [COLUMN_KEYS.CHANNEL]: isAdminUser,
       [COLUMN_KEYS.TYPE]: true,
       [COLUMN_KEYS.TASK_ID]: true,
@@ -411,6 +416,38 @@ const LogsTable = () => {
     );
   }
 
+  const showUserInfo = async (userId) => {
+    if (!isAdminUser) {
+      return;
+    }
+    const res = await API.get(`/api/user/${userId}`);
+    const { success, message, data } = res.data;
+    if (success) {
+      Modal.info({
+        title: t('用户信息'),
+        content: (
+            <div style={{ padding: 12 }}>
+              <p>
+                {t('用户名')}: {data.username}
+              </p>
+              <p>
+                {t('余额')}: {renderQuota(data.quota)}
+              </p>
+              <p>
+                {t('已用额度')}：{renderQuota(data.used_quota)}
+              </p>
+              <p>
+                {t('请求次数')}：{renderNumber(data.request_count)}
+              </p>
+            </div>
+        ),
+        centered: true,
+      });
+    } else {
+      showError(message);
+    }
+  };
+
   // 定义所有列
   const allColumns = [
     {
@@ -419,6 +456,54 @@ const LogsTable = () => {
       dataIndex: 'submit_time',
       render: (text, record, index) => {
         return <div>{renderTimestamp(text / 1000)}</div>;
+      },
+    },
+    {
+      key: COLUMN_KEYS.USERNAME,
+      title: t('用户'),
+      dataIndex: 'username',
+      className: isAdmin() ? 'tableShow' : 'tableHiddle',
+      render: (text, record, index) => {
+        return isAdminUser ? (
+            <div>
+              <Avatar
+                  size='extra-small'
+                  color={stringToColor(text)}
+                  style={{ marginRight: 4 }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    showUserInfo(record.user_id);
+                  }}
+              >
+                {typeof text === 'string' && text.slice(0, 1)}
+              </Avatar>
+              {text}
+            </div>
+        ) : (
+            <></>
+        );
+      },
+    },
+    {
+      key: COLUMN_KEYS.TOKEN_NAME,
+      title: t('令牌'),
+      dataIndex: 'token_name',
+      render: (text, record, index) => {
+        return (
+            <div>
+              <Tag
+                  color='grey'
+                  shape='circle'
+                  onClick={(event) => {
+                    //cancel the row click event
+                    copyText(text);
+                  }}
+              >
+                {' '}
+                {t(text)}{' '}
+              </Tag>
+            </div>
+        );
       },
     },
     {
