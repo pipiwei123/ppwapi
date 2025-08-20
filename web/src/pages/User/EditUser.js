@@ -41,6 +41,8 @@ const EditUser = (props) => {
   const [loading, setLoading] = useState(true);
   const [addQuotaModalOpen, setIsModalOpen] = useState(false);
   const [addQuotaLocal, setAddQuotaLocal] = useState('');
+  const [balance, setBalance] = useState(0);
+  const [addBalance, setAddBalance] = useState(0);
   const isMobile = useIsMobile();
   const [groupOptions, setGroupOptions] = useState([]);
   const formApiRef = useRef(null);
@@ -82,6 +84,13 @@ const EditUser = (props) => {
     if (success) {
       data.password = '';
       formApiRef.current?.setValues({ ...getInitValues(), ...data });
+
+      console.log(res.data)
+
+      if (data.quota) {
+        setBalance(data.quota / 500000)
+      }
+
     } else {
       showError(message);
     }
@@ -97,7 +106,8 @@ const EditUser = (props) => {
   const submit = async (values) => {
     setLoading(true);
     let payload = { ...values };
-    if (typeof payload.quota === 'string') payload.quota = parseInt(payload.quota) || 0;
+
+    payload.quota = balance * 500000;
     if (userId) {
       payload.id = parseInt(userId);
     }
@@ -116,9 +126,7 @@ const EditUser = (props) => {
 
   /* --------------------- quota helper -------------------- */
   const addLocalQuota = () => {
-    const current = parseInt(formApiRef.current?.getValue('quota') || 0);
-    const delta = parseInt(addQuotaLocal) || 0;
-    formApiRef.current?.setValue('quota', current + delta);
+    setBalance(b=>b+addBalance);
   };
 
   /* --------------------------- UI --------------------------- */
@@ -252,15 +260,17 @@ const EditUser = (props) => {
                       </Col>
 
                       <Col span={10}>
-                        <Form.InputNumber
-                          field='quota'
-                          label={t('剩余额度')}
-                          placeholder={t('请输入新的剩余额度')}
-                          step={500000}
-                          extraText={renderQuotaWithPrompt(values.quota || 0)}
-                          rules={[{ required: true, message: t('请输入额度') }]}
-                          style={{ width: '100%' }}
-                        />
+                        <Form.Slot label={`${t('剩余额度')}(￥)`}>
+                          <InputNumber
+                            value={balance}
+                            onChange={setBalance}
+                            label={t('剩余额度')}
+                            placeholder={t('请输入新的剩余额度')}
+                            rules={[{ required: true, message: t('请输入额度') }]}
+                            style={{ width: '100%' }}
+                          />
+                        </Form.Slot>
+
                       </Col>
 
                       <Col span={14}>
@@ -326,10 +336,9 @@ const EditUser = (props) => {
         <div className='mb-4'>
           {
             (() => {
-              const current = formApiRef.current?.getValue('quota') || 0;
               return (
                 <Text type='secondary' className='block mb-2'>
-                  {`${t('新额度：')}${renderQuota(current)} + ${renderQuota(addQuotaLocal)} = ${renderQuota(current + parseInt(addQuotaLocal || 0))}`}
+                  {`${t('新额度：')}${balance} + ${addBalance} = ${balance + addBalance}`}
                 </Text>
               );
             })()
@@ -337,11 +346,10 @@ const EditUser = (props) => {
         </div>
         <InputNumber
           placeholder={t('需要添加的额度（支持负数）')}
-          value={addQuotaLocal}
-          onChange={setAddQuotaLocal}
+          value={addBalance}
+          onChange={setAddBalance}
           style={{ width: '100%' }}
           showClear
-          step={500000}
         />
       </Modal>
     </>
