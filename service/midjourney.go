@@ -182,7 +182,38 @@ func DoMidjourneyHttpRequest(c *gin.Context, timeout time.Duration, fullRequestU
 		//req, err := http.NewRequest(c.Request.Method, fullRequestURL, requestBody)
 		// make new request with mapResult
 	}
-	if setting.MjModeClearEnabled {
+	// 处理模式参数
+	mjMode := c.GetString("mj_mode")
+	if mjMode != "" {
+		// 如果有模式参数，需要添加到prompt中或者特定处理
+		if prompt, ok := mapResult["prompt"].(string); ok {
+			// 如果启用了模式清理，先清理现有的模式参数，再添加新的
+			if setting.MjModeClearEnabled {
+				prompt = strings.Replace(prompt, "--fast", "", -1)
+				prompt = strings.Replace(prompt, "--relax", "", -1)
+				prompt = strings.Replace(prompt, "--turbo", "", -1)
+			}
+
+			// 根据模式添加相应的参数
+			switch mjMode {
+			case "relax":
+				if !strings.Contains(prompt, "--relax") {
+					prompt = prompt + " --relax"
+				}
+			case "fast":
+				if !strings.Contains(prompt, "--fast") {
+					prompt = prompt + " --fast"
+				}
+			case "turbo":
+				if !strings.Contains(prompt, "--turbo") {
+					prompt = prompt + " --turbo"
+				}
+			}
+
+			mapResult["prompt"] = prompt
+		}
+	} else if setting.MjModeClearEnabled {
+		// 如果没有指定模式但启用了模式清理，则清理现有的模式参数
 		if prompt, ok := mapResult["prompt"].(string); ok {
 			prompt = strings.Replace(prompt, "--fast", "", -1)
 			prompt = strings.Replace(prompt, "--relax", "", -1)

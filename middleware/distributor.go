@@ -187,6 +187,13 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 	var err error
 	if strings.Contains(c.Request.URL.Path, "/mj/") {
 		relayMode := relayconstant.Path2RelayModeMidjourney(c.Request.URL.Path)
+
+		// 提取路径中的模式参数（如果存在）
+		mode := c.Param("mode")
+		if mode != "" {
+			c.Set("mj_mode", mode)
+		}
+
 		if relayMode == relayconstant.RelayModeMidjourneyTaskFetch ||
 			relayMode == relayconstant.RelayModeMidjourneyTaskFetchByCondition ||
 			relayMode == relayconstant.RelayModeMidjourneyNotify ||
@@ -210,6 +217,14 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 					shouldSelectChannel = false
 				}
 			}
+
+			// 检查是否为模式相关的模型（如 mj-relax, mj-fast, mj-turbo）
+			if extractedMode := constant.ExtractModeFromModel(midjourneyModel); extractedMode != "" {
+				c.Set("mj_mode", extractedMode)
+				// 将模型名称转换为标准格式用于渠道选择
+				midjourneyModel = constant.ConvertModeModelToStandard(midjourneyModel)
+			}
+
 			modelRequest.Model = midjourneyModel
 		}
 		c.Set("relay_mode", relayMode)

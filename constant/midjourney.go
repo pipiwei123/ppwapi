@@ -45,4 +45,32 @@ var MidjourneyModel2Action = map[string]string{
 	"mj_upload":         MjActionUpload,
 	"mj_video":          MjActionVideo,
 	"mj_edits":          MjActionEdits,
+	// 支持模式映射的模型
+	"mj-relax": MjActionImagine,
+	"mj-fast":  MjActionImagine,
+	"mj-turbo": MjActionImagine,
+}
+
+// 模型名称到模式的映射
+var MidjourneyModel2Mode = map[string]string{
+	"mj-relax": "relax",
+	"mj-fast":  "fast",
+	"mj-turbo": "turbo",
+}
+
+// 从模型名称提取模式
+func ExtractModeFromModel(model string) string {
+	if mode, exists := MidjourneyModel2Mode[model]; exists {
+		return mode
+	}
+	return ""
+}
+
+// 将带模式的模型名称转换为标准模型名称
+func ConvertModeModelToStandard(model string) string {
+	// 如果是模式相关的模型，转换为标准的imagine模型
+	if _, exists := MidjourneyModel2Mode[model]; exists {
+		return "mj_imagine"
+	}
+	return model
 }
