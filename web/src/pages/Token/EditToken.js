@@ -160,18 +160,40 @@ const EditToken = (props) => {
       // 处理多分组数据
       if (data.group_info && data.group_info.is_multi_group) {
         data.is_multi_group = data.group_info.is_multi_group;
-        data.multi_group_list = data.group_info.multi_group_list || [];
+        data.multi_group_list = Array.isArray(data.group_info.multi_group_list) ? data.group_info.multi_group_list : [];
       } else if (data.group && data.group.includes(',')) {
         // 兼容逗号分隔的group字段（历史数据或手动修改的数据）
         data.is_multi_group = true;
         data.multi_group_list = data.group.split(',').map(g => g.trim()).filter(g => g);
       } else {
         data.is_multi_group = false;
-        data.multi_group_list = data.group ? [data.group] : [];
+        // 单分组模式下，multi_group_list应该为空数组，而不是包含单个分组
+        data.multi_group_list = [];
       }
       
+      console.log('Loading token data:', {
+        is_multi_group: data.is_multi_group,
+        multi_group_list: data.multi_group_list,
+        group: data.group,
+        group_info: data.group_info
+      });
+      
       if (formApiRef.current) {
-        formApiRef.current.setValues({ ...getInitValues(), ...data });
+        // 确保所有数据都已准备就绪再设置表单值
+        const formData = { ...getInitValues(), ...data };
+        console.log('Setting form values:', formData);
+        
+        // 等待下一个事件循环，确保组件已完全渲染
+        setTimeout(() => {
+          formApiRef.current.setValues(formData);
+          // 强制触发表单重新渲染
+          setTimeout(() => {
+            formApiRef.current.setValue('is_multi_group', formData.is_multi_group);
+            if (formData.is_multi_group && Array.isArray(formData.multi_group_list)) {
+              formApiRef.current.setValue('multi_group_list', [...formData.multi_group_list]);
+            }
+          }, 50);
+        }, 100);
       }
     } else {
       showError(message);
@@ -192,7 +214,14 @@ const EditToken = (props) => {
   useEffect(() => {
     if (props.visiable) {
       if (isEdit) {
-        loadToken();
+        // 确保分组数据加载完成后再加载token数据
+        const loadTokenWithDelay = async () => {
+          if (groups.length === 0) {
+            await loadGroups();
+          }
+          await loadToken();
+        };
+        loadTokenWithDelay();
       } else {
         formApiRef.current?.setValues(getInitValues());
       }
@@ -233,7 +262,7 @@ const EditToken = (props) => {
       localInputs.model_limits_enabled = localInputs.model_limits.length > 0;
       
       // 处理多分组数据
-      if (localInputs.is_multi_group && localInputs.multi_group_list && localInputs.multi_group_list.length > 0) {
+      if (localInputs.is_multi_group && Array.isArray(localInputs.multi_group_list) && localInputs.multi_group_list.length > 0) {
         localInputs.group_info = {
           is_multi_group: true,
           multi_group_size: localInputs.multi_group_list.length,
@@ -292,7 +321,7 @@ const EditToken = (props) => {
         localInputs.model_limits_enabled = localInputs.model_limits.length > 0;
         
         // 处理多分组数据
-        if (localInputs.is_multi_group && localInputs.multi_group_list && localInputs.multi_group_list.length > 0) {
+        if (localInputs.is_multi_group && Array.isArray(localInputs.multi_group_list) && localInputs.multi_group_list.length > 0) {
           localInputs.group_info = {
             is_multi_group: true,
             multi_group_size: localInputs.multi_group_list.length,
@@ -436,24 +465,64 @@ const EditToken = (props) => {
                   {!values.is_multi_group ? (
                     <Col span={24}>
                       {groups.length > 0 ? (
-                        <Form.Select
-                          field='group'
-                          label={
-                            <div className='flex items-center gap-2'>
-                              <span>{t('令牌分组')}</span>
-                              <Tag color='grey' size='small'>
-                                {t('单分组')}
-                              </Tag>
-                            </div>
-                          }
-                          placeholder={t('请选择分组，默认为用户的分组')}
-                          optionList={groups}
-                          renderOptionItem={renderGroupOption}
-                          showClear
-                          filter
-                          style={{ width: '100%' }}
-                          extraText={t('传统模式：令牌固定使用一个分组')}
-                        />
+                        <div className='space-y-3'>
+                          <Form.Select
+                            field='group'
+                            label={
+                              <div className='flex items-center gap-2'>
+                                <span>{t('令牌分组')}</span>
+                                <Tag color='grey' size='small'>
+                                  {t('单分组')}
+                                </Tag>
+                                {values.group && (
+                                  <Tag color='blue' size='small'>
+                                    {values.group}
+                                  </Tag>
+                                )}
+                              </div>
+                            }
+                            placeholder={t('请选择分组，默认为用户的分组')}
+                            optionList={groups}
+                            renderOptionItem={renderGroupOption}
+                            showClear
+                            filter
+                            value={values.group}
+                            style={{ width: '100%' }}
+                            extraText={t('传统模式：令牌固定使用一个分组')}
+                          />
+                          
+                          {/* 单分组预览 */}
+                          {values.group && (
+                            <Card className='!rounded-lg border-0 bg-gray-50'>
+                              <div className='flex items-center justify-between mb-2'>
+                                <Text className='text-sm font-medium text-gray-800'>
+                                  {t('当前分组信息')}
+                                </Text>
+                              </div>
+                              <div className='flex items-center gap-2 p-2 bg-white rounded-md border'>
+                                {(() => {
+                                  const group = groups.find(g => g.value === values.group);
+                                  return (
+                                    <div className='flex items-center gap-2'>
+                                      <Text strong size='small'>{values.group}</Text>
+                                      {group?.label && (
+                                        <Text type='tertiary' size='small'>({group.label})</Text>
+                                      )}
+                                      {group?.ratio && (
+                                        <Tag size='small' color={
+                                          group.ratio < 1 ? 'green' : 
+                                          group.ratio === 1 ? 'blue' : 'orange'
+                                        }>
+                                          ×{group.ratio}
+                                        </Tag>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            </Card>
+                          )}
+                        </div>
                       ) : (
                         <Form.Select
                           placeholder={t('管理员未设置用户可选分组')}
@@ -470,11 +539,67 @@ const EditToken = (props) => {
                           <Form.Select
                             field='multi_group_list'
                             label={
-                              <div className='flex items-center gap-2'>
-                                <span>{t('多分组配置')}</span>
-                                <Tag color='green' size='small'>
-                                  {t('智能切换')}
-                                </Tag>
+                              <div className='flex items-center justify-between w-full'>
+                                <div className='flex items-center gap-2'>
+                                  <span>{t('多分组配置')}</span>
+                                  <Tag color='green' size='small'>
+                                    {t('智能切换')}
+                                  </Tag>
+                                  {Array.isArray(values.multi_group_list) && values.multi_group_list.length > 0 && (
+                                    <Tag color='blue' size='small'>
+                                      {values.multi_group_list.length}个已选择
+                                    </Tag>
+                                  )}
+                                </div>
+                                {/* 全选操作按钮 */}
+                                <div className='flex items-center gap-1'>
+                                  <Button
+                                    theme='borderless'
+                                    size='small'
+                                    type='tertiary'
+                                    onClick={() => {
+                                      const availableGroups = groups.filter(g => g.value !== 'auto').map(g => g.value);
+                                      const currentList = values.multi_group_list || [];
+                                      const isAllSelected = availableGroups.length > 0 && 
+                                        availableGroups.every(group => currentList.includes(group));
+                                      
+                                      if (isAllSelected) {
+                                        // 取消全选
+                                        formApiRef.current?.setValue('multi_group_list', []);
+                                      } else {
+                                        // 全选，按优先级排序
+                                        const sortedGroups = [...availableGroups].sort((a, b) => {
+                                          const groupA = groups.find(g => g.value === a);
+                                          const groupB = groups.find(g => g.value === b);
+                                          return (groupA?.priority || 999) - (groupB?.priority || 999);
+                                        });
+                                        formApiRef.current?.setValue('multi_group_list', sortedGroups);
+                                      }
+                                    }}
+                                    style={{ 
+                                      fontSize: '12px', 
+                                      padding: '2px 6px',
+                                      color: (() => {
+                                        const availableGroups = groups.filter(g => g.value !== 'auto').map(g => g.value);
+                                        const currentList = values.multi_group_list || [];
+                                        const isAllSelected = availableGroups.length > 0 && 
+                                          availableGroups.every(group => currentList.includes(group));
+                                        return isAllSelected ? '#ff4d4f' : '#1890ff';
+                                      })()
+                                    }}
+                                  >
+                                    {(() => {
+                                      const availableGroups = groups.filter(g => g.value !== 'auto').map(g => g.value);
+                                      const currentList = values.multi_group_list || [];
+                                      const isAllSelected = availableGroups.length > 0 && 
+                                        availableGroups.every(group => currentList.includes(group));
+                                      return isAllSelected ? t('取消全选') : t('全选');
+                                    })()}
+                                  </Button>
+                                  <Text type='tertiary' size='small'>
+                                    {groups.filter(g => g.value !== 'auto').length}个分组
+                                  </Text>
+                                </div>
                               </div>
                             }
                             placeholder={t('按优先级选择多个分组，第一个最优先')}
@@ -486,6 +611,7 @@ const EditToken = (props) => {
                             restTagsPopoverProps={{ showArrow: true }}
                             filter
                             searchPosition='dropdown'
+                            value={values.multi_group_list || []}
                             style={{ width: '100%' }}
                             extraText={
                               <div className='text-sm space-y-1'>
@@ -501,34 +627,62 @@ const EditToken = (props) => {
                                 <div className='text-orange-600 text-xs'>
                                   {t('提示：最多建议配置3-5个分组，避免过于复杂')}
                                 </div>
+                                <div className='text-green-600 text-xs'>
+                                  {t('快捷：点击右上角"全选"可一键选择所有分组，按优先级自动排序')}
+                                </div>
                               </div>
                             }
                           />
 
 
-                          {/* 优先级预览 */}
-                          {values.multi_group_list && values.multi_group_list.length > 0 && (
+                                                    {/* 优先级预览 */}
+                          {Array.isArray(values.multi_group_list) && values.multi_group_list.length > 0 && (
                             <Card className='!rounded-lg border-0 bg-blue-50'>
                               <div className='flex items-center justify-between mb-3'>
                                 <Text className='text-sm font-medium text-blue-800'>
                                   {t('调用优先级预览')}
                                 </Text>
-                                <Text type='tertiary' size='small' className='text-blue-600'>
-                                  {values.multi_group_list.length} {t('个分组')}
-                                </Text>
+                                <div className='flex items-center gap-2'>
+                                  <Text type='tertiary' size='small' className='text-blue-600'>
+                                    {values.multi_group_list.length} {t('个分组')}
+                                  </Text>
+                                  {(() => {
+                                    const availableGroups = groups.filter(g => g.value !== 'auto').map(g => g.value);
+                                    const currentList = values.multi_group_list || [];
+                                    const isAllSelected = availableGroups.length > 0 && 
+                                      availableGroups.every(group => currentList.includes(group));
+                                    
+                                    if (isAllSelected && currentList.length === availableGroups.length) {
+                                      return (
+                                        <Tag color='green' size='small'>
+                                          {t('已全选')}
+                                        </Tag>
+                                      );
+                                    } else if (currentList.length > availableGroups.length * 0.5) {
+                                      return (
+                                        <Tag color='orange' size='small'>
+                                          {t('多数已选')}
+                                        </Tag>
+                                      );
+                                    }
+                                    return null;
+                                  })()}
+                                </div>
                               </div>
                               {/* 紧凑展示模式 - 自动换行 */}
                               <div className='flex flex-wrap gap-2 p-2 bg-white rounded-md border border-blue-100'>
-                                {values.multi_group_list.map((groupValue, index) => {
+                                {(values.multi_group_list || []).map((groupValue, index) => {
                                   const group = groups.find(g => g.value === groupValue);
                                   return (
-                                    <div key={groupValue} className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-md border'>
+                                    <div key={`${groupValue}-${index}`} className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-md border relative group hover:bg-gray-100 transition-colors'>
                                       <span className='bg-blue-500 text-white px-2 py-1 rounded-full font-mono text-xs min-w-[20px] h-[20px] flex items-center justify-center'>
                                         {index + 1}
                                       </span>
                                       <div className='flex items-center gap-2'>
                                         <Text strong size='small'>{groupValue}</Text>
-                                        <Text type='tertiary' size='small'>({group?.label})</Text>
+                                        {group?.label && (
+                                          <Text type='tertiary' size='small'>({group.label})</Text>
+                                        )}
                                         {group?.ratio && (
                                           <Tag size='small' color={
                                             group.ratio < 1 ? 'green' : 
@@ -543,14 +697,62 @@ const EditToken = (props) => {
                                           </Tag>
                                         )}
                                       </div>
+                                      {/* 快速移除按钮 */}
+                                      <Button
+                                        theme='borderless'
+                                        size='small'
+                                        type='danger'
+                                        className='!p-0 !min-w-0 opacity-0 group-hover:opacity-100 transition-opacity ml-1'
+                                        style={{ width: '16px', height: '16px', fontSize: '10px' }}
+                                        onClick={() => {
+                                          const currentList = values.multi_group_list || [];
+                                          const newList = currentList.filter(g => g !== groupValue);
+                                          formApiRef.current?.setValue('multi_group_list', newList);
+                                        }}
+                                      >
+                                        ×
+                                      </Button>
                                     </div>
                                   );
                                 })}
                               </div>
-                              <div className='mt-3 pt-3 border-t border-blue-200'>
+                              
+                              {/* 快捷操作区域 */}
+                              <div className='mt-3 pt-3 border-t border-blue-200 flex items-center justify-between'>
                                 <Text type='tertiary' size='small' className='text-blue-600'>
                                   {t('成本预估：API调用将优先使用折扣更高的分组，有效降低使用成本')}
                                 </Text>
+                                <div className='flex items-center gap-1'>
+                                  <Button
+                                    theme='borderless'
+                                    size='small'
+                                    type='tertiary'
+                                    onClick={() => {
+                                      // 按优先级重新排序
+                                      const currentList = values.multi_group_list || [];
+                                      const sortedList = [...currentList].sort((a, b) => {
+                                        const groupA = groups.find(g => g.value === a);
+                                        const groupB = groups.find(g => g.value === b);
+                                        return (groupA?.priority || 999) - (groupB?.priority || 999);
+                                      });
+                                      formApiRef.current?.setValue('multi_group_list', sortedList);
+                                    }}
+                                    style={{ fontSize: '11px', padding: '1px 4px' }}
+                                  >
+                                    {t('重排序')}
+                                  </Button>
+                                  <Button
+                                    theme='borderless'
+                                    size='small'
+                                    type='danger'
+                                    onClick={() => {
+                                      formApiRef.current?.setValue('multi_group_list', []);
+                                    }}
+                                    style={{ fontSize: '11px', padding: '1px 4px' }}
+                                  >
+                                    {t('清空')}
+                                  </Button>
+                                </div>
                               </div>
                             </Card>
                           )}
