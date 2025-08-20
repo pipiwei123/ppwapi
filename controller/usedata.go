@@ -13,7 +13,14 @@ func GetAllQuotaDates(c *gin.Context) {
 	startTimestamp, _ := strconv.ParseInt(c.Query("start_timestamp"), 10, 64)
 	endTimestamp, _ := strconv.ParseInt(c.Query("end_timestamp"), 10, 64)
 	username := c.Query("username")
-	dates, err := model.GetAllQuotaDates(startTimestamp, endTimestamp, username)
+	quotaData, err := model.GetAllQuotaDates(startTimestamp, endTimestamp, username)
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
+
+	userRank, err := model.GetQuotaUserRank(startTimestamp, endTimestamp)
+
 	if err != nil {
 		common.ApiError(c, err)
 		return
@@ -21,7 +28,27 @@ func GetAllQuotaDates(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    dates,
+		"data": model.QuotaStats{
+			QuotaData: quotaData,
+			UserRank:  userRank,
+		},
+	})
+	return
+}
+
+func GetAllQuotaUserRank(c *gin.Context) {
+	startTimestamp, _ := strconv.ParseInt(c.Query("start_timestamp"), 10, 64)
+	endTimestamp, _ := strconv.ParseInt(c.Query("end_timestamp"), 10, 64)
+	data, err := model.GetQuotaUserRank(startTimestamp, endTimestamp)
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    data,
 	})
 	return
 }
