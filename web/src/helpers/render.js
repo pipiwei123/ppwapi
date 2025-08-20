@@ -34,6 +34,10 @@ import {
   FastGPT,
   Kling,
   Jimeng,
+  Kimi,
+  Pika,
+  Flux,
+  Runway,
 } from '@lobehub/icons';
 
 import {
@@ -244,7 +248,9 @@ export const getModelCategories = (() => {
       minimax: {
         label: 'MiniMax',
         icon: <Minimax.Color />,
-        filter: (model) => model.model_name.toLowerCase().includes('abab'),
+        filter: (model) => 
+          model.model_name.toLowerCase().includes('abab') ||
+          model.model_name.toLowerCase().includes('minimax'),
       },
       baidu: {
         label: t('文心一言'),
@@ -259,7 +265,9 @@ export const getModelCategories = (() => {
       midjourney: {
         label: 'Midjourney',
         icon: <Midjourney />,
-        filter: (model) => model.model_name.toLowerCase().includes('mj_'),
+        filter: (model) => 
+          model.model_name.toLowerCase().includes('mj_') ||
+          model.model_name.toLowerCase().includes('midjourney'),
       },
       tencent: {
         label: t('腾讯混元'),
@@ -310,6 +318,51 @@ export const getModelCategories = (() => {
         label: t('豆包'),
         icon: <Doubao.Color />,
         filter: (model) => model.model_name.toLowerCase().includes('doubao'),
+      },
+      suno: {
+        label: 'Suno',
+        icon: <Suno />,
+        filter: (model) => model.model_name.toLowerCase().includes('suno'),
+      },
+      runway: {
+        label: 'Runway',
+        icon: <Runway />,
+        filter: (model) => model.model_name.toLowerCase().includes('runway'),
+      },
+      kling: {
+        label: t('可灵'),
+        icon: <Kling />,
+        filter: (model) => model.model_name.toLowerCase().includes('kling'),
+      },
+      pika: {
+        label: 'Pika',
+        icon: <Pika />,
+        filter: (model) => model.model_name.toLowerCase().includes('pika'),
+      },
+      flux: {
+        label: 'Flux',
+        icon: <Flux />,
+        filter: (model) => model.model_name.toLowerCase().includes('flux'),
+      },
+      veo: {
+        label: 'Veo',
+        icon: <Gemini />,
+        filter: (model) => model.model_name.toLowerCase().includes('veo'),
+      },
+      seedance: {
+        label: 'Seedance',
+        icon: <OpenAI />,
+        filter: (model) => model.model_name.toLowerCase().includes('seedance') || model.model_name.toLowerCase().includes('seedream'),
+      },
+      sora: {
+        label: 'Sora',
+        icon: <OpenAI />,
+        filter: (model) => model.model_name.toLowerCase().includes('sora'),
+      },
+      kimi: {
+        label: 'Kimi',
+        icon: <Kimi />,
+        filter: (model) => model.model_name.toLowerCase().includes('kimi'),
       },
     };
 
@@ -390,7 +443,7 @@ export function getChannelIcon(channelType) {
     case 49: // Coze
       return <Coze size={iconSize} />;
     case 50: // 可灵 Kling
-      return <Kling.Color size={iconSize} />;
+      return <Kling />;
     case 51: // 即梦 Jimeng
       return <Jimeng.Color size={iconSize} />;
     case 8: // 自定义渠道

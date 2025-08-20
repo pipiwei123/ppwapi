@@ -20,6 +20,33 @@ export async function fetchTokenKeys() {
 }
 
 /**
+ * 获取完整的token信息
+ * @returns {Promise<Array>} 返回active状态的token完整信息数组
+ */
+export async function fetchTokens() {
+  try {
+    const response = await API.get('/api/token/?p=1&size=100');
+    const { success, data } = response.data;
+    if (!success) throw new Error('Failed to fetch tokens');
+
+    const tokenItems = Array.isArray(data) ? data : data.items || [];
+    const activeTokens = tokenItems.filter((token) => token.status === 1);
+    return activeTokens.map((token) => ({
+      key: token.key,
+      name: token.name,
+      id: token.id,
+      created_time: token.created_time,
+      used_quota: token.used_quota,
+      remain_quota: token.remain_quota,
+      unlimited_quota: token.unlimited_quota
+    }));
+  } catch (error) {
+    console.error('Error fetching tokens:', error);
+    return [];
+  }
+}
+
+/**
  * 获取服务器地址
  * @returns {string} 服务器地址
  */

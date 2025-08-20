@@ -141,6 +141,14 @@ func coverMidjourneyTaskDto(c *gin.Context, originTask *model.Midjourney) (midjo
 	if originTask.VideoUrl != "" {
 		midjourneyTask.VideoUrl = originTask.VideoUrl
 	}
+	// 处理ImageUrls字段
+	if originTask.ImageUrls != "" {
+		var imageUrls []dto.ImgUrls
+		err := json.Unmarshal([]byte(originTask.ImageUrls), &imageUrls)
+		if err == nil {
+			midjourneyTask.ImageUrls = imageUrls
+		}
+	}
 	midjourneyTask.Status = originTask.Status
 	midjourneyTask.FailReason = originTask.FailReason
 	midjourneyTask.Action = originTask.Action

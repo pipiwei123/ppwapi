@@ -135,6 +135,11 @@ func UpdateMidjourneyTaskBulk() {
 				task.StartTime = responseItem.StartTime
 				task.FinishTime = responseItem.FinishTime
 				task.ImageUrl = responseItem.ImageUrl
+				// 处理ImageUrls字段
+				if responseItem.ImageUrls != nil {
+					imageUrlsStr, _ := json.Marshal(responseItem.ImageUrls)
+					task.ImageUrls = string(imageUrlsStr)
+				}
 				task.Status = responseItem.Status
 				task.FailReason = responseItem.FailReason
 				if responseItem.Properties != nil {

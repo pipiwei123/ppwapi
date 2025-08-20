@@ -48,7 +48,7 @@ var MidjourneyModel2Action = map[string]string{
 	"mj_upload":         MjActionUpload,
 	"mj_video":          MjActionVideo,
 	"mj_edits":          MjActionEdits,
-	
+
 	// 快速模式动作模型
 	"mj_fast_imagine":        MjActionImagine,
 	"mj_fast_describe":       MjActionDescribe,
@@ -68,7 +68,7 @@ var MidjourneyModel2Action = map[string]string{
 	"mj_fast_upload":         MjActionUpload,
 	"mj_fast_video":          MjActionVideo,
 	"mj_fast_edits":          MjActionEdits,
-	
+
 	// 慢速模式动作模型
 	"mj_relax_imagine":        MjActionImagine,
 	"mj_relax_describe":       MjActionDescribe,
@@ -88,7 +88,7 @@ var MidjourneyModel2Action = map[string]string{
 	"mj_relax_upload":         MjActionUpload,
 	"mj_relax_video":          MjActionVideo,
 	"mj_relax_edits":          MjActionEdits,
-	
+
 	// 超快模式动作模型
 	"mj_turbo_imagine":        MjActionImagine,
 	"mj_turbo_describe":       MjActionDescribe,
@@ -108,7 +108,7 @@ var MidjourneyModel2Action = map[string]string{
 	"mj_turbo_upload":         MjActionUpload,
 	"mj_turbo_video":          MjActionVideo,
 	"mj_turbo_edits":          MjActionEdits,
-	
+
 	// 兼容旧版本的模式映射模型
 	"mj-relax": MjActionImagine,
 	"mj-fast":  MjActionImagine,
@@ -121,7 +121,7 @@ var MidjourneyModel2Mode = map[string]string{
 	"mj-relax": "relax",
 	"mj-fast":  "fast",
 	"mj-turbo": "turbo",
-	
+
 	// 快速模式动作模型映射
 	"mj_fast_imagine":        "fast",
 	"mj_fast_describe":       "fast",
@@ -141,7 +141,7 @@ var MidjourneyModel2Mode = map[string]string{
 	"mj_fast_upload":         "fast",
 	"mj_fast_video":          "fast",
 	"mj_fast_edits":          "fast",
-	
+
 	// 慢速模式动作模型映射
 	"mj_relax_imagine":        "relax",
 	"mj_relax_describe":       "relax",
@@ -161,7 +161,7 @@ var MidjourneyModel2Mode = map[string]string{
 	"mj_relax_upload":         "relax",
 	"mj_relax_video":          "relax",
 	"mj_relax_edits":          "relax",
-	
+
 	// 超快模式动作模型映射
 	"mj_turbo_imagine":        "turbo",
 	"mj_turbo_describe":       "turbo",
@@ -235,17 +235,17 @@ func GenerateModeModel(baseAction string, mode string) string {
 	if mode == "" {
 		return baseAction
 	}
-	
+
 	// 生成新格式的模式模型名称
 	if strings.HasPrefix(baseAction, "mj_") {
 		actionName := strings.TrimPrefix(baseAction, "mj_")
 		return "mj_" + mode + "_" + actionName
 	}
-	
+
 	// 对于特殊情况，返回旧格式
 	if baseAction == "mj_imagine" {
 		return "mj-" + mode
 	}
-	
+
 	return baseAction
 }
