@@ -148,6 +148,6 @@ func GetAllQuotaDates(startTime int64, endTime int64, username string) (quotaDat
 
 func GetQuotaUserRank(startTime int64, endTime int64) (rank []*QuotaUserRank, err error) {
 	var userRanks []*QuotaUserRank
-	err = DB.Table("quota_data").Select("user_id, username, sum(count) as count, sum(quota) as quota, sum(token_used) as token_used, created_at").Where("created_at >= ? and created_at <= ?", startTime, endTime).Group("user_id, username, created_at").Find(&userRanks).Error
+	err = DB.Table("quota_data").Select("user_id, username, sum(count) as count, sum(quota) as quota, sum(token_used) as token_used, created_at").Where("created_at >= ? and created_at <= ?", startTime, endTime).Group("user_id, username, created_at").Limit(10).Find(&userRanks).Error
 	return userRanks, err
 }
