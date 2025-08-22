@@ -246,6 +246,7 @@ func RelaySwapFace(c *gin.Context) *dto.MidjourneyResponse {
 	midjResponse := &mjResp.Response
 	midjourneyTask := &model.Midjourney{
 		UserId:      userId,
+		TokenId:     tokenId,
 		Code:        midjResponse.Code,
 		Action:      constant.MjActionSwapFace,
 		MjId:        midjResponse.Result,
@@ -559,6 +560,7 @@ func RelayMidjourneySubmit(c *gin.Context, relayMode int) *dto.MidjourneyRespons
 	// other: 提交错误，description为错误描述
 	midjourneyTask := &model.Midjourney{
 		UserId:      userId,
+		TokenId:     relayInfo.TokenId,
 		Code:        midjResponse.Code,
 		Action:      midjRequest.Action,
 		MjId:        midjResponse.Result,

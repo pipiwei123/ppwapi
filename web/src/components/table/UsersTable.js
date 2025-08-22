@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { API, showError, showSuccess, renderGroup, renderNumber, renderQuota } from '../../helpers';
+import {API, showError, showSuccess, renderGroup, renderNumber, renderQuota, timestamp2string} from '../../helpers';
 
 import {
   User,
@@ -98,6 +98,10 @@ const UsersTable = () => {
     }
   };
 
+  function renderTimestamp(timestamp) {
+    return <>{timestamp2string(timestamp)}</>;
+  }
+
   const columns = [
     {
       title: 'ID',
@@ -154,6 +158,13 @@ const UsersTable = () => {
             </Space>
           </div>
         );
+      },
+    },
+    {
+      title: t('注册时间'),
+      dataIndex: 'created_at',
+      render: (text, record, index) => {
+        return <div>{renderTimestamp(text)}</div>;
       },
     },
     {

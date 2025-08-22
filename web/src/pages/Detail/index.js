@@ -52,7 +52,7 @@ import {
   renderQuota,
   modelToColor,
   copy,
-  getRelativeTime
+  getRelativeTime, stringToColor
 } from '../../helpers';
 import { useIsMobile } from '../../hooks/useIsMobile.js';
 import { UserContext } from '../../context/User/index.js';
@@ -197,6 +197,7 @@ const Detail = (props) => {
   const [loading, setLoading] = useState(false);
   const [greetingVisible, setGreetingVisible] = useState(false);
   const [quotaData, setQuotaData] = useState([]);
+  const [userRank, setUserRank] = useState([])
   const [consumeQuota, setConsumeQuota] = useState(0);
   const [consumeTokens, setConsumeTokens] = useState(0);
   const [times, setTimes] = useState(0);
@@ -644,17 +645,24 @@ const Detail = (props) => {
       const res = await API.get(url);
       const { success, message, data } = res.data;
       if (success) {
-        setQuotaData(data);
-        if (data.length === 0) {
-          data.push({
+        let newData = data;
+        if (isAdminUser) {
+          newData = data.quota_data;
+          // 设置榜单数据
+          setUserRank(data.user_rank)
+        }
+
+        setQuotaData(newData);
+        if (newData.length === 0) {
+          newData.push({
             count: 0,
             model_name: '无数据',
             quota: 0,
             created_at: now.getTime() / 1000,
           });
         }
-        data.sort((a, b) => a.created_at - b.created_at);
-        updateChartData(data);
+        newData.sort((a, b) => a.created_at - b.created_at);
+        updateChartData(newData);
       } else {
         showError(message);
       }
@@ -1119,6 +1127,19 @@ const Detail = (props) => {
     }
   }, []);
 
+  const getRankIcon = (rank) => {
+    switch (rank) {
+      case 1:
+        return <Trophy className="h-5 w-5 text-yellow-500" />
+      case 2:
+        return <Medal className="h-5 w-5 text-gray-400" />
+      case 3:
+        return <Award className="h-5 w-5 text-amber-600" />
+      default:
+        return <span className="text-lg font-bold text-muted-foreground">#{rank}</span>
+    }
+  }
+
   return (
     <div className="bg-gray-50 h-full mt-[64px] px-2">
       <div className="flex items-center justify-between mb-4">
@@ -1272,6 +1293,16 @@ const Detail = (props) => {
                   activeKey={activeChartTab}
                   onChange={setActiveChartTab}
                 >
+                  {
+                    isAdminUser && (
+                      <TabPane tab={
+                        <span>
+                          <IconHistogram />
+                              {t('用户消耗')}
+                        </span>
+                      } itemKey="0" />
+                    )
+                  }
                   <TabPane tab={
                     <span>
                       <IconHistogram />
@@ -1302,6 +1333,47 @@ const Detail = (props) => {
             bodyStyle={{ padding: 0 }}
           >
             <div className="h-96 p-2">
+              {
+                activeChartTab === '0' && (
+                  <div className='grid grid-cols-1 lg:grid-cols-2'>
+                    {
+                      userRank.map((item, index)=> (
+                        <div
+                          key={index}
+                          className={`flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors ${
+                            index < 3 ? "bg-gradient-to-r from-muted/30 to-transparent" : ""
+                          }`}
+                        >
+                          <div className="flex items-center gap-4">
+                            <Avatar
+                              size='extra-small'
+                              color={stringToColor(item.username)}
+                              style={{marginRight: 4}}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                              }}
+                            >
+                              {typeof item.username === 'string' && item.username.slice(0, 1)}
+                            </Avatar>
+                            {item.username}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <p className="font-semibold text-lg">{item.quota}</p>
+                              <p className="text-sm text-muted-foreground">消耗量</p>
+                            </div>
+                            <Tag className="ml-2">
+                              第{index + 1}名
+                            </Tag>
+                          </div>
+                        </div>
+
+                      ))
+                    }
+                  </div>
+                )
+              }
+
               {activeChartTab === '1' && (
                 <VChart
                   spec={spec_line}
@@ -1335,11 +1407,11 @@ const Detail = (props) => {
               className="bg-gray-50 border-0 !rounded-2xl"
               title={
                 <div className={FLEX_CENTER_GAP2}>
-                  <Server size={16} />
+                  <Server size={16}/>
                   {t('API信息')}
                 </div>
               }
-              bodyStyle={{ padding: 0 }}
+              bodyStyle={{padding: 0}}
             >
               <div className="card-content-container">
                 <div

@@ -27,6 +27,7 @@ type Task struct {
 	TaskID     string                `json:"task_id" gorm:"type:varchar(50);index"`  // 第三方id，不一定有/ song id\ Task id
 	Platform   constant.TaskPlatform `json:"platform" gorm:"type:varchar(30);index"` // 平台
 	UserId     int                   `json:"user_id" gorm:"index"`
+	TokenId    int                   `json:"token_id" gorm:"index"`
 	ChannelId  int                   `json:"channel_id" gorm:"index"`
 	Quota      int                   `json:"quota"`
 	Action     string                `json:"action" gorm:"type:varchar(40);index"` // 任务类型, song, lyrics, description-mode
@@ -39,6 +40,12 @@ type Task struct {
 	Properties Properties            `json:"properties" gorm:"type:json"`
 
 	Data json.RawMessage `json:"data" gorm:"type:json"`
+}
+
+type TaskWithExtra struct {
+	Task
+	Username  string `json:"username" gorm:"column:username"`
+	TokenName string `json:"token_name" gorm:"column:token_name"`
 }
 
 func (t *Task) SetData(data any) {
@@ -80,6 +87,7 @@ type SyncTaskQueryParams struct {
 func InitTask(platform constant.TaskPlatform, relayInfo *commonRelay.TaskRelayInfo) *Task {
 	t := &Task{
 		UserId:     relayInfo.UserId,
+		TokenId:    relayInfo.TokenId,
 		SubmitTime: time.Now().Unix(),
 		Status:     TaskStatusNotStart,
 		Progress:   "0%",
@@ -125,12 +133,15 @@ func TaskGetAllUserTask(userId int, startIdx int, num int, queryParams SyncTaskQ
 	return tasks
 }
 
-func TaskGetAllTasks(startIdx int, num int, queryParams SyncTaskQueryParams) []*Task {
-	var tasks []*Task
+func TaskGetAllTasks(startIdx int, num int, queryParams SyncTaskQueryParams) []*TaskWithExtra {
+	var tasks []*TaskWithExtra
 	var err error
 
 	// 初始化查询构建器
-	query := DB
+	query := DB.Model(&Task{}).
+		Select("tasks.*, users.username as username, tokens.name as token_name").
+		Joins("LEFT JOIN users ON users.id = tasks.user_id").
+		Joins("LEFT JOIN tokens ON tokens.id = tasks.token_id")
 
 	// 添加过滤条件
 	if queryParams.ChannelID != "" {
@@ -162,7 +173,7 @@ func TaskGetAllTasks(startIdx int, num int, queryParams SyncTaskQueryParams) []*
 	}
 
 	// 获取数据
-	err = query.Order("id desc").Limit(num).Offset(startIdx).Find(&tasks).Error
+	err = query.Order("id desc").Limit(num).Offset(startIdx).Scan(&tasks).Error
 	if err != nil {
 		return nil
 	}

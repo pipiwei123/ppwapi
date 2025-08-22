@@ -8,6 +8,7 @@ import (
 	"one-api/dto"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/bytedance/gopkg/util/gopool"
 	"gorm.io/gorm"
@@ -45,6 +46,7 @@ type User struct {
 	Setting          string         `json:"setting" gorm:"type:text;column:setting"`
 	Remark           string         `json:"remark,omitempty" gorm:"type:varchar(255)" validate:"max=255"`
 	StripeCustomer   string         `json:"stripe_customer" gorm:"type:varchar(64);column:stripe_customer;index"`
+	CreatedAt        int64          `json:"created_at" gorm:"type:bigint(20)"`
 }
 
 func (user *User) ToBaseUser() *UserBase {
@@ -317,6 +319,9 @@ func (user *User) Insert(inviterId int) error {
 			return err
 		}
 	}
+	// 设置用户的创建时间
+	user.CreatedAt = time.Now().Unix()
+	// 设置新用户默认额度
 	user.Quota = common.QuotaForNewUser
 	//user.SetAccessToken(common.GetUUID())
 	user.AffCode = common.GetRandomString(4)
@@ -338,6 +343,7 @@ func (user *User) Insert(inviterId int) error {
 			_ = inviteUser(inviterId)
 		}
 	}
+
 	return nil
 }
 

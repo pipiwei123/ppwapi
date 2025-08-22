@@ -20,6 +20,20 @@ type QuotaData struct {
 	Quota     int    `json:"quota" gorm:"default:0"`
 }
 
+// QuotaUserRank 用户使用额度排名
+type QuotaUserRank struct {
+	UserId    int    `json:"user_id"`
+	Username  string `json:"username"`
+	Count     int    `json:"count"`
+	Quota     int    `json:"quota"`
+	TokenUsed int    `json:"token_used"`
+}
+
+type QuotaStats struct {
+	QuotaData []*QuotaData     `json:"quota_data"`
+	UserRank  []*QuotaUserRank `json:"user_rank"`
+}
+
 func UpdateQuotaData() {
 	// recover
 	defer func() {
@@ -130,4 +144,10 @@ func GetAllQuotaDates(startTime int64, endTime int64, username string) (quotaDat
 	//err = DB.Table("quota_data").Where("created_at >= ? and created_at <= ?", startTime, endTime).Find(&quotaDatas).Error
 	err = DB.Table("quota_data").Select("model_name, sum(count) as count, sum(quota) as quota, sum(token_used) as token_used, created_at").Where("created_at >= ? and created_at <= ?", startTime, endTime).Group("model_name, created_at").Find(&quotaDatas).Error
 	return quotaDatas, err
+}
+
+func GetQuotaUserRank(startTime int64, endTime int64) (rank []*QuotaUserRank, err error) {
+	var userRanks []*QuotaUserRank
+	err = DB.Table("quota_data").Select("user_id, username, sum(count) as count, sum(quota) as quota, sum(token_used) as token_used, created_at").Where("created_at >= ? and created_at <= ?", startTime, endTime).Group("user_id, username, created_at").Limit(10).Find(&userRanks).Error
+	return userRanks, err
 }

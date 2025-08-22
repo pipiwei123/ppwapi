@@ -251,6 +251,7 @@ const LogsTable = () => {
   const COLUMN_KEYS = {
     TIME: 'time',
     CHANNEL: 'channel',
+    USER_ID: "user_id",
     USERNAME: 'username',
     TOKEN: 'token',
     GROUP: 'group',
@@ -293,6 +294,7 @@ const LogsTable = () => {
     return {
       [COLUMN_KEYS.TIME]: true,
       [COLUMN_KEYS.CHANNEL]: isAdminUser,
+      [COLUMN_KEYS.USER_ID]: isAdminUser,
       [COLUMN_KEYS.USERNAME]: isAdminUser,
       [COLUMN_KEYS.TOKEN]: true,
       [COLUMN_KEYS.GROUP]: true,
@@ -385,6 +387,11 @@ const LogsTable = () => {
           </Space>
         ) : null;
       },
+    },
+    {
+      key: COLUMN_KEYS.USER_ID,
+      title: t('用户ID'),
+      dataIndex: 'user_id',
     },
     {
       key: COLUMN_KEYS.USERNAME,
