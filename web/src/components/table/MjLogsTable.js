@@ -603,50 +603,99 @@ const LogsTable = () => {
       title: t('结果图片'),
       dataIndex: 'image_url',
       render: (text, record, index) => {
-        // 尝试解析image_urls字段
-        let imageUrls = [];
-        if (record.image_urls) {
-          try {
-            imageUrls = JSON.parse(record.image_urls);
-          } catch (e) {
-            console.warn('Failed to parse image_urls:', e);
-          }
-        }
+        // 定义渲染策略映射
+        const renderStrategies = {
+          // 图生文操作策略
+          isDescribeAction: () => record.action === 'DESCRIBE',
+          describeRender: () => t('图生文'),
+          
+          // 任务未完成策略
+          isIncomplete: () => !['SUCCESS'].includes(record.status),
+          incompleteRender: () => t('处理中'),
+          
+          // 多图片策略
+          hasMultipleImages: () => {
+            const imageUrls = (() => {
+              try {
+                const parsed = record.image_urls?.trim() 
+                  ? JSON.parse(record.image_urls) 
+                  : [];
+                return Array.isArray(parsed) 
+                  ? parsed.filter(item => item?.url) 
+                  : [];
+              } catch {
+                return [];
+              }
+            })();
+            return imageUrls.length > 0;
+          },
+          multiImageRender: () => {
+            const imageUrls = (() => {
+              try {
+                const parsed = JSON.parse(record.image_urls);
+                return Array.isArray(parsed) 
+                  ? parsed.filter(item => item?.url) 
+                  : [];
+              } catch {
+                return [];
+              }
+            })();
+            
+            return (
+              <div className="flex gap-1">
+                <Button
+                  size="small"
+                  type="primary"
+                  onClick={() => {
+                    setModalImageUrls(imageUrls);
+                    setIsMultiImageModal(true);
+                    setIsModalOpenurl(true);
+                  }}
+                >
+                  {t('查看图片')} ({imageUrls.length})
+                </Button>
+              </div>
+            );
+          },
+          
+          // 单图片策略
+          hasSingleImage: () => text && !text.endsWith('/'),
+          singleImageRender: () => (
+            <Button
+              size="small"
+              onClick={() => {
+                setModalImageUrl(text);
+                setIsMultiImageModal(false);
+                setIsModalOpenurl(true);
+              }}
+            >
+              {t('查看图片')}
+            </Button>
+          ),
+          
+          // 默认策略
+          defaultRender: () => t('无')
+        };
         
-        // 如果有多张图片，显示多图片按钮
-        if (imageUrls && imageUrls.length > 0) {
-          return (
-            <div className="flex gap-1">
-              <Button
-                size="small"
-                onClick={() => {
-                  setModalImageUrls(imageUrls);
-                  setIsMultiImageModal(true);
-                  setIsModalOpenurl(true);
-                }}
-              >
-                {t('查看图片')} ({imageUrls.length})
-              </Button>
-            </div>
+        // 执行渲染策略链
+        const executeStrategy = (strategies) => {
+          const strategyPairs = [
+            ['isDescribeAction', 'describeRender'],
+            ['isIncomplete', 'incompleteRender'],
+            ['hasMultipleImages', 'multiImageRender'],
+            ['hasSingleImage', 'singleImageRender']
+          ];
+          
+          const matchedStrategy = strategyPairs.find(([condition]) => 
+            strategies[condition]()
           );
-        }
+          
+          return matchedStrategy 
+            ? strategies[matchedStrategy[1]]() 
+            : strategies.defaultRender();
+        };
         
-        // 回退到单张图片
-        if (!text) {
-          return t('无');
-        }
-        return (
-          <Button
-            size="small"
-            onClick={() => {
-              setModalImageUrl(text);
-              setIsMultiImageModal(false);
-              setIsModalOpenurl(true);
-            }}
-          >
-            {t('查看图片')}
-          </Button>
-        );
+        return executeStrategy(renderStrategies);
       },
     },
     {
@@ -1093,31 +1142,90 @@ const LogsTable = () => {
             visible={isModalOpenurl}
             onCancel={() => setIsModalOpenurl(false)}
             footer={null}
-            width="90%"
-            style={{ maxWidth: '1200px' }}
+            width="95vw"
+            style={{ 
+              maxWidth: '1400px',
+              top: '20px'
+            }}
+            bodyStyle={{
+              maxHeight: '80vh',
+              overflow: 'auto',
+              padding: '24px'
+            }}
             title={t('图片预览')}
           >
-            <div className="grid grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto">
-              {modalImageUrls.map((imgItem, index) => (
-                <div key={index} className="relative">
-                  <img
-                    src={imgItem.url}
-                    alt={`图片 ${index + 1}`}
-                    className="w-full h-auto rounded-lg shadow-lg cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => {
-                      // 点击单张图片时切换到单图预览
-                      setModalImageUrl(imgItem.url);
-                      setIsMultiImageModal(false);
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                  <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
-                    {index + 1}
+            <div 
+              className="grid gap-4"
+              style={{
+                gridTemplateColumns: modalImageUrls.length === 1 ? '1fr' : 
+                                   modalImageUrls.length === 2 ? 'repeat(2, 1fr)' :
+                                   modalImageUrls.length === 3 ? 'repeat(2, 1fr)' :
+                                   'repeat(2, 1fr)',
+                minHeight: '400px'
+              }}
+            >
+              {modalImageUrls.map((imgItem, index) => {
+                // 确保imgItem有url属性
+                const imageUrl = typeof imgItem === 'string' ? imgItem : imgItem.url;
+                if (!imageUrl) {
+                  console.warn('Invalid image item at index', index, imgItem);
+                  return null;
+                }
+                
+                return (
+                  <div key={index} className="relative">
+                    <img
+                      src={imageUrl}
+                      alt={`图片 ${index + 1}`}
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        maxHeight: '35vh',
+                        objectFit: 'contain',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        cursor: 'pointer',
+                        transition: 'opacity 0.2s'
+                      }}
+                      onClick={() => {
+                        // 点击单张图片时切换到单图预览
+                        setModalImageUrl(imageUrl);
+                        setIsMultiImageModal(false);
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.opacity = '0.8';
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.opacity = '1';
+                      }}
+                      onError={(e) => {
+                        console.error('Failed to load image:', imageUrl);
+                        e.target.style.border = '2px dashed #ccc';
+                        e.target.style.display = 'flex';
+                        e.target.style.alignItems = 'center';
+                        e.target.style.justifyContent = 'center';
+                        e.target.style.minHeight = '200px';
+                        e.target.innerHTML = '图片加载失败';
+                      }}
+                    />
+                    <div 
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        left: '8px',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        color: 'white',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {index + 1}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Modal>
         ) : (

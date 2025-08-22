@@ -281,10 +281,20 @@ func SetupContextForToken(c *gin.Context, token *model.Token, parts ...string) e
 		c.Set("token_group", currentGroup)   // 当前可用的分组
 		c.Set("token_all_groups", allGroups) // 所有分组列表
 		c.Set("token_is_multi_group", true)
+		// 调试日志
+		if common.DebugEnabled {
+			common.SysLog(fmt.Sprintf("Token %s: Multi-group mode enabled, groups: %v, current: %s",
+				token.Key, allGroups, currentGroup))
+		}
 	} else {
 		c.Set("token_group", token.Group)
 		c.Set("token_all_groups", []string{token.Group})
 		c.Set("token_is_multi_group", false)
+		// 调试日志
+		if common.DebugEnabled {
+			common.SysLog(fmt.Sprintf("Token %s: Single-group mode, group: %s, IsMultiGroup: %v, ListLen: %d",
+				token.Key, token.Group, token.GroupInfo.IsMultiGroup, len(token.GroupInfo.MultiGroupList)))
+		}
 	}
 	if len(parts) > 1 {
 		if model.IsAdmin(token.UserId) {

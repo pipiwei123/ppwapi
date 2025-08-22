@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/samber/lo"
 	"io"
 	"net/http"
 	"one-api/model"
 	"strings"
 	"time"
+
+	"github.com/samber/lo"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -114,19 +115,35 @@ func (a *TaskAdaptor) ValidateRequestAndSetAction(c *gin.Context, info *relaycom
 // BuildRequestURL constructs the upstream URL.
 func (a *TaskAdaptor) BuildRequestURL(info *relaycommon.TaskRelayInfo) (string, error) {
 	path := lo.Ternary(info.Action == constant.TaskActionGenerate, "/v1/videos/image2video", "/v1/videos/text2video")
-	return fmt.Sprintf("%s%s", a.baseURL, path), nil
+	fullURL := fmt.Sprintf("%s%s", a.baseURL, path)
+	fmt.Printf("[DEBUG] 请求URL: %s, Action: %s\n", fullURL, info.Action)
+	return fullURL, nil
 }
 
 // BuildRequestHeader sets required headers.
 func (a *TaskAdaptor) BuildRequestHeader(c *gin.Context, req *http.Request, info *relaycommon.TaskRelayInfo) error {
-	token, err := a.createJWTToken()
-	if err != nil {
-		return fmt.Errorf("failed to create JWT token: %w", err)
+	var authToken string
+	var err error
+
+	// 检查是否是官方可灵 API（需要 JWT 认证）
+	if a.isOfficialKlingAPI(info.BaseUrl) {
+		// 官方 API：使用 JWT 认证
+		fmt.Printf("[DEBUG] 检测到官方可灵API，使用JWT认证\n")
+		authToken, err = a.createJWTToken()
+		if err != nil {
+			return fmt.Errorf("failed to create JWT token: %w", err)
+		}
+	} else {
+		// 第三方代理：直接使用 API key
+		fmt.Printf("[DEBUG] 检测到第三方代理，使用Bearer Token认证\n")
+		authToken = info.ApiKey
 	}
+
+	fmt.Printf("[DEBUG] 认证Token: %s\n", authToken)
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Authorization", "Bearer "+authToken)
 	req.Header.Set("User-Agent", "kling-sdk/1.0")
 	return nil
 }
@@ -139,14 +156,21 @@ func (a *TaskAdaptor) BuildRequestBody(c *gin.Context, info *relaycommon.TaskRel
 	}
 	req := v.(SubmitReq)
 
+	fmt.Printf("[DEBUG] 原始请求: %+v\n", req)
+
 	body, err := a.convertToRequestPayload(&req)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("[DEBUG] 转换后的请求体: %+v\n", body)
+
 	data, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("[DEBUG] 发送给可灵的JSON: %s\n", string(data))
 	return bytes.NewReader(data), nil
 }
 
@@ -166,20 +190,30 @@ func (a *TaskAdaptor) DoResponse(c *gin.Context, resp *http.Response, info *rela
 		return
 	}
 
+	// 打印上游响应用于调试
+	fmt.Printf("[DEBUG] 可灵上游响应状态码: %d\n", resp.StatusCode)
+	fmt.Printf("[DEBUG] 可灵上游响应头: %+v\n", resp.Header)
+	fmt.Printf("[DEBUG] 可灵上游响应体: %s\n", string(responseBody))
+
 	// Attempt Kling response parse first.
 	var kResp responsePayload
 	if err := json.Unmarshal(responseBody, &kResp); err == nil && kResp.Code == 0 {
+		fmt.Printf("[DEBUG] 成功解析可灵响应: %+v\n", kResp)
 		c.JSON(http.StatusOK, gin.H{"task_id": kResp.Data.TaskId})
 		return kResp.Data.TaskId, responseBody, nil
+	} else {
+		fmt.Printf("[DEBUG] 解析可灵响应失败, 错误: %v\n", err)
 	}
 
 	// Fallback generic task response.
 	var generic dto.TaskResponse[string]
 	if err := json.Unmarshal(responseBody, &generic); err != nil {
+		fmt.Printf("[DEBUG] 解析通用响应也失败, 错误: %v\n", err)
 		taskErr = service.TaskErrorWrapper(errors.Wrapf(err, "body: %s", responseBody), "unmarshal_response_body_failed", http.StatusInternalServerError)
 		return
 	}
 
+	fmt.Printf("[DEBUG] 通用响应解析成功: %+v\n", generic)
 	if !generic.IsSuccess() {
 		taskErr = service.TaskErrorWrapper(fmt.Errorf(generic.Message), generic.Code, http.StatusInternalServerError)
 		return
@@ -207,8 +241,18 @@ func (a *TaskAdaptor) FetchTask(baseUrl, key string, body map[string]any) (*http
 		return nil, err
 	}
 
-	token, err := a.createJWTTokenWithKey(key)
-	if err != nil {
+	var token string
+
+	// 检查是否是官方可灵 API
+	if a.isOfficialKlingAPI(baseUrl) {
+		// 官方 API：尝试创建 JWT token
+		token, err = a.createJWTTokenWithKey(key)
+		if err != nil {
+			// 如果 JWT 创建失败，直接使用 key
+			token = key
+		}
+	} else {
+		// 第三方代理：直接使用 key
 		token = key
 	}
 
@@ -231,27 +275,94 @@ func (a *TaskAdaptor) GetChannelName() string {
 // helpers
 // ============================
 
+// isOfficialKlingAPI 检查是否是官方可灵 API
+func (a *TaskAdaptor) isOfficialKlingAPI(baseUrl string) bool {
+	// 官方可灵 API 的域名
+	officialDomains := []string{
+		"api.klingai.com",
+		"klingai.com",
+		"kling.kuaishou.com",
+	}
+
+	baseUrl = strings.ToLower(baseUrl)
+	for _, domain := range officialDomains {
+		if strings.Contains(baseUrl, domain) {
+			return true
+		}
+	}
+	return false
+}
+
 func (a *TaskAdaptor) convertToRequestPayload(req *SubmitReq) (*requestPayload, error) {
+	// 处理模型名称映射
+	modelName := req.Model
+	if modelName == "" {
+		modelName = "kling-v1" // 默认模型
+	}
+
+	// 映射第三方模型名称到官方模型名称
+	switch modelName {
+	case "kling_video":
+		modelName = "kling-v1-6"
+	case "kling_image":
+		modelName = "kling-v1-6"
+	case "kling_extend":
+		modelName = "kling-v2-master"
+	case "kling_effects":
+		modelName = "kling-v2-master"
+	case "kling_lip_sync":
+		modelName = "kling-v2-master"
+	case "kling_virtual_try_on":
+		modelName = "kling-v2-master"
+	case "kling_image_expand":
+		modelName = "kling-v2-master"
+	}
+
+	fmt.Printf("[DEBUG] 模型映射: %s -> %s\n", req.Model, modelName)
+
 	r := requestPayload{
 		Prompt:      req.Prompt,
 		Image:       req.Image,
 		Mode:        defaultString(req.Mode, "std"),
 		Duration:    fmt.Sprintf("%d", defaultInt(req.Duration, 5)),
 		AspectRatio: a.getAspectRatio(req.Size),
-		ModelName:   req.Model,
+		ModelName:   modelName,
 		CfgScale:    0.5,
 	}
 	if r.ModelName == "" {
 		r.ModelName = "kling-v1"
 	}
-	metadata := req.Metadata
-	medaBytes, err := json.Marshal(metadata)
-	if err != nil {
-		return nil, errors.Wrap(err, "metadata marshal metadata failed")
-	}
-	err = json.Unmarshal(medaBytes, &r)
-	if err != nil {
-		return nil, errors.Wrap(err, "unmarshal metadata failed")
+	// 从 metadata 中提取额外参数，手动处理避免类型冲突
+	if req.Metadata != nil {
+		fmt.Printf("[DEBUG] 处理 metadata: %+v\n", req.Metadata)
+
+		// 处理 cfg_scale
+		if cfgScale, ok := req.Metadata["cfg_scale"]; ok {
+			if scale, ok := cfgScale.(float64); ok {
+				r.CfgScale = scale
+			}
+		}
+
+		// 处理 mode
+		if mode, ok := req.Metadata["mode"]; ok {
+			if modeStr, ok := mode.(string); ok {
+				r.Mode = modeStr
+			}
+		}
+
+		// 处理 aspect_ratio
+		if aspectRatio, ok := req.Metadata["aspect_ratio"]; ok {
+			if ratioStr, ok := aspectRatio.(string); ok {
+				r.AspectRatio = ratioStr
+			}
+		}
+
+		// 处理 negative_prompt（暂时跳过，因为 requestPayload 没有这个字段）
+		if negativePrompt, ok := req.Metadata["negative_prompt"]; ok {
+			if negStr, ok := negativePrompt.(string); ok {
+				fmt.Printf("[DEBUG] 发现负面提示词: %s\n", negStr)
+			}
+		}
 	}
 	return &r, nil
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useCallback, useRef } from 'react';
+import React, { useContext, useEffect, useCallback, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Layout, Toast, Modal } from '@douyinfe/semi-ui';
@@ -61,7 +61,8 @@ const Playground = () => {
   const [userState] = useContext(UserContext);
   const isMobile = useIsMobile();
   const styleState = { isMobile };
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [urlParamsProcessed, setUrlParamsProcessed] = useState(false);
 
   const state = usePlaygroundState();
   const {
@@ -315,25 +316,58 @@ const Playground = () => {
     syncCustomBodyToMessage();
   }, [customRequestBody, syncCustomBodyToMessage]);
 
-  // 处理URL参数
+  // 处理URL参数 - 只在首次加载时处理一次
   useEffect(() => {
     if (searchParams.get('expired')) {
       Toast.warning(t('登录过期，请重新登录！'));
     }
     
-    // 处理模型参数
-    const modelParam = searchParams.get('model');
-    if (modelParam && models.length > 0) {
-      // 检查模型是否存在于可用模型列表中
-      const availableModel = models.find(model => model.value === modelParam);
-      if (availableModel) {
-        handleInputChange('model', modelParam);
-        Toast.success(t('已自动选择模型：{{model}}', { model: modelParam }));
-      } else {
-        Toast.warning(t('指定的模型不可用：{{model}}', { model: modelParam }));
+    // 只在还未处理过URL参数且数据已加载时处理
+    if (!urlParamsProcessed && models.length > 0 && groups.length > 0) {
+      let hasUpdates = false;
+      const newSearchParams = new URLSearchParams(searchParams);
+      
+      // 处理模型参数
+      const modelParam = searchParams.get('model');
+      if (modelParam) {
+        // 检查模型是否存在于可用模型列表中
+        const availableModel = models.find(model => model.value === modelParam);
+        if (availableModel) {
+          handleInputChange('model', modelParam);
+          Toast.success(t('已自动选择模型：{{model}}', { model: modelParam }));
+          hasUpdates = true;
+        } else {
+          Toast.warning(t('指定的模型不可用：{{model}}', { model: modelParam }));
+        }
+        // 从URL中移除模型参数
+        newSearchParams.delete('model');
       }
+      
+      // 处理分组参数
+      const groupParam = searchParams.get('group');
+      if (groupParam) {
+        // 检查分组是否存在于可用分组列表中
+        const availableGroup = groups.find(group => group.value === groupParam);
+        if (availableGroup) {
+          handleInputChange('group', groupParam);
+          Toast.success(t('已自动选择分组：{{group}}', { group: groupParam }));
+          hasUpdates = true;
+        } else {
+          Toast.warning(t('指定的分组不可用：{{group}}', { group: groupParam }));
+        }
+        // 从URL中移除分组参数
+        newSearchParams.delete('group');
+      }
+      
+      // 更新URL，移除已处理的参数
+      if (modelParam || groupParam) {
+        setSearchParams(newSearchParams, { replace: true });
+      }
+      
+      // 标记已处理过URL参数
+      setUrlParamsProcessed(true);
     }
-  }, [searchParams, t, models, handleInputChange]);
+  }, [searchParams, setSearchParams, t, models, groups, handleInputChange, urlParamsProcessed]);
 
   // Playground 组件无需再监听窗口变化，isMobile 由 useIsMobile Hook 自动更新
 

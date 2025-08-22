@@ -413,7 +413,16 @@ const ModelPricing = () => {
 
   // 跳转到聊天页面
   const handleChatWithModel = (modelName) => {
-    navigate(`/console/playground?model=${encodeURIComponent(modelName)}`);
+    const params = new URLSearchParams({
+      model: modelName
+    });
+    
+    // 添加分组参数，如果不是默认分组
+    if (selectedGroup && selectedGroup !== 'default') {
+      params.append('group', selectedGroup);
+    }
+    
+    navigate(`/console/playground?${params.toString()}`);
   };
 
   useEffect(() => {

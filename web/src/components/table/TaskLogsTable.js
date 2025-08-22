@@ -13,7 +13,12 @@ import {
   List,
   Hash,
   Video,
-  Sparkles
+  Sparkles,
+  Volume2,
+  Download,
+  Image as ImageIcon,
+  PlayCircle,
+  ExternalLink
 } from 'lucide-react';
 import {
   API,
@@ -32,6 +37,7 @@ import {
   Divider,
   Empty,
   Form,
+  Image,
   Layout,
   Modal,
   Progress,
@@ -124,6 +130,19 @@ const LogsTable = () => {
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const isAdminUser = isAdmin();
   const [pageSize, setPageSize] = useState(ITEMS_PER_PAGE);
+
+  // 音乐播放组件相关状态
+  const [currentPlayingId, setCurrentPlayingId] = useState(null);
+  const [audioRef, setAudioRef] = useState(null);
+
+  // 图片预览相关状态
+  const [previewImageVisible, setPreviewImageVisible] = useState(false);
+  const [previewImageSrc, setPreviewImageSrc] = useState('');
+
+  // 视频播放相关状态
+  const [videoModalVisible, setVideoModalVisible] = useState(false);
+  const [currentVideoUrl, setCurrentVideoUrl] = useState('');
+  const [currentVideoRef, setCurrentVideoRef] = useState(null);
 
   // 加载保存的列偏好设置
   useEffect(() => {
@@ -528,20 +547,221 @@ const LogsTable = () => {
       dataIndex: 'fail_reason',
       fixed: 'right',
       render: (text, record, index) => {
-        // 仅当为视频生成任务且成功，且 fail_reason 是 URL 时显示可点击链接
         const isVideoTask = record.action === TASK_ACTION_GENERATE || record.action === TASK_ACTION_TEXT_GENERATE;
+        const isMusicTask = record.action === 'MUSIC';
         const isSuccess = record.status === 'SUCCESS';
         const isUrl = typeof text === 'string' && /^https?:\/\//.test(text);
-        if (isSuccess && isVideoTask && isUrl) {
-          return (
-            <a href={text} target="_blank" rel="noopener noreferrer">
-              {t('点击预览视频')}
-            </a>
-          );
+
+        // 音乐任务且成功
+        if (isSuccess && isMusicTask) {
+          const musicUrls = getMusicUrls(record);
+          
+          if (musicUrls?.audio_url) {
+            const isPlaying = currentPlayingId === record.task_id;
+            
+            return (
+              <div className="flex gap-2 items-center">
+                {/* 缩略图显示 */}
+                {musicUrls.image_url && (
+                  <div className="flex-shrink-0">
+                    <div 
+                      style={{ 
+                        width: '60px', 
+                        height: '60px',
+                        position: 'relative',
+                        borderRadius: '4px',
+                        overflow: 'hidden',
+                        border: '1px solid #e5e5e5'
+                      }}
+                    >
+                      <img
+                        src={musicUrls.image_url}
+                        alt={musicUrls.title || t('音乐封面')}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block'
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.parentNode.innerHTML = `
+                            <div style="
+                              width: 100%; 
+                              height: 100%; 
+                              display: flex; 
+                              align-items: center; 
+                              justify-content: center; 
+                              background: #f5f5f5; 
+                              color: #999;
+                              font-size: 12px;
+                            ">
+                              封面加载失败
+                            </div>
+                          `;
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                {/* 控制按钮组 */}
+                <div className="flex gap-1 flex-wrap">
+                  <Button
+                    size="small"
+                    type={isPlaying ? "primary" : "tertiary"}
+                    icon={isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                    onClick={() => toggleAudioPlay(record)}
+                    title={isPlaying ? t('暂停播放') : t('播放音乐')}
+                  >
+                    {isPlaying ? t('暂停') : t('播放')}
+                  </Button>
+                  
+                  {musicUrls.audio_url && (
+                    <Button
+                      size="small"
+                      type="tertiary"
+                      icon={<Download size={14} />}
+                      onClick={() => window.open(musicUrls.audio_url, '_blank')}
+                      title={t('下载音频')}
+                    />
+                  )}
+                  
+                  {musicUrls.video_url && (
+                    <Button
+                      size="small"
+                      type="tertiary"
+                      icon={<Video size={14} />}
+                      onClick={() => window.open(musicUrls.video_url, '_blank')}
+                      title={t('查看视频')}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          }
         }
+
+        // 视频生成任务且成功
+        if (isSuccess && isVideoTask) {
+          const videoUrls = getVideoUrls(record);
+          
+          if (videoUrls?.video_url) {
+            return (
+              <div className="flex gap-2 items-center">
+                {/* 视频缩略图 */}
+                <div className="flex-shrink-0">
+                  <div 
+                    style={{ 
+                      width: '60px', 
+                      height: '60px',
+                      position: 'relative',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      border: '1px solid #e5e5e5',
+                      background: '#f5f5f5',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => showVideoPlayer(videoUrls.video_url)}
+                    title={t('点击播放视频')}
+                  >
+                    <video
+                      src={videoUrls.video_url}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block'
+                      }}
+                      muted
+                      preload="metadata"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.parentNode.innerHTML = `
+                          <div style="
+                            width: 100%; 
+                            height: 100%; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            background: #f5f5f5; 
+                            color: #999;
+                            font-size: 12px;
+                            flex-direction: column;
+                          ">
+                            <div style="font-size: 16px; margin-bottom: 2px;">🎬</div>
+                            <div>视频</div>
+                          </div>
+                        `;
+                      }}
+                    />
+                    {/* 播放覆盖层 */}
+                    <div 
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0,0,0,0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontSize: '20px'
+                      }}
+                    >
+                      <PlayCircle size={24} />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 控制按钮组 */}
+                <div className="flex gap-1 flex-wrap">
+                  <Button
+                    size="small"
+                    type="primary"
+                    icon={<PlayCircle size={14} />}
+                    onClick={() => showVideoPlayer(videoUrls.video_url)}
+                    title={t('播放视频')}
+                  >
+                    {t('播放')}
+                  </Button>
+                  
+                  <Button
+                    size="small"
+                    type="tertiary"
+                    icon={<ExternalLink size={14} />}
+                    onClick={() => window.open(videoUrls.video_url, '_blank')}
+                    title={t('在新窗口打开')}
+                  />
+                  
+                  <Button
+                    size="small"
+                    type="tertiary"
+                    icon={<Download size={14} />}
+                    onClick={() => window.open(videoUrls.video_url, '_blank')}
+                    title={t('下载视频')}
+                  />
+                </div>
+              </div>
+            );
+          }
+          
+          // 如果有URL但不在预期字段中，显示原有的链接
+          if (isUrl) {
+            return (
+              <a href={text} target="_blank" rel="noopener noreferrer">
+                {t('点击预览视频')}
+              </a>
+            );
+          }
+        }
+        
         if (!text) {
           return t('无');
         }
+        
         return (
           <Typography.Text
             ellipsis={{ showTooltip: true }}
@@ -575,6 +795,26 @@ const LogsTable = () => {
     setPageSize(localPageSize);
     loadLogs(1, localPageSize).then();
   }, []);
+
+  // 清理音频播放器
+  useEffect(() => {
+    return () => {
+      if (audioRef) {
+        audioRef.pause();
+        setCurrentPlayingId(null);
+      }
+    };
+  }, [audioRef]);
+
+  // 视频清理 useEffect
+  useEffect(() => {
+    return () => {
+      if (currentVideoRef) {
+        currentVideoRef.pause();
+        setCurrentVideoRef(null);
+      }
+    };
+  }, [currentVideoRef]);
 
   let now = new Date();
   // 初始化start_timestamp为前一天
@@ -664,12 +904,196 @@ const LogsTable = () => {
   };
 
   const copyText = async (text) => {
-
     if (await copy(text)) {
       showSuccess(t('已复制：') + text);
     } else {
       Modal.error({ title: t('无法复制到剪贴板，请手动复制'), content: text });
     }
+  };
+
+  // 音乐播放相关函数
+  const parseTaskData = (record) => {
+    if (!record.data) return null;
+    try {
+      const data = typeof record.data === 'string' ? JSON.parse(record.data) : record.data;
+      return data;
+    } catch (e) {
+      console.warn('Failed to parse task data:', e);
+      return null;
+    }
+  };
+
+  const getMusicUrls = (record) => {
+    const data = parseTaskData(record);
+    if (!data) return null;
+
+    // 支持多种数据格式
+    if (Array.isArray(data)) {
+      // 数组格式，取第一个元素
+      const firstItem = data[0];
+      return {
+        audio_url: firstItem?.audio_url,
+        video_url: firstItem?.video_url,
+        image_url: firstItem?.image_url || firstItem?.image_large_url,
+        title: firstItem?.title
+      };
+    } else if (data.audio_url) {
+      // 直接包含 audio_url 的格式
+      return {
+        audio_url: data.audio_url,
+        video_url: data.video_url,
+        image_url: data.image_url || data.image_large_url,
+        title: data.title
+      };
+    }
+    return null;
+  };
+
+  const toggleAudioPlay = (record) => {
+    const musicUrls = getMusicUrls(record);
+    if (!musicUrls?.audio_url) return;
+
+    if (currentPlayingId === record.task_id) {
+      // 暂停当前播放
+      if (audioRef) {
+        audioRef.pause();
+        setCurrentPlayingId(null);
+      }
+    } else {
+      // 停止之前的播放
+      if (audioRef) {
+        audioRef.pause();
+      }
+
+      // 创建新的音频对象
+      const audio = new Audio(musicUrls.audio_url);
+      audio.onended = () => setCurrentPlayingId(null);
+      audio.onerror = () => {
+        showError(t('音频播放失败'));
+        setCurrentPlayingId(null);
+      };
+      
+      setAudioRef(audio);
+      setCurrentPlayingId(record.task_id);
+      audio.play().catch(() => {
+        showError(t('音频播放失败'));
+        setCurrentPlayingId(null);
+      });
+    }
+  };
+
+  // 图片预览功能
+  const showImagePreview = (imageUrl) => {
+    setPreviewImageSrc(imageUrl);
+    setPreviewImageVisible(true);
+  };
+
+  // 视频播放功能
+  const showVideoPlayer = (videoUrl) => {
+    setCurrentVideoUrl(videoUrl);
+    setVideoModalVisible(true);
+  };
+
+  // 获取视频URL - 从任务数据中提取视频链接
+  const getVideoUrls = (record) => {
+    try {
+      // 对于视频任务，URL通常在fail_reason字段中（成功时）
+      if (record.fail_reason && /^https?:\/\//.test(record.fail_reason)) {
+        return {
+          video_url: record.fail_reason,
+          title: record.action === 'generate' ? '图生视频' : '文生视频'
+        };
+      }
+
+      // 也检查data字段中是否有视频URL
+      if (record.data) {
+        const taskData = parseTaskData(record);
+        if (taskData) {
+          // 可能的视频URL字段
+          const videoUrl = taskData.video_url || 
+                          taskData.url || 
+                          (taskData.data && taskData.data.url) ||
+                          (taskData.data && taskData.data.video_url);
+          
+          if (videoUrl && /^https?:\/\//.test(videoUrl)) {
+            return {
+              video_url: videoUrl,
+              title: record.action === 'generate' ? '图生视频' : '文生视频'
+            };
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('解析视频URL失败:', error);
+      return null;
+    }
+  };
+
+  // 渲染缩略图组件
+  const renderThumbnail = (imageUrl, title = '') => {
+    if (!imageUrl) return null;
+
+    return (
+      <div 
+        className="inline-block cursor-pointer rounded overflow-hidden border border-gray-200 hover:border-blue-400 transition-colors"
+        onClick={() => showImagePreview(imageUrl)}
+        style={{ 
+          width: '60px', 
+          height: '60px',
+          position: 'relative'
+        }}
+      >
+        <img
+          src={imageUrl}
+          alt={title || t('缩略图')}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block'
+          }}
+          onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.parentNode.innerHTML = `
+              <div style="
+                width: 100%; 
+                height: 100%; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                background: #f5f5f5; 
+                color: #999;
+                font-size: 12px;
+              ">
+                图片加载失败
+              </div>
+            `;
+          }}
+        />
+        <div 
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0,
+            transition: 'opacity 0.2s',
+            color: 'white',
+            fontSize: '12px'
+          }}
+          className="hover:opacity-100 hover:bg-black hover:bg-opacity-30"
+        >
+          {t('点击预览')}
+        </div>
+      </div>
+    );
   };
 
   // 列选择器模态框
@@ -890,6 +1314,79 @@ const LogsTable = () => {
           width={800} // 设置模态框宽度
         >
           <p style={{ whiteSpace: 'pre-line' }}>{modalContent}</p>
+        </Modal>
+
+        {/* 图片预览模态框 */}
+        <Image
+          src={previewImageSrc}
+          visible={previewImageVisible}
+          onVisibleChange={(visible) => setPreviewImageVisible(visible)}
+          preview={{
+            zIndex: 1050,
+            getContainer: () => document.body
+          }}
+        />
+
+        {/* 视频播放模态框 */}
+        <Modal
+          visible={videoModalVisible}
+          onCancel={() => {
+            setVideoModalVisible(false);
+            if (currentVideoRef) {
+              currentVideoRef.pause();
+            }
+          }}
+          onOk={() => {
+            setVideoModalVisible(false);
+            if (currentVideoRef) {
+              currentVideoRef.pause();
+            }
+          }}
+          title={t('视频播放')}
+          width={800}
+          style={{ top: 50 }}
+          bodyStyle={{ 
+            padding: '20px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '400px'
+          }}
+          footer={[
+            <Button 
+              key="close" 
+              onClick={() => {
+                setVideoModalVisible(false);
+                if (currentVideoRef) {
+                  currentVideoRef.pause();
+                }
+              }}
+            >
+              {t('关闭')}
+            </Button>
+          ]}
+        >
+          {currentVideoUrl && (
+            <video
+              ref={(ref) => setCurrentVideoRef(ref)}
+              src={currentVideoUrl}
+              controls
+              autoPlay
+              style={{
+                maxWidth: '100%',
+                maxHeight: '500px',
+                width: '100%',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              }}
+              onError={(e) => {
+                console.error('视频播放错误:', e);
+                showError(t('视频加载失败'));
+              }}
+            >
+              {t('您的浏览器不支持视频播放')}
+            </video>
+          )}
         </Modal>
       </Layout>
     </>
