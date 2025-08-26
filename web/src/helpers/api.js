@@ -1,4 +1,9 @@
-import { getUserIdFromLocalStorage, showError, formatMessageForAPI, isValidMessage } from './utils';
+import {
+  getUserIdFromLocalStorage,
+  showError,
+  formatMessageForAPI,
+  isValidMessage,
+} from './utils';
 import axios from 'axios';
 import { MESSAGE_ROLES } from '../constants/playground.constants';
 
@@ -66,13 +71,18 @@ API.interceptors.response.use(
     }
     showError(error);
     return Promise.reject(error);
-  },
+  }
 );
 
 // playground
 
 // 构建API请求负载
-export const buildApiPayload = (messages, systemPrompt, inputs, parameterEnabled) => {
+export const buildApiPayload = (
+  messages,
+  systemPrompt,
+  inputs,
+  parameterEnabled
+) => {
   const processedMessages = messages
     .filter(isValidMessage)
     .map(formatMessageForAPI)
@@ -82,7 +92,7 @@ export const buildApiPayload = (messages, systemPrompt, inputs, parameterEnabled
   if (systemPrompt && systemPrompt.trim()) {
     processedMessages.unshift({
       role: MESSAGE_ROLES.SYSTEM,
-      content: systemPrompt.trim()
+      content: systemPrompt.trim(),
     });
   }
 
@@ -90,7 +100,11 @@ export const buildApiPayload = (messages, systemPrompt, inputs, parameterEnabled
   let validGroup = inputs.group || '';
   if (/^\d+$/.test(validGroup)) {
     // 如果分组值是纯数字（可能是令牌ID），重置为空字符串
-    console.info('检测到无效的分组值（数字ID）:', validGroup, '已重置为空字符串');
+    console.info(
+      '检测到无效的分组值（数字ID）:',
+      validGroup,
+      '已重置为空字符串'
+    );
     validGroup = '';
   }
 
@@ -108,11 +122,15 @@ export const buildApiPayload = (messages, systemPrompt, inputs, parameterEnabled
     max_tokens: 'max_tokens',
     frequency_penalty: 'frequency_penalty',
     presence_penalty: 'presence_penalty',
-    seed: 'seed'
+    seed: 'seed',
   };
 
   Object.entries(parameterMappings).forEach(([key, param]) => {
-    if (parameterEnabled[key] && inputs[param] !== undefined && inputs[param] !== null) {
+    if (
+      parameterEnabled[key] &&
+      inputs[param] !== undefined &&
+      inputs[param] !== null
+    ) {
       payload[param] = inputs[param];
     }
   });
@@ -125,7 +143,7 @@ export const handleApiError = (error, response = null) => {
   const errorInfo = {
     error: error.message || '未知错误',
     timestamp: new Date().toISOString(),
-    stack: error.stack
+    stack: error.stack,
   };
 
   if (response) {
@@ -144,15 +162,18 @@ export const handleApiError = (error, response = null) => {
 
 // 处理模型数据
 export const processModelsData = (data, currentModel) => {
-  const modelOptions = data.map(model => ({
+  const modelOptions = data.map((model) => ({
     label: model,
     value: model,
   }));
 
-  const hasCurrentModel = modelOptions.some(option => option.value === currentModel);
-  const selectedModel = hasCurrentModel && modelOptions.length > 0
-    ? currentModel
-    : modelOptions[0]?.value;
+  const hasCurrentModel = modelOptions.some(
+    (option) => option.value === currentModel
+  );
+  const selectedModel =
+    hasCurrentModel && modelOptions.length > 0
+      ? currentModel
+      : modelOptions[0]?.value;
 
   return { modelOptions, selectedModel };
 };
@@ -161,7 +182,7 @@ export const processModelsData = (data, currentModel) => {
 export const processGroupsData = (data, userGroup) => {
   // 检查数据格式 - 如果是数组，直接处理；如果是对象，转换为数组格式
   let groupArray = [];
-  
+
   if (Array.isArray(data)) {
     // 新格式：后端返回已排序的数组
     groupArray = data;
@@ -185,12 +206,14 @@ export const processGroupsData = (data, userGroup) => {
   }));
 
   if (groupOptions.length === 0) {
-    groupOptions = [{
-      label: '用户分组',
-      value: '',
-      ratio: 1,
-      priority: 999,
-    }];
+    groupOptions = [
+      {
+        label: '用户分组',
+        value: '',
+        ratio: 1,
+        priority: 999,
+      },
+    ];
   }
 
   // 按优先级排序（数字越小优先级越高）
@@ -235,7 +258,7 @@ export async function onGitHubOAuthClicked(github_client_id) {
   const state = await getOAuthState();
   if (!state) return;
   window.open(
-    `https://github.com/login/oauth/authorize?client_id=${github_client_id}&state=${state}&scope=user:email`,
+    `https://github.com/login/oauth/authorize?client_id=${github_client_id}&state=${state}&scope=user:email`
   );
 }
 
@@ -243,16 +266,16 @@ export async function onLinuxDOOAuthClicked(linuxdo_client_id) {
   const state = await getOAuthState();
   if (!state) return;
   window.open(
-    `https://connect.linux.do/oauth2/authorize?response_type=code&client_id=${linuxdo_client_id}&state=${state}`,
+    `https://connect.linux.do/oauth2/authorize?response_type=code&client_id=${linuxdo_client_id}&state=${state}`
   );
 }
 
 export async function onGoogleOAuthClicked(google_client_id) {
   const state = await getOAuthState();
   if (!state) return;
-  
+
   window.open(
-    `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${google_client_id}&redirect_uri=${encodeURIComponent(window.location.origin + '/oauth/google')}&state=${state}&scope=openid%20email%20profile`,
+    `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${google_client_id}&redirect_uri=${encodeURIComponent(window.location.origin + '/oauth/google')}&state=${state}&scope=openid%20email%20profile`
   );
 }
 

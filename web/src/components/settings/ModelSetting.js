@@ -74,7 +74,7 @@ const ModelSetting = () => {
 
   return (
     <>
-      <Spin spinning={loading} size='large'>
+      <Spin spinning={loading} size="large">
         {/* OpenAI */}
         <Card style={{ marginTop: '10px' }}>
           <SettingGlobalModel options={inputs} refresh={onRefresh} />

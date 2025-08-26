@@ -38,7 +38,7 @@ function App() {
     <SetupCheck>
       <Routes>
         <Route
-          path='/'
+          path="/"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <Home />
@@ -46,7 +46,7 @@ function App() {
           }
         />
         <Route
-          path='/setup'
+          path="/setup"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <Setup />
@@ -54,7 +54,7 @@ function App() {
           }
         />
         <Route
-          path='/console/channel'
+          path="/console/channel"
           element={
             <PrivateRoute>
               <Channel />
@@ -62,7 +62,7 @@ function App() {
           }
         />
         <Route
-          path='/console/channel/edit/:id'
+          path="/console/channel/edit/:id"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <EditChannel />
@@ -70,7 +70,7 @@ function App() {
           }
         />
         <Route
-          path='/console/channel/add'
+          path="/console/channel/add"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <EditChannel />
@@ -78,7 +78,7 @@ function App() {
           }
         />
         <Route
-          path='/console/token'
+          path="/console/token"
           element={
             <PrivateRoute>
               <Token />
@@ -86,7 +86,7 @@ function App() {
           }
         />
         <Route
-          path='/console/playground'
+          path="/console/playground"
           element={
             <PrivateRoute>
               <Playground />
@@ -94,7 +94,7 @@ function App() {
           }
         />
         <Route
-          path='/console/redemption'
+          path="/console/redemption"
           element={
             <PrivateRoute>
               <Redemption />
@@ -102,7 +102,7 @@ function App() {
           }
         />
         <Route
-          path='/console/user'
+          path="/console/user"
           element={
             <PrivateRoute>
               <User />
@@ -110,7 +110,7 @@ function App() {
           }
         />
         <Route
-          path='/console/user/edit/:id'
+          path="/console/user/edit/:id"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <EditUser />
@@ -118,7 +118,7 @@ function App() {
           }
         />
         <Route
-          path='/console/user/edit'
+          path="/console/user/edit"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <EditUser />
@@ -126,7 +126,7 @@ function App() {
           }
         />
         <Route
-          path='/user/reset'
+          path="/user/reset"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <PasswordResetConfirm />
@@ -134,7 +134,7 @@ function App() {
           }
         />
         <Route
-          path='/login'
+          path="/login"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <AuthRedirect>
@@ -144,7 +144,7 @@ function App() {
           }
         />
         <Route
-          path='/register'
+          path="/register"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <AuthRedirect>
@@ -154,7 +154,7 @@ function App() {
           }
         />
         <Route
-          path='/reset'
+          path="/reset"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <PasswordResetForm />
@@ -162,39 +162,39 @@ function App() {
           }
         />
         <Route
-          path='/oauth/github'
+          path="/oauth/github"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
-              <OAuth2Callback type='github'></OAuth2Callback>
+              <OAuth2Callback type="github"></OAuth2Callback>
             </Suspense>
           }
         />
         <Route
-          path='/oauth/oidc'
+          path="/oauth/oidc"
           element={
             <Suspense fallback={<Loading></Loading>}>
-              <OAuth2Callback type='oidc'></OAuth2Callback>
+              <OAuth2Callback type="oidc"></OAuth2Callback>
             </Suspense>
           }
         />
         <Route
-          path='/oauth/linuxdo'
+          path="/oauth/linuxdo"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
-              <OAuth2Callback type='linuxdo'></OAuth2Callback>
+              <OAuth2Callback type="linuxdo"></OAuth2Callback>
             </Suspense>
           }
         />
         <Route
-          path='/oauth/google'
+          path="/oauth/google"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
-              <OAuth2Callback type='google'></OAuth2Callback>
+              <OAuth2Callback type="google"></OAuth2Callback>
             </Suspense>
           }
         />
         <Route
-          path='/console/setting'
+          path="/console/setting"
           element={
             <PrivateRoute>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
@@ -204,7 +204,7 @@ function App() {
           }
         />
         <Route
-          path='/console/personal'
+          path="/console/personal"
           element={
             <PrivateRoute>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
@@ -214,7 +214,7 @@ function App() {
           }
         />
         <Route
-          path='/console/topup'
+          path="/console/topup"
           element={
             <PrivateRoute>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
@@ -224,7 +224,7 @@ function App() {
           }
         />
         <Route
-          path='/console/log'
+          path="/console/log"
           element={
             <PrivateRoute>
               <Log />
@@ -232,7 +232,7 @@ function App() {
           }
         />
         <Route
-          path='/console'
+          path="/console"
           element={
             <PrivateRoute>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
@@ -242,7 +242,7 @@ function App() {
           }
         />
         <Route
-          path='/console/midjourney'
+          path="/console/midjourney"
           element={
             <PrivateRoute>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
@@ -252,7 +252,7 @@ function App() {
           }
         />
         <Route
-          path='/console/task'
+          path="/console/task"
           element={
             <PrivateRoute>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
@@ -262,7 +262,7 @@ function App() {
           }
         />
         <Route
-          path='/pricing'
+          path="/pricing"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <Pricing />
@@ -270,7 +270,7 @@ function App() {
           }
         />
         <Route
-          path='/about'
+          path="/about"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <About />
@@ -278,7 +278,7 @@ function App() {
           }
         />
         <Route
-          path='/console/chat/:id?'
+          path="/console/chat/:id?"
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <Chat />
@@ -287,7 +287,7 @@ function App() {
         />
         {/* 方便使用chat2link直接跳转聊天... */}
         <Route
-          path='/chat2link'
+          path="/chat2link"
           element={
             <PrivateRoute>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
@@ -296,7 +296,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path='*' element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </SetupCheck>
   );

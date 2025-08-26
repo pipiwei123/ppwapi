@@ -3,7 +3,13 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from '../../context/User/index.js';
 import { useSetTheme, useTheme } from '../../context/Theme/index.js';
 import { useTranslation } from 'react-i18next';
-import { API, getLogo, getSystemName, showSuccess, stringToColor } from '../../helpers/index.js';
+import {
+  API,
+  getLogo,
+  getSystemName,
+  showSuccess,
+  stringToColor,
+} from '../../helpers/index.js';
 import fireworks from 'react-fireworks';
 import { CN, GB } from 'country-flag-icons/react/3x2';
 import NoticeModal from './NoticeModal.js';
@@ -65,7 +71,8 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
 
   const announcements = statusState?.status?.announcements || [];
 
-  const getAnnouncementKey = (a) => `${a?.publishDate || ''}-${(a?.content || '').slice(0, 30)}`;
+  const getAnnouncementKey = (a) =>
+    `${a?.publishDate || ''}-${(a?.content || '').slice(0, 30)}`;
 
   const calculateUnreadCount = () => {
     if (!announcements.length) return 0;
@@ -76,7 +83,8 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
       readKeys = [];
     }
     const readSet = new Set(readKeys);
-    return announcements.filter((a) => !readSet.has(getAnnouncementKey(a))).length;
+    return announcements.filter((a) => !readSet.has(getAnnouncementKey(a)))
+      .length;
   };
 
   const getUnreadKeys = () => {
@@ -88,7 +96,9 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
       readKeys = [];
     }
     const readSet = new Set(readKeys);
-    return announcements.filter((a) => !readSet.has(getAnnouncementKey(a))).map(getAnnouncementKey);
+    return announcements
+      .filter((a) => !readSet.has(getAnnouncementKey(a)))
+      .map(getAnnouncementKey);
   };
 
   useEffect(() => {
@@ -114,13 +124,13 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
     },
     ...(docsLink
       ? [
-        {
-          text: t('文档'),
-          itemKey: 'docs',
-          isExternal: true,
-          externalLink: docsLink,
-        },
-      ]
+          {
+            text: t('文档'),
+            itemKey: 'docs',
+            isExternal: true,
+            externalLink: docsLink,
+          },
+        ]
       : []),
     {
       text: t('关于'),
@@ -159,7 +169,9 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
       } catch (_) {
         readKeys = [];
       }
-      const mergedKeys = Array.from(new Set([...readKeys, ...announcements.map(getAnnouncementKey)]));
+      const mergedKeys = Array.from(
+        new Set([...readKeys, ...announcements.map(getAnnouncementKey)])
+      );
       localStorage.setItem('notice_read_keys', JSON.stringify(mergedKeys));
     }
     setUnreadCount(0);
@@ -178,7 +190,6 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
     if (iframe) {
       iframe.contentWindow.postMessage({ themeMode: theme }, '*');
     }
-
   }, [theme, isNewYear]);
 
   useEffect(() => {
@@ -247,17 +258,15 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
         ? 'flex items-center gap-1 p-3 w-full text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-semibold'
         : 'flex items-center gap-1 p-2 text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-md font-semibold';
 
-      const linkContent = (
-        <span>{link.text}</span>
-      );
+      const linkContent = <span>{link.text}</span>;
 
       if (link.isExternal) {
         return (
           <a
             key={link.itemKey}
             href={link.externalLink}
-            target='_blank'
-            rel='noopener noreferrer'
+            target="_blank"
+            rel="noopener noreferrer"
             className={commonLinkClasses}
             onClick={() => handleNavLinkClick(link.itemKey)}
           >
@@ -291,7 +300,13 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
           <Skeleton
             loading={true}
             active
-            placeholder={<Skeleton.Avatar active size="extra-small" className="shadow-sm" />}
+            placeholder={
+              <Skeleton.Avatar
+                active
+                size="extra-small"
+                className="shadow-sm"
+              />
+            }
           />
           <div className="ml-1.5 mr-1">
             <Skeleton
@@ -323,7 +338,10 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
                 className="!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-blue-500 dark:hover:!text-white"
               >
                 <div className="flex items-center gap-2">
-                  <IconUserSetting size="small" className="text-gray-500 dark:text-gray-400" />
+                  <IconUserSetting
+                    size="small"
+                    className="text-gray-500 dark:text-gray-400"
+                  />
                   <span>{t('个人设置')}</span>
                 </div>
               </Dropdown.Item>
@@ -335,7 +353,10 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
                 className="!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-blue-500 dark:hover:!text-white"
               >
                 <div className="flex items-center gap-2">
-                  <IconKey size="small" className="text-gray-500 dark:text-gray-400" />
+                  <IconKey
+                    size="small"
+                    className="text-gray-500 dark:text-gray-400"
+                  />
                   <span>{t('API令牌')}</span>
                 </div>
               </Dropdown.Item>
@@ -347,13 +368,22 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
                 className="!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-blue-500 dark:hover:!text-white"
               >
                 <div className="flex items-center gap-2">
-                  <IconCreditCard size="small" className="text-gray-500 dark:text-gray-400" />
+                  <IconCreditCard
+                    size="small"
+                    className="text-gray-500 dark:text-gray-400"
+                  />
                   <span>{t('钱包')}</span>
                 </div>
               </Dropdown.Item>
-              <Dropdown.Item onClick={logout} className="!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-red-500 dark:hover:!text-white">
+              <Dropdown.Item
+                onClick={logout}
+                className="!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-red-500 dark:hover:!text-white"
+              >
                 <div className="flex items-center gap-2">
-                  <IconExit size="small" className="text-gray-500 dark:text-gray-400" />
+                  <IconExit
+                    size="small"
+                    className="text-gray-500 dark:text-gray-400"
+                  />
                   <span>{t('退出')}</span>
                 </div>
               </Dropdown.Item>
@@ -384,43 +414,52 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
     } else {
       const showRegisterButton = !isSelfUseMode;
 
-      const commonSizingAndLayoutClass = "flex items-center justify-center !py-[10px] !px-1.5";
+      const commonSizingAndLayoutClass =
+        'flex items-center justify-center !py-[10px] !px-1.5';
 
-      const loginButtonSpecificStyling = "!bg-semi-color-fill-0 dark:!bg-semi-color-fill-1 hover:!bg-semi-color-fill-1 dark:hover:!bg-gray-700 transition-colors";
+      const loginButtonSpecificStyling =
+        '!bg-semi-color-fill-0 dark:!bg-semi-color-fill-1 hover:!bg-semi-color-fill-1 dark:hover:!bg-gray-700 transition-colors';
       let loginButtonClasses = `${commonSizingAndLayoutClass} ${loginButtonSpecificStyling}`;
 
       let registerButtonClasses = `${commonSizingAndLayoutClass}`;
 
-      const loginButtonTextSpanClass = "!text-xs !text-semi-color-text-1 dark:!text-gray-300 !p-1.5";
-      const registerButtonTextSpanClass = "!text-xs !text-white !p-1.5";
+      const loginButtonTextSpanClass =
+        '!text-xs !text-semi-color-text-1 dark:!text-gray-300 !p-1.5';
+      const registerButtonTextSpanClass = '!text-xs !text-white !p-1.5';
 
       if (showRegisterButton) {
         if (isMobile) {
-          loginButtonClasses += " !rounded-full";
+          loginButtonClasses += ' !rounded-full';
         } else {
-          loginButtonClasses += " !rounded-l-full !rounded-r-none";
+          loginButtonClasses += ' !rounded-l-full !rounded-r-none';
         }
-        registerButtonClasses += " !rounded-r-full !rounded-l-none";
+        registerButtonClasses += ' !rounded-r-full !rounded-l-none';
       } else {
-        loginButtonClasses += " !rounded-full";
+        loginButtonClasses += ' !rounded-full';
       }
 
       return (
         <div className="flex items-center">
-          <Link to="/login" onClick={() => handleNavLinkClick('login')} className="flex">
+          <Link
+            to="/login"
+            onClick={() => handleNavLinkClick('login')}
+            className="flex"
+          >
             <Button
               theme="borderless"
               type="tertiary"
               className={loginButtonClasses}
             >
-              <span className={loginButtonTextSpanClass}>
-                {t('登录')}
-              </span>
+              <span className={loginButtonTextSpanClass}>{t('登录')}</span>
             </Button>
           </Link>
           {showRegisterButton && (
             <div className="hidden md:block">
-              <Link to="/register" onClick={() => handleNavLinkClick('register')} className="flex -ml-px">
+              <Link
+                to="/register"
+                onClick={() => handleNavLinkClick('register')}
+                className="flex -ml-px"
+              >
                 <Button
                   theme="solid"
                   type="primary"
@@ -453,14 +492,26 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
             <div className="md:hidden">
               <Button
                 icon={
-                  isConsoleRoute
-                    ? ((isMobile ? drawerOpen : collapsed) ? <IconClose className="text-lg" /> : <IconMenu className="text-lg" />)
-                    : (mobileMenuOpen ? <IconClose className="text-lg" /> : <IconMenu className="text-lg" />)
+                  isConsoleRoute ? (
+                    (isMobile ? drawerOpen : collapsed) ? (
+                      <IconClose className="text-lg" />
+                    ) : (
+                      <IconMenu className="text-lg" />
+                    )
+                  ) : mobileMenuOpen ? (
+                    <IconClose className="text-lg" />
+                  ) : (
+                    <IconMenu className="text-lg" />
+                  )
                 }
                 aria-label={
                   isConsoleRoute
-                    ? ((isMobile ? drawerOpen : collapsed) ? t('关闭侧边栏') : t('打开侧边栏'))
-                    : (mobileMenuOpen ? t('关闭菜单') : t('打开菜单'))
+                    ? (isMobile ? drawerOpen : collapsed)
+                      ? t('关闭侧边栏')
+                      : t('打开侧边栏')
+                    : mobileMenuOpen
+                      ? t('关闭菜单')
+                      : t('打开菜单')
                 }
                 onClick={() => {
                   if (isConsoleRoute) {
@@ -476,7 +527,11 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
                 className="!p-2 !text-current focus:!bg-semi-color-fill-1 dark:focus:!bg-gray-700"
               />
             </div>
-            <Link to="/" onClick={() => handleNavLinkClick('home')} className="flex items-center gap-2 group ml-2">
+            <Link
+              to="/"
+              onClick={() => handleNavLinkClick('home')}
+              className="flex items-center gap-2 group ml-2"
+            >
               <Skeleton
                 loading={isLoading}
                 active
@@ -488,7 +543,11 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
                   />
                 }
               >
-                <img src={logo} alt="logo" className="h-7 md:h-8 transition-transform duration-300 ease-in-out group-hover:scale-105 rounded-full" />
+                <img
+                  src={logo}
+                  alt="logo"
+                  className="h-7 md:h-8 transition-transform duration-300 ease-in-out group-hover:scale-105 rounded-full"
+                />
               </Skeleton>
               <div className="hidden md:flex items-center gap-2">
                 <div className="flex items-center gap-2">
@@ -502,7 +561,10 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
                       />
                     }
                   >
-                    <Typography.Title heading={4} className="!text-lg !font-semibold !mb-0">
+                    <Typography.Title
+                      heading={4}
+                      className="!text-lg !font-semibold !mb-0"
+                    >
                       {systemName}
                     </Typography.Title>
                   </Skeleton>
@@ -511,7 +573,7 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
                       color={isSelfUseMode ? 'purple' : 'blue'}
                       className="text-xs px-1.5 py-0.5 rounded whitespace-nowrap shadow-sm"
                       size="small"
-                      shape='circle'
+                      shape="circle"
                     >
                       {isSelfUseMode ? t('自用模式') : t('演示站点')}
                     </Tag>
@@ -525,7 +587,7 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
                   color={isSelfUseMode ? 'purple' : 'blue'}
                   className="ml-2 text-xs px-1 py-0.5 rounded whitespace-nowrap shadow-sm"
                   size="small"
-                  shape='circle'
+                  shape="circle"
                 >
                   {isSelfUseMode ? t('自用模式') : t('演示站点')}
                 </Tag>
@@ -543,7 +605,10 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
                 position="bottomRight"
                 render={
                   <Dropdown.Menu className="!bg-semi-color-bg-overlay !border-semi-color-border !shadow-lg !rounded-lg dark:!bg-gray-700 dark:!border-gray-600">
-                    <Dropdown.Item onClick={handleNewYearClick} className="!text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-gray-600">
+                    <Dropdown.Item
+                      onClick={handleNewYearClick}
+                      className="!text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-gray-600"
+                    >
                       Happy New Year!!! 🎉
                     </Dropdown.Item>
                   </Dropdown.Menu>
@@ -582,7 +647,13 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
             )}
 
             <Button
-              icon={theme === 'dark' ? <IconSun size="large" className="text-yellow-500" /> : <IconMoon size="large" className="text-gray-300" />}
+              icon={
+                theme === 'dark' ? (
+                  <IconSun size="large" className="text-yellow-500" />
+                ) : (
+                  <IconMoon size="large" className="text-gray-300" />
+                )
+              }
               aria-label={t('切换主题')}
               onClick={() => setTheme(theme === 'dark' ? false : true)}
               theme="borderless"
@@ -631,7 +702,7 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
             absolute top-16 left-0 right-0 bg-semi-color-bg-0 
             shadow-lg p-3
             transform transition-all duration-300 ease-in-out
-            ${(!isConsoleRoute && mobileMenuOpen) ? 'translate-y-0 opacity-100 visible' : '-translate-y-4 opacity-0 invisible'}
+            ${!isConsoleRoute && mobileMenuOpen ? 'translate-y-0 opacity-100 visible' : '-translate-y-4 opacity-0 invisible'}
           `}
         >
           <nav className="flex flex-col gap-1">

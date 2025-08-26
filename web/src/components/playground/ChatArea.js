@@ -1,15 +1,6 @@
 import React from 'react';
-import {
-  Card,
-  Chat,
-  Typography,
-  Button,
-} from '@douyinfe/semi-ui';
-import {
-  MessageSquare,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
+import { Card, Chat, Typography, Button } from '@douyinfe/semi-ui';
+import { MessageSquare, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import CustomInputRender from './CustomInputRender';
 
@@ -40,7 +31,13 @@ const ChatArea = ({
     <Card
       className="h-full"
       bordered={false}
-      bodyStyle={{ padding: 0, height: 'calc(100vh - 66px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+      bodyStyle={{
+        padding: 0,
+        height: 'calc(100vh - 66px)',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
     >
       {/* 聊天头部 */}
       {styleState.isMobile ? (
@@ -91,7 +88,7 @@ const ChatArea = ({
           style={{
             height: '100%',
             maxWidth: '100%',
-            overflow: 'hidden'
+            overflow: 'hidden',
           }}
           chats={message}
           onMessageSend={onMessageSend}
@@ -110,4 +107,4 @@ const ChatArea = ({
   );
 };
 
-export default ChatArea; 
+export default ChatArea;

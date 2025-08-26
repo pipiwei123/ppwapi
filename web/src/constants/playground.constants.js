@@ -92,4 +92,4 @@ export const ERROR_MESSAGES = {
 export const STORAGE_KEYS = {
   CONFIG: 'playground_config',
   MESSAGES: 'playground_messages',
-}; 
+};

@@ -4,17 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { getLucideIcon, sidebarIconColors } from '../../helpers/render.js';
 import { ChevronLeft } from 'lucide-react';
 import { useSidebarCollapsed } from '../../hooks/useSidebarCollapsed.js';
-import {
-  isAdmin,
-  isRoot,
-  showError
-} from '../../helpers/index.js';
+import { isAdmin, isRoot, showError } from '../../helpers/index.js';
 
-import {
-  Nav,
-  Divider,
-  Button,
-} from '@douyinfe/semi-ui';
+import { Nav, Divider, Button } from '@douyinfe/semi-ui';
 
 const routerMap = {
   home: '/',
@@ -34,7 +26,7 @@ const routerMap = {
   personal: '/console/personal',
 };
 
-const SiderBar = ({ onNavigate = () => { } }) => {
+const SiderBar = ({ onNavigate = () => {} }) => {
   const { t } = useTranslation();
   const [collapsed, toggleCollapsed] = useSidebarCollapsed();
 
@@ -87,7 +79,7 @@ const SiderBar = ({ onNavigate = () => { } }) => {
       localStorage.getItem('enable_drawing'),
       localStorage.getItem('enable_task'),
       t,
-    ],
+    ]
   );
 
   const financeItems = useMemo(
@@ -103,7 +95,7 @@ const SiderBar = ({ onNavigate = () => { } }) => {
         to: '/personal',
       },
     ],
-    [t],
+    [t]
   );
 
   const adminItems = useMemo(
@@ -133,7 +125,7 @@ const SiderBar = ({ onNavigate = () => { } }) => {
         className: isRoot() ? '' : 'tableHiddle',
       },
     ],
-    [isAdmin(), isRoot(), t],
+    [isAdmin(), isRoot(), t]
   );
 
   const chatMenuItems = useMemo(
@@ -149,7 +141,7 @@ const SiderBar = ({ onNavigate = () => { } }) => {
         items: chatItems,
       },
     ],
-    [chatItems, t],
+    [chatItems, t]
   );
 
   // 更新路由映射，添加聊天路由
@@ -197,7 +189,7 @@ const SiderBar = ({ onNavigate = () => { } }) => {
   useEffect(() => {
     const currentPath = location.pathname;
     let matchingKey = Object.keys(routerMapState).find(
-      (key) => routerMapState[key] === currentPath,
+      (key) => routerMapState[key] === currentPath
     );
 
     // 处理聊天路由
@@ -228,22 +220,35 @@ const SiderBar = ({ onNavigate = () => { } }) => {
   // 获取菜单项对应的颜色
   const getItemColor = (itemKey) => {
     switch (itemKey) {
-      case 'detail': return sidebarIconColors.dashboard;
-      case 'playground': return sidebarIconColors.terminal;
-      case 'chat': return sidebarIconColors.message;
-      case 'token': return sidebarIconColors.key;
-      case 'log': return sidebarIconColors.chart;
-      case 'midjourney': return sidebarIconColors.image;
-      case 'task': return sidebarIconColors.check;
-      case 'topup': return sidebarIconColors.credit;
-      case 'channel': return sidebarIconColors.layers;
-      case 'redemption': return sidebarIconColors.gift;
+      case 'detail':
+        return sidebarIconColors.dashboard;
+      case 'playground':
+        return sidebarIconColors.terminal;
+      case 'chat':
+        return sidebarIconColors.message;
+      case 'token':
+        return sidebarIconColors.key;
+      case 'log':
+        return sidebarIconColors.chart;
+      case 'midjourney':
+        return sidebarIconColors.image;
+      case 'task':
+        return sidebarIconColors.check;
+      case 'topup':
+        return sidebarIconColors.credit;
+      case 'channel':
+        return sidebarIconColors.layers;
+      case 'redemption':
+        return sidebarIconColors.gift;
       case 'user':
-      case 'personal': return sidebarIconColors.user;
-      case 'setting': return sidebarIconColors.settings;
+      case 'personal':
+        return sidebarIconColors.user;
+      case 'setting':
+        return sidebarIconColors.settings;
       default:
         // 处理聊天项
-        if (itemKey && itemKey.startsWith('chat')) return sidebarIconColors.message;
+        if (itemKey && itemKey.startsWith('chat'))
+          return sidebarIconColors.message;
         return 'currentColor';
     }
   };
@@ -262,7 +267,10 @@ const SiderBar = ({ onNavigate = () => { } }) => {
         itemKey={item.itemKey}
         text={
           <div className="flex items-center">
-            <span className="truncate font-medium text-sm" style={{ color: textColor }}>
+            <span
+              className="truncate font-medium text-sm"
+              style={{ color: textColor }}
+            >
               {item.text}
             </span>
           </div>
@@ -289,7 +297,10 @@ const SiderBar = ({ onNavigate = () => { } }) => {
           itemKey={item.itemKey}
           text={
             <div className="flex items-center">
-              <span className="truncate font-medium text-sm" style={{ color: textColor }}>
+              <span
+                className="truncate font-medium text-sm"
+                style={{ color: textColor }}
+              >
                 {item.text}
               </span>
             </div>
@@ -302,14 +313,19 @@ const SiderBar = ({ onNavigate = () => { } }) => {
         >
           {item.items.map((subItem) => {
             const isSubSelected = selectedKeys.includes(subItem.itemKey);
-            const subTextColor = isSubSelected ? getItemColor(subItem.itemKey) : 'inherit';
+            const subTextColor = isSubSelected
+              ? getItemColor(subItem.itemKey)
+              : 'inherit';
 
             return (
               <Nav.Item
                 key={subItem.itemKey}
                 itemKey={subItem.itemKey}
                 text={
-                  <span className="truncate font-medium text-sm" style={{ color: subTextColor }}>
+                  <span
+                    className="truncate font-medium text-sm"
+                    style={{ color: subTextColor }}
+                  >
                     {subItem.text}
                   </span>
                 }
@@ -368,9 +384,7 @@ const SiderBar = ({ onNavigate = () => { } }) => {
       >
         {/* 聊天区域 */}
         <div className="sidebar-section">
-          {!collapsed && (
-            <div className="sidebar-group-label">{t('聊天')}</div>
-          )}
+          {!collapsed && <div className="sidebar-group-label">{t('聊天')}</div>}
           {chatMenuItems.map((item) => renderSubItem(item))}
         </div>
 
@@ -417,12 +431,18 @@ const SiderBar = ({ onNavigate = () => { } }) => {
               size={16}
               strokeWidth={2.5}
               color="var(--semi-color-text-2)"
-              style={{ transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              style={{
+                transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}
             />
           }
           onClick={toggleCollapsed}
           iconOnly={collapsed}
-          style={collapsed ? { padding: '4px', width: '100%' } : { padding: '4px 12px', width: '100%' }}
+          style={
+            collapsed
+              ? { padding: '4px', width: '100%' }
+              : { padding: '4px 12px', width: '100%' }
+          }
         >
           {!collapsed ? t('收起侧边栏') : null}
         </Button>

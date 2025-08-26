@@ -50,7 +50,7 @@ const ChatsSetting = () => {
 
   return (
     <>
-      <Spin spinning={loading} size='large'>
+      <Spin spinning={loading} size="large">
         {/* 聊天设置 */}
         <Card style={{ marginTop: '10px' }}>
           <SettingsChats options={inputs} refresh={onRefresh} />
@@ -60,4 +60,4 @@ const ChatsSetting = () => {
   );
 };
 
-export default ChatsSetting; 
+export default ChatsSetting;

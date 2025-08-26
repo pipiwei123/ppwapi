@@ -150,7 +150,7 @@ export default function SettingsCreditLimit(props) {
                 />
               </Col>
             </Row>
-            
+
             <Row gutter={16}>
               <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                 <Form.Switch
@@ -192,7 +192,9 @@ export default function SettingsCreditLimit(props) {
                   field={'MaxInviteRewards'}
                   step={1}
                   min={0}
-                  extraText={t('每个被邀请用户最多可以触发多少次返现，0表示不限制')}
+                  extraText={t(
+                    '每个被邀请用户最多可以触发多少次返现，0表示不限制'
+                  )}
                   placeholder={t('例如：10')}
                   onChange={(value) =>
                     setInputs({
@@ -205,7 +207,7 @@ export default function SettingsCreditLimit(props) {
             </Row>
 
             <Row>
-              <Button size='default' onClick={onSubmit}>
+              <Button size="default" onClick={onSubmit}>
                 {t('保存额度设置')}
               </Button>
             </Row>

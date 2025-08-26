@@ -8,7 +8,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile.js';
 import { useSidebarCollapsed } from '../../hooks/useSidebarCollapsed.js';
 import { useTranslation } from 'react-i18next';
-import { API, getLogo, getSystemName, showError, setStatusData } from '../../helpers/index.js';
+import {
+  API,
+  getLogo,
+  getSystemName,
+  showError,
+  setStatusData,
+} from '../../helpers/index.js';
 import { UserContext } from '../../context/User/index.js';
 import { StatusContext } from '../../context/Status/index.js';
 import { useLocation } from 'react-router-dom';
@@ -23,9 +29,12 @@ const PageLayout = () => {
   const { i18n } = useTranslation();
   const location = useLocation();
 
-  const shouldHideFooter = location.pathname === '/console/playground' || location.pathname.startsWith('/console/chat');
+  const shouldHideFooter =
+    location.pathname === '/console/playground' ||
+    location.pathname.startsWith('/console/chat');
 
-  const shouldInnerPadding = location.pathname.includes('/console') &&
+  const shouldInnerPadding =
+    location.pathname.includes('/console') &&
     !location.pathname.startsWith('/console/chat') &&
     location.pathname !== '/console/playground';
 
@@ -101,7 +110,10 @@ const PageLayout = () => {
           zIndex: 100,
         }}
       >
-        <HeaderBar onMobileMenuToggle={() => setDrawerOpen(prev => !prev)} drawerOpen={drawerOpen} />
+        <HeaderBar
+          onMobileMenuToggle={() => setDrawerOpen((prev) => !prev)}
+          drawerOpen={drawerOpen}
+        />
       </Header>
       <Layout
         style={{
@@ -123,12 +135,20 @@ const PageLayout = () => {
               width: 'var(--sidebar-current-width)',
             }}
           >
-            <SiderBar onNavigate={() => { if (isMobile) setDrawerOpen(false); }} />
+            <SiderBar
+              onNavigate={() => {
+                if (isMobile) setDrawerOpen(false);
+              }}
+            />
           </Sider>
         )}
         <Layout
           style={{
-            marginLeft: isMobile ? '0' : showSider ? 'var(--sidebar-current-width)' : '0',
+            marginLeft: isMobile
+              ? '0'
+              : showSider
+                ? 'var(--sidebar-current-width)'
+                : '0',
             flex: '1 1 auto',
             display: 'flex',
             flexDirection: 'column',

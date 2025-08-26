@@ -1,7 +1,13 @@
 import React, { useContext, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { API, showError, showSuccess, updateAPI, setUserData } from '../../helpers';
+import {
+  API,
+  showError,
+  showSuccess,
+  updateAPI,
+  setUserData,
+} from '../../helpers';
 import { UserContext } from '../../context/User';
 import Loading from '../common/Loading';
 
@@ -17,7 +23,7 @@ const OAuth2Callback = (props) => {
   const sendCode = async (code, state, retry = 0) => {
     try {
       const { data: resData } = await API.get(
-        `/api/oauth/${props.type}?code=${code}&state=${state}`,
+        `/api/oauth/${props.type}?code=${code}&state=${state}`
       );
 
       const { success, message, data } = resData;

@@ -9,19 +9,36 @@ import {
   Divider,
   Modal,
   Switch,
-  Tooltip
+  Tooltip,
 } from '@douyinfe/semi-ui';
 import {
   IllustrationNoResult,
-  IllustrationNoResultDark
+  IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
 import {
   Plus,
   Edit,
   Trash2,
   Save,
-  HelpCircle
+  HelpCircle,
+  GripVertical,
 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { API, showError, showSuccess } from '../../../helpers';
 import { useTranslation } from 'react-i18next';
 
@@ -40,7 +57,7 @@ const SettingsFAQ = ({ options, refresh }) => {
   const [hasChanges, setHasChanges] = useState(false);
   const [faqForm, setFaqForm] = useState({
     question: '',
-    answer: ''
+    answer: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -49,24 +66,151 @@ const SettingsFAQ = ({ options, refresh }) => {
   // 面板启用状态
   const [panelEnabled, setPanelEnabled] = useState(true);
 
+  // 拖拽传感器配置
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 需要拖拽8像素才激活
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // 拖拽句柄组件
+  const DragHandle = React.memo(({ id }) => {
+    return (
+      <div
+        style={{
+          cursor: 'grab',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          padding: '8px',
+        }}
+        onMouseDown={(e) => {
+          // 阻止事件冒泡到其他元素
+          e.stopPropagation();
+        }}
+      >
+        <GripVertical size={16} style={{ color: 'var(--semi-color-text-2)' }} />
+      </div>
+    );
+  });
+
+  // 可拖拽的表格行组件
+  const SortableRow = ({ children, ...props }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: props['data-row-key'] });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return React.createElement(
+      'tr',
+      {
+        ...props,
+        ref: setNodeRef,
+        style,
+        ...attributes,
+        ...listeners,
+      },
+      children
+    );
+  };
+
+  // 拖拽开始处理
+  const handleDragStart = (event) => {
+    console.log('Drag started:', event.active.id);
+  };
+
+  // 拖拽结束处理
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    console.log('Drag ended:', { activeId: active?.id, overId: over?.id });
+
+    if (!over) return;
+
+    if (active.id !== over.id) {
+      // 在当前页面的数据中查找索引
+      const currentData = getCurrentPageData();
+      const activeIndex = currentData.findIndex(
+        (item) => item.id === active.id
+      );
+      const overIndex = currentData.findIndex((item) => item.id === over.id);
+
+      console.log('Found indices:', {
+        activeIndex,
+        overIndex,
+        currentData: currentData.map((i) => i.id),
+      });
+
+      if (activeIndex !== -1 && overIndex !== -1) {
+        // 重新排序当前页面的数据
+        const newCurrentData = arrayMove(currentData, activeIndex, overIndex);
+
+        // 创建新的完整列表
+        const newList = [...faqList];
+        const startIndex = (currentPage - 1) * pageSize;
+
+        // 替换当前页面的数据
+        newCurrentData.forEach((item, index) => {
+          const globalIndex = startIndex + index;
+          newList[globalIndex] = item;
+        });
+
+        // 重新分配所有项目的 order 值
+        const updatedList = newList.map((item, index) => ({
+          ...item,
+          order: index + 1,
+        }));
+
+        setFaqList(updatedList);
+        setHasChanges(true);
+        showSuccess('问答顺序已调整，请及时点击"保存设置"进行保存');
+      }
+    }
+  };
+
   const columns = [
+    {
+      title: '',
+      key: 'drag',
+      width: 60,
+      fixed: 'left',
+      render: (text, record) => <DragHandle id={record.id} />,
+    },
     {
       title: t('问题标题'),
       dataIndex: 'question',
       key: 'question',
       render: (text) => (
         <Tooltip content={text} showArrow>
-          <div style={{
-            maxWidth: '300px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            fontWeight: 'bold'
-          }}>
+          <div
+            style={{
+              maxWidth: '300px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              fontWeight: 'bold',
+            }}
+          >
             {text}
           </div>
         </Tooltip>
-      )
+      ),
     },
     {
       title: t('回答内容'),
@@ -74,17 +218,19 @@ const SettingsFAQ = ({ options, refresh }) => {
       key: 'answer',
       render: (text) => (
         <Tooltip content={text} showArrow>
-          <div style={{
-            maxWidth: '400px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            color: 'var(--semi-color-text-1)'
-          }}>
+          <div
+            style={{
+              maxWidth: '400px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              color: 'var(--semi-color-text-1)',
+            }}
+          >
             {text}
           </div>
         </Tooltip>
-      )
+      ),
     },
     {
       title: t('操作'),
@@ -95,25 +241,25 @@ const SettingsFAQ = ({ options, refresh }) => {
         <Space>
           <Button
             icon={<Edit size={14} />}
-            theme='light'
-            type='tertiary'
-            size='small'
+            theme="light"
+            type="tertiary"
+            size="small"
             onClick={() => handleEditFaq(record)}
           >
             {t('编辑')}
           </Button>
           <Button
             icon={<Trash2 size={14} />}
-            type='danger'
-            theme='light'
-            size='small'
+            type="danger"
+            theme="light"
+            size="small"
             onClick={() => handleDeleteFaq(record)}
           >
             {t('删除')}
           </Button>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   const updateOption = async (key, value) => {
@@ -148,7 +294,7 @@ const SettingsFAQ = ({ options, refresh }) => {
     setEditingFaq(null);
     setFaqForm({
       question: '',
-      answer: ''
+      answer: '',
     });
     setShowFaqModal(true);
   };
@@ -157,7 +303,7 @@ const SettingsFAQ = ({ options, refresh }) => {
     setEditingFaq(faq);
     setFaqForm({
       question: faq.question,
-      answer: faq.answer
+      answer: faq.answer,
     });
     setShowFaqModal(true);
   };
@@ -169,7 +315,7 @@ const SettingsFAQ = ({ options, refresh }) => {
 
   const confirmDeleteFaq = () => {
     if (deletingFaq) {
-      const newList = faqList.filter(item => item.id !== deletingFaq.id);
+      const newList = faqList.filter((item) => item.id !== deletingFaq.id);
       setFaqList(newList);
       setHasChanges(true);
       showSuccess('问答已删除，请及时点击“保存设置”进行保存');
@@ -189,16 +335,17 @@ const SettingsFAQ = ({ options, refresh }) => {
 
       let newList;
       if (editingFaq) {
-        newList = faqList.map(item =>
-          item.id === editingFaq.id
-            ? { ...item, ...faqForm }
-            : item
+        newList = faqList.map((item) =>
+          item.id === editingFaq.id ? { ...item, ...faqForm } : item
         );
       } else {
-        const newId = Math.max(...faqList.map(item => item.id), 0) + 1;
+        const newId = Math.max(...faqList.map((item) => item.id), 0) + 1;
+        const newOrder =
+          Math.max(...faqList.map((item) => item.order || 0), 0) + 1;
         const newFaq = {
           id: newId,
-          ...faqForm
+          order: newOrder,
+          ...faqForm,
         };
         newList = [...faqList, newFaq];
       }
@@ -206,7 +353,11 @@ const SettingsFAQ = ({ options, refresh }) => {
       setFaqList(newList);
       setHasChanges(true);
       setShowFaqModal(false);
-      showSuccess(editingFaq ? '问答已更新，请及时点击“保存设置”进行保存' : '问答已添加，请及时点击“保存设置”进行保存');
+      showSuccess(
+        editingFaq
+          ? '问答已更新，请及时点击“保存设置”进行保存'
+          : '问答已添加，请及时点击“保存设置”进行保存'
+      );
     } catch (error) {
       showError('操作失败: ' + error.message);
     } finally {
@@ -223,12 +374,18 @@ const SettingsFAQ = ({ options, refresh }) => {
     try {
       const parsed = JSON.parse(faqStr);
       const list = Array.isArray(parsed) ? parsed : [];
-      // 确保每个项目都有id
+      // 确保每个项目都有id和order
       const listWithIds = list.map((item, index) => ({
         ...item,
-        id: item.id || index + 1
+        id: item.id || index + 1,
+        order: item.order || index + 1,
       }));
-      setFaqList(listWithIds);
+
+      // 按 order 排序
+      const sortedList = listWithIds.sort(
+        (a, b) => (a.order || 0) - (b.order || 0)
+      );
+      setFaqList(sortedList);
     } catch (error) {
       console.error('解析常见问答失败:', error);
       setFaqList([]);
@@ -243,7 +400,11 @@ const SettingsFAQ = ({ options, refresh }) => {
 
   useEffect(() => {
     const enabledStr = options['console_setting.faq_enabled'];
-    setPanelEnabled(enabledStr === undefined ? true : enabledStr === 'true' || enabledStr === true);
+    setPanelEnabled(
+      enabledStr === undefined
+        ? true
+        : enabledStr === 'true' || enabledStr === true
+    );
   }, [options['console_setting.faq_enabled']]);
 
   const handleToggleEnabled = async (checked) => {
@@ -271,11 +432,15 @@ const SettingsFAQ = ({ options, refresh }) => {
       return;
     }
 
-    const newList = faqList.filter(item => !selectedRowKeys.includes(item.id));
+    const newList = faqList.filter(
+      (item) => !selectedRowKeys.includes(item.id)
+    );
     setFaqList(newList);
     setSelectedRowKeys([]);
     setHasChanges(true);
-    showSuccess(`已删除 ${selectedRowKeys.length} 个常见问答，请及时点击“保存设置”进行保存`);
+    showSuccess(
+      `已删除 ${selectedRowKeys.length} 个常见问答，请及时点击“保存设置”进行保存`
+    );
   };
 
   const renderHeader = () => (
@@ -283,7 +448,11 @@ const SettingsFAQ = ({ options, refresh }) => {
       <div className="mb-2">
         <div className="flex items-center text-blue-500">
           <HelpCircle size={16} className="mr-2" />
-          <Text>{t('常见问答管理，为用户提供常见问题的答案（最多50个，前端显示最新20条）')}</Text>
+          <Text>
+            {t(
+              '常见问答管理，为用户提供常见问题的答案（最多50个，前端显示最新20条）'
+            )}
+          </Text>
         </div>
       </div>
 
@@ -292,8 +461,8 @@ const SettingsFAQ = ({ options, refresh }) => {
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
         <div className="flex gap-2 w-full md:w-auto order-2 md:order-1">
           <Button
-            theme='light'
-            type='primary'
+            theme="light"
+            type="primary"
             icon={<Plus size={14} />}
             className="w-full md:w-auto"
             onClick={handleAddFaq}
@@ -302,20 +471,21 @@ const SettingsFAQ = ({ options, refresh }) => {
           </Button>
           <Button
             icon={<Trash2 size={14} />}
-            type='danger'
-            theme='light'
+            type="danger"
+            theme="light"
             onClick={handleBatchDelete}
             disabled={selectedRowKeys.length === 0}
             className="w-full md:w-auto"
           >
-            {t('批量删除')} {selectedRowKeys.length > 0 && `(${selectedRowKeys.length})`}
+            {t('批量删除')}{' '}
+            {selectedRowKeys.length > 0 && `(${selectedRowKeys.length})`}
           </Button>
           <Button
             icon={<Save size={14} />}
             onClick={submitFAQ}
             loading={loading}
             disabled={!hasChanges}
-            type='secondary'
+            type="secondary"
             className="w-full md:w-auto"
           >
             {t('保存设置')}
@@ -358,45 +528,81 @@ const SettingsFAQ = ({ options, refresh }) => {
   return (
     <>
       <Form.Section text={renderHeader()}>
-        <Table
-          columns={columns}
-          dataSource={getCurrentPageData()}
-          rowSelection={rowSelection}
-          rowKey="id"
-          scroll={{ x: 'max-content' }}
-          pagination={{
-            currentPage: currentPage,
-            pageSize: pageSize,
-            total: faqList.length,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            formatPageText: (page) => t('第 {{start}} - {{end}} 条，共 {{total}} 条', {
-              start: page.currentStart,
-              end: page.currentEnd,
-              total: faqList.length,
-            }),
-            pageSizeOptions: ['5', '10', '20', '50'],
-            onChange: (page, size) => {
-              setCurrentPage(page);
-              setPageSize(size);
-            },
-            onShowSizeChange: (current, size) => {
-              setCurrentPage(1);
-              setPageSize(size);
-            }
-          }}
-          size='middle'
-          loading={loading}
-          empty={
-            <Empty
-              image={<IllustrationNoResult style={{ width: 150, height: 150 }} />}
-              darkModeImage={<IllustrationNoResultDark style={{ width: 150, height: 150 }} />}
-              description={t('暂无常见问答')}
-              style={{ padding: 30 }}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={(() => {
+              const items = getCurrentPageData().map((item) => item.id);
+              console.log('SortableContext items:', items);
+              return items;
+            })()}
+            strategy={verticalListSortingStrategy}
+          >
+            <Table
+              columns={columns}
+              dataSource={getCurrentPageData()}
+              rowSelection={rowSelection}
+              rowKey="id"
+              scroll={{ x: 'max-content' }}
+              components={{
+                body: {
+                  row: SortableRow,
+                },
+              }}
+              style={{
+                '.semi-table-tbody tr': {
+                  cursor: 'grab',
+                },
+                '.semi-table-tbody tr:active': {
+                  cursor: 'grabbing',
+                },
+              }}
+              pagination={{
+                currentPage: currentPage,
+                pageSize: pageSize,
+                total: faqList.length,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                formatPageText: (page) =>
+                  t('第 {{start}} - {{end}} 条，共 {{total}} 条', {
+                    start: page.currentStart,
+                    end: page.currentEnd,
+                    total: faqList.length,
+                  }),
+                pageSizeOptions: ['5', '10', '20', '50'],
+                onChange: (page, size) => {
+                  setCurrentPage(page);
+                  setPageSize(size);
+                },
+                onShowSizeChange: (current, size) => {
+                  setCurrentPage(1);
+                  setPageSize(size);
+                },
+              }}
+              size="middle"
+              loading={loading}
+              empty={
+                <Empty
+                  image={
+                    <IllustrationNoResult style={{ width: 150, height: 150 }} />
+                  }
+                  darkModeImage={
+                    <IllustrationNoResultDark
+                      style={{ width: 150, height: 150 }}
+                    />
+                  }
+                  description={t('暂无常见问答')}
+                  style={{ padding: 30 }}
+                />
+              }
+              className="overflow-hidden"
             />
-          }
-          className="overflow-hidden"
-        />
+          </SortableContext>
+        </DndContext>
       </Form.Section>
 
       <Modal
@@ -409,9 +615,13 @@ const SettingsFAQ = ({ options, refresh }) => {
         confirmLoading={modalLoading}
         width={800}
       >
-        <Form layout='vertical' initValues={faqForm} key={editingFaq ? editingFaq.id : 'new'}>
+        <Form
+          layout="vertical"
+          initValues={faqForm}
+          key={editingFaq ? editingFaq.id : 'new'}
+        >
           <Form.Input
-            field='question'
+            field="question"
             label={t('问题标题')}
             placeholder={t('请输入问题标题')}
             maxLength={200}
@@ -419,7 +629,7 @@ const SettingsFAQ = ({ options, refresh }) => {
             onChange={(value) => setFaqForm({ ...faqForm, question: value })}
           />
           <Form.TextArea
-            field='answer'
+            field="answer"
             label={t('回答内容')}
             placeholder={t('请输入回答内容（支持 Markdown/HTML）')}
             maxCount={1000}
@@ -443,7 +653,7 @@ const SettingsFAQ = ({ options, refresh }) => {
         type="warning"
         okButtonProps={{
           type: 'danger',
-          theme: 'solid'
+          theme: 'solid',
         }}
       >
         <Text>{t('确定要删除此问答吗？')}</Text>
@@ -452,4 +662,4 @@ const SettingsFAQ = ({ options, refresh }) => {
   );
 };
 
-export default SettingsFAQ; 
+export default SettingsFAQ;

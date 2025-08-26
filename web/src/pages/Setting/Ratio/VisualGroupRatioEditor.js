@@ -12,9 +12,15 @@ import {
   Divider,
   Form,
   Modal,
-  Tag
+  Tag,
 } from '@douyinfe/semi-ui';
-import { IconPlus, IconDelete, IconEdit, IconSave, IconClose } from '@douyinfe/semi-icons';
+import {
+  IconPlus,
+  IconDelete,
+  IconEdit,
+  IconSave,
+  IconClose,
+} from '@douyinfe/semi-icons';
 import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
@@ -32,12 +38,14 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
     try {
       if (value && value.trim()) {
         const parsed = JSON.parse(value);
-        const tableData = Object.entries(parsed).map(([group, ratio], index) => ({
-          key: index.toString(),
-          group,
-          ratio: parseFloat(ratio),
-          originalGroup: group // 用于编辑时的原始组名
-        }));
+        const tableData = Object.entries(parsed).map(
+          ([group, ratio], index) => ({
+            key: index.toString(),
+            group,
+            ratio: parseFloat(ratio),
+            originalGroup: group, // 用于编辑时的原始组名
+          })
+        );
         setData(tableData);
       } else {
         setData([]);
@@ -51,7 +59,7 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
   // 将表格数据转换为JSON字符串
   const updateValue = (newData) => {
     const ratioObj = {};
-    newData.forEach(item => {
+    newData.forEach((item) => {
       if (item.group && item.ratio !== undefined) {
         ratioObj[item.group] = item.ratio;
       }
@@ -77,7 +85,7 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
 
   const save = async (key) => {
     if (!formApi) return;
-    
+
     try {
       // 先验证表单
       await formApi.validate();
@@ -85,7 +93,7 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
       const formValues = formApi.getValues();
       const newData = [...data];
       const index = newData.findIndex((item) => key === item.key);
-      
+
       if (index > -1) {
         const item = newData[index];
         newData.splice(index, 1, {
@@ -103,19 +111,22 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
   };
 
   const handleDelete = (key) => {
-    const newData = data.filter(item => item.key !== key);
+    const newData = data.filter((item) => item.key !== key);
     setData(newData);
     updateValue(newData);
   };
 
   const handleAdd = (values) => {
     const newKey = Date.now().toString();
-    const newData = [...data, {
-      key: newKey,
-      group: values.group,
-      ratio: values.ratio,
-      originalGroup: values.group
-    }];
+    const newData = [
+      ...data,
+      {
+        key: newKey,
+        group: values.group,
+        ratio: values.ratio,
+        originalGroup: values.group,
+      },
+    ];
     setData(newData);
     updateValue(newData);
     setShowAddModal(false);
@@ -127,7 +138,7 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
 
   const getRatioColor = (ratio) => {
     if (ratio < 1) return 'green';
-    if (ratio === 1) return 'blue'; 
+    if (ratio === 1) return 'blue';
     return 'orange';
   };
 
@@ -150,25 +161,26 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
               style={{ margin: 0 }}
               rules={[
                 { required: true, message: t('分组名称不能为空') },
-                { 
+                {
                   validator: (rule, value) => {
                     if (value && value !== record.originalGroup) {
-                      const exists = data.some(item => 
-                        item.key !== record.key && item.group === value
+                      const exists = data.some(
+                        (item) =>
+                          item.key !== record.key && item.group === value
                       );
                       if (exists) {
                         return Promise.reject(t('分组名称已存在'));
                       }
                     }
                     return Promise.resolve();
-                  }
-                }
+                  },
+                },
               ]}
             />
           );
         }
         return (
-          <Tag color='cyan' size='large'>
+          <Tag color="cyan" size="large">
             {text}
           </Tag>
         );
@@ -192,17 +204,17 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
               style={{ width: '100%', margin: 0 }}
               rules={[
                 { required: true, message: t('倍率不能为空') },
-                { type: 'number', min: 0, message: t('倍率不能小于0') }
+                { type: 'number', min: 0, message: t('倍率不能小于0') },
               ]}
             />
           );
         }
         return (
           <Space>
-            <Tag color={getRatioColor(text)} size='large'>
+            <Tag color={getRatioColor(text)} size="large">
               ×{text}
             </Tag>
-            <Text type='secondary' size='small'>
+            <Text type="secondary" size="small">
               {getRatioText(text)}
             </Text>
           </Space>
@@ -219,9 +231,9 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
           return (
             <Space>
               <Button
-                theme='solid'
-                type='primary'
-                size='small'
+                theme="solid"
+                type="primary"
+                size="small"
                 icon={<IconSave />}
                 onClick={() => save(record.key)}
                 disabled={disabled}
@@ -229,9 +241,9 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
                 {t('保存')}
               </Button>
               <Button
-                theme='light'
-                type='tertiary'
-                size='small'
+                theme="light"
+                type="tertiary"
+                size="small"
                 icon={<IconClose />}
                 onClick={cancel}
               >
@@ -243,9 +255,9 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
         return (
           <Space>
             <Button
-              theme='light'
-              type='primary'
-              size='small'
+              theme="light"
+              type="primary"
+              size="small"
               icon={<IconEdit />}
               onClick={() => edit(record)}
               disabled={disabled || editingKey !== ''}
@@ -258,9 +270,9 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
               disabled={disabled}
             >
               <Button
-                theme='light'
-                type='danger'
-                size='small'
+                theme="light"
+                type="danger"
+                size="small"
                 icon={<IconDelete />}
                 disabled={disabled || editingKey !== ''}
               >
@@ -276,11 +288,17 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
   return (
     <Card>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <Title heading={6}>{t('分组倍率可视化配置')}</Title>
           <Button
-            theme='solid'
-            type='primary'
+            theme="solid"
+            type="primary"
             icon={<IconPlus />}
             onClick={() => setShowAddModal(true)}
             disabled={disabled || editingKey !== ''}
@@ -288,13 +306,13 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
             {t('添加分组')}
           </Button>
         </div>
-        <Text type='secondary' size='small'>
+        <Text type="secondary" size="small">
           {t('配置不同分组的价格倍率')}
         </Text>
       </div>
 
-      <Form 
-        getFormApi={(api) => setFormApi(api)} 
+      <Form
+        getFormApi={(api) => setFormApi(api)}
         component={false}
         initValues={{}}
       >
@@ -302,10 +320,10 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
           dataSource={data}
           columns={columns}
           pagination={false}
-          size='small'
+          size="small"
           empty={
             <div style={{ padding: '40px 0', textAlign: 'center' }}>
-              <Text type='secondary'>
+              <Text type="secondary">
                 {t('暂无分组倍率配置，点击"添加分组"开始配置')}
               </Text>
             </div>
@@ -327,7 +345,7 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
       >
         <Form
           onSubmit={handleAdd}
-          labelPosition='left'
+          labelPosition="left"
           labelWidth={100}
           getFormApi={(api) => setAddFormApi(api)}
         >
@@ -337,17 +355,17 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
             placeholder={t('请输入分组名称，如：vip, svip, trial')}
             rules={[
               { required: true, message: t('分组名称不能为空') },
-              { 
+              {
                 validator: (rule, value) => {
                   if (value) {
-                    const exists = data.some(item => item.group === value);
+                    const exists = data.some((item) => item.group === value);
                     if (exists) {
                       return Promise.reject(t('分组名称已存在'));
                     }
                   }
                   return Promise.resolve();
-                }
-              }
+                },
+              },
             ]}
           />
           <Form.InputNumber
@@ -361,7 +379,7 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
             style={{ width: '100%' }}
             rules={[
               { required: true, message: t('倍率不能为空') },
-              { type: 'number', min: 0, message: t('倍率不能小于0') }
+              { type: 'number', min: 0, message: t('倍率不能小于0') },
             ]}
           />
           <div style={{ marginTop: 24, textAlign: 'right' }}>
@@ -373,11 +391,7 @@ const VisualGroupRatioEditor = ({ value, onChange, disabled = false }) => {
             >
               {t('取消')}
             </Button>
-            <Button
-              theme='solid'
-              type='primary'
-              htmlType='submit'
-            >
+            <Button theme="solid" type="primary" htmlType="submit">
               {t('添加')}
             </Button>
           </div>

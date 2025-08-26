@@ -16,11 +16,13 @@ export const useSyncMessageAndCustomBody = (
   const lastCustomBodyHash = useRef('');
 
   const getMessageHash = useCallback((messages) => {
-    return JSON.stringify(messages.map(msg => ({
-      id: msg.id,
-      role: msg.role,
-      content: msg.content
-    })));
+    return JSON.stringify(
+      messages.map((msg) => ({
+        id: msg.id,
+        role: msg.role,
+        content: msg.content,
+      }))
+    );
   }, []);
 
   const getCustomBodyHash = useCallback((customBody) => {
@@ -49,13 +51,13 @@ export const useSyncMessageAndCustomBody = (
           model: inputs.model || 'gpt-4o',
           messages: [],
           temperature: inputs.temperature || 0.7,
-          stream: inputs.stream !== false
+          stream: inputs.stream !== false,
         };
       }
 
-      customPayload.messages = message.map(msg => ({
+      customPayload.messages = message.map((msg) => ({
         role: msg.role,
-        content: msg.content
+        content: msg.content,
       }));
 
       const newCustomBody = JSON.stringify(customPayload, null, 2);
@@ -69,7 +71,18 @@ export const useSyncMessageAndCustomBody = (
     } finally {
       isUpdatingFromMessage.current = false;
     }
-  }, [customRequestMode, customRequestBody, message, inputs.model, inputs.temperature, inputs.stream, getMessageHash, getCustomBodyHash, setCustomRequestBody, debouncedSaveConfig]);
+  }, [
+    customRequestMode,
+    customRequestBody,
+    message,
+    inputs.model,
+    inputs.temperature,
+    inputs.stream,
+    getMessageHash,
+    getCustomBodyHash,
+    setCustomRequestBody,
+    debouncedSaveConfig,
+  ]);
 
   const syncCustomBodyToMessage = useCallback(() => {
     if (!customRequestMode || isUpdatingFromMessage.current) return;
@@ -89,8 +102,8 @@ export const useSyncMessageAndCustomBody = (
           createAt: Date.now(),
           ...(msg.role === MESSAGE_ROLES.ASSISTANT && {
             reasoningContent: msg.reasoningContent || '',
-            isReasoningExpanded: false
-          })
+            isReasoningExpanded: false,
+          }),
         }));
 
         setMessage(newMessages);
@@ -102,10 +115,16 @@ export const useSyncMessageAndCustomBody = (
     } finally {
       isUpdatingFromCustomBody.current = false;
     }
-  }, [customRequestMode, customRequestBody, getCustomBodyHash, getMessageHash, setMessage]);
+  }, [
+    customRequestMode,
+    customRequestBody,
+    getCustomBodyHash,
+    getMessageHash,
+    setMessage,
+  ]);
 
   return {
     syncMessageToCustomBody,
-    syncCustomBodyToMessage
+    syncCustomBodyToMessage,
   };
-}; 
+};

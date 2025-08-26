@@ -1,15 +1,6 @@
 import React from 'react';
-import {
-  Button,
-  Tooltip,
-} from '@douyinfe/semi-ui';
-import {
-  RefreshCw,
-  Copy,
-  Trash2,
-  UserCheck,
-  Edit,
-} from 'lucide-react';
+import { Button, Tooltip } from '@douyinfe/semi-ui';
+import { RefreshCw, Copy, Trash2, UserCheck, Edit } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const MessageActions = ({
@@ -21,19 +12,28 @@ const MessageActions = ({
   onRoleToggle,
   onMessageEdit,
   isAnyMessageGenerating = false,
-  isEditing = false
+  isEditing = false,
 }) => {
   const { t } = useTranslation();
 
-  const isLoading = message.status === 'loading' || message.status === 'incomplete';
+  const isLoading =
+    message.status === 'loading' || message.status === 'incomplete';
   const shouldDisableActions = isAnyMessageGenerating || isEditing;
-  const canToggleRole = message.role === 'assistant' || message.role === 'system';
-  const canEdit = !isLoading && message.content && typeof onMessageEdit === 'function' && !isEditing;
+  const canToggleRole =
+    message.role === 'assistant' || message.role === 'system';
+  const canEdit =
+    !isLoading &&
+    message.content &&
+    typeof onMessageEdit === 'function' &&
+    !isEditing;
 
   return (
     <div className="flex items-center gap-0.5">
       {!isLoading && (
-        <Tooltip content={shouldDisableActions ? t('操作暂时被禁用') : t('重试')} position="top">
+        <Tooltip
+          content={shouldDisableActions ? t('操作暂时被禁用') : t('重试')}
+          position="top"
+        >
           <Button
             theme="borderless"
             type="tertiary"
@@ -62,7 +62,10 @@ const MessageActions = ({
       )}
 
       {canEdit && (
-        <Tooltip content={shouldDisableActions ? t('操作暂时被禁用') : t('编辑')} position="top">
+        <Tooltip
+          content={shouldDisableActions ? t('操作暂时被禁用') : t('编辑')}
+          position="top"
+        >
           <Button
             theme="borderless"
             type="tertiary"
@@ -92,16 +95,25 @@ const MessageActions = ({
             type="tertiary"
             size="small"
             icon={<UserCheck size={styleState.isMobile ? 12 : 14} />}
-            onClick={() => !shouldDisableActions && onRoleToggle && onRoleToggle(message)}
+            onClick={() =>
+              !shouldDisableActions && onRoleToggle && onRoleToggle(message)
+            }
             disabled={shouldDisableActions}
             className={`!rounded-full ${shouldDisableActions ? '!text-gray-300 !cursor-not-allowed' : message.role === 'system' ? '!text-purple-500 hover:!text-purple-700 hover:!bg-purple-50' : '!text-gray-400 hover:!text-purple-600 hover:!bg-purple-50'} ${styleState.isMobile ? '!w-6 !h-6' : '!w-7 !h-7'} !p-0 transition-all`}
-            aria-label={message.role === 'assistant' ? t('切换为System角色') : t('切换为Assistant角色')}
+            aria-label={
+              message.role === 'assistant'
+                ? t('切换为System角色')
+                : t('切换为Assistant角色')
+            }
           />
         </Tooltip>
       )}
 
       {!isLoading && (
-        <Tooltip content={shouldDisableActions ? t('操作暂时被禁用') : t('删除')} position="top">
+        <Tooltip
+          content={shouldDisableActions ? t('操作暂时被禁用') : t('删除')}
+          position="top"
+        >
           <Button
             theme="borderless"
             type="tertiary"
@@ -118,4 +130,4 @@ const MessageActions = ({
   );
 };
 
-export default MessageActions; 
+export default MessageActions;

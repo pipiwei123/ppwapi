@@ -1,11 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  Banner,
-  Button,
-  Form,
-  Space,
-  Spin,
-} from '@douyinfe/semi-ui';
+import { Banner, Button, Form, Space, Spin } from '@douyinfe/semi-ui';
 import {
   compareObjects,
   API,
@@ -102,9 +96,9 @@ export default function SettingsChats(props) {
       >
         <Form.Section text={t('聊天设置')}>
           <Banner
-            type='info'
+            type="info"
             description={t(
-              '链接中的{key}将自动替换为sk-xxxx，{address}将自动替换为系统设置的服务器地址，末尾不带/和/v1',
+              '链接中的{key}将自动替换为sk-xxxx，{address}将自动替换为系统设置的服务器地址，末尾不带/和/v1'
             )}
           />
           <Form.TextArea
@@ -113,7 +107,7 @@ export default function SettingsChats(props) {
             placeholder={t('为一个 JSON 文本')}
             field={'Chats'}
             autosize={{ minRows: 6, maxRows: 12 }}
-            trigger='blur'
+            trigger="blur"
             stopValidateWithError
             rules={[
               {

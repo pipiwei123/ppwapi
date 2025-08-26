@@ -2,23 +2,24 @@ import React from 'react';
 
 const CustomInputRender = (props) => {
   const { detailProps } = props;
-  const { clearContextNode, uploadNode, inputNode, sendNode, onClick } = detailProps;
+  const { clearContextNode, uploadNode, inputNode, sendNode, onClick } =
+    detailProps;
 
   // 清空按钮
   const styledClearNode = clearContextNode
     ? React.cloneElement(clearContextNode, {
-      className: `!rounded-full !bg-gray-100 hover:!bg-red-500 hover:!text-white flex-shrink-0 transition-all ${clearContextNode.props.className || ''}`,
-      style: {
-        ...clearContextNode.props.style,
-        width: '32px',
-        height: '32px',
-        minWidth: '32px',
-        padding: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }
-    })
+        className: `!rounded-full !bg-gray-100 hover:!bg-red-500 hover:!text-white flex-shrink-0 transition-all ${clearContextNode.props.className || ''}`,
+        style: {
+          ...clearContextNode.props.style,
+          width: '32px',
+          height: '32px',
+          minWidth: '32px',
+          padding: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      })
     : null;
 
   // 发送按钮
@@ -33,7 +34,7 @@ const CustomInputRender = (props) => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-    }
+    },
   });
 
   return (
@@ -45,9 +46,7 @@ const CustomInputRender = (props) => {
       >
         {/* 清空对话按钮 - 左边 */}
         {styledClearNode}
-        <div className="flex-1">
-          {inputNode}
-        </div>
+        <div className="flex-1">{inputNode}</div>
         {/* 发送按钮 - 右边 */}
         {styledSendNode}
       </div>
@@ -55,4 +54,4 @@ const CustomInputRender = (props) => {
   );
 };
 
-export default CustomInputRender; 
+export default CustomInputRender;

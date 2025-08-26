@@ -1,16 +1,8 @@
 import React, { useRef, useEffect } from 'react';
-import {
-  Typography,
-  TextArea,
-  Button,
-} from '@douyinfe/semi-ui';
+import { Typography, TextArea, Button } from '@douyinfe/semi-ui';
 import MarkdownRenderer from '../common/markdown/MarkdownRenderer';
 import ThinkingContent from './ThinkingContent';
-import {
-  Loader2,
-  Check,
-  X,
-} from 'lucide-react';
+import { Loader2, Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const MessageContent = ({
@@ -22,13 +14,14 @@ const MessageContent = ({
   onEditSave,
   onEditCancel,
   editValue,
-  onEditValueChange
+  onEditValueChange,
 }) => {
   const { t } = useTranslation();
   const previousContentLengthRef = useRef(0);
   const lastContentRef = useRef('');
 
-  const isThinkingStatus = message.status === 'loading' || message.status === 'incomplete';
+  const isThinkingStatus =
+    message.status === 'loading' || message.status === 'incomplete';
 
   useEffect(() => {
     if (!isThinkingStatus) {
@@ -41,10 +34,11 @@ const MessageContent = ({
     let errorText;
 
     if (Array.isArray(message.content)) {
-      const textContent = message.content.find(item => item.type === 'text');
-      errorText = textContent && textContent.text && typeof textContent.text === 'string'
-        ? textContent.text
-        : t('请求发生错误');
+      const textContent = message.content.find((item) => item.type === 'text');
+      errorText =
+        textContent && textContent.text && typeof textContent.text === 'string'
+          ? textContent.text
+          : t('请求发生错误');
     } else if (typeof message.content === 'string') {
       errorText = message.content;
     } else {
@@ -52,7 +46,9 @@ const MessageContent = ({
     }
 
     return (
-      <div className={`${className} flex items-center p-4 bg-red-50 rounded-xl`}>
+      <div
+        className={`${className} flex items-center p-4 bg-red-50 rounded-xl`}
+      >
         <Typography.Text type="danger" className="text-sm">
           {errorText}
         </Typography.Text>
@@ -61,13 +57,15 @@ const MessageContent = ({
   }
 
   let currentExtractedThinkingContent = null;
-  let currentDisplayableFinalContent = "";
+  let currentDisplayableFinalContent = '';
   let thinkingSource = null;
 
   const getTextContent = (content) => {
     if (Array.isArray(content)) {
-      const textItem = content.find(item => item.type === 'text');
-      return textItem && textItem.text && typeof textItem.text === 'string' ? textItem.text : '';
+      const textItem = content.find((item) => item.type === 'text');
+      return textItem && textItem.text && typeof textItem.text === 'string'
+        ? textItem.text
+        : '';
     } else if (typeof content === 'string') {
       return content;
     }
@@ -78,7 +76,7 @@ const MessageContent = ({
 
   if (message.role === 'assistant') {
     let baseContentForDisplay = getTextContent(message.content);
-    let combinedThinkingContent = "";
+    let combinedThinkingContent = '';
 
     if (message.reasoningContent) {
       combinedThinkingContent = message.reasoningContent;
@@ -93,7 +91,9 @@ const MessageContent = ({
       let lastIndex = 0;
 
       while ((match = thinkTagRegex.exec(baseContentForDisplay)) !== null) {
-        replyParts.push(baseContentForDisplay.substring(lastIndex, match.index));
+        replyParts.push(
+          baseContentForDisplay.substring(lastIndex, match.index)
+        );
         thoughtsFromPairedTags.push(match[1]);
         lastIndex = match.index + match[0].length;
       }
@@ -106,7 +106,9 @@ const MessageContent = ({
         } else {
           combinedThinkingContent = pairedThoughtsStr;
         }
-        thinkingSource = thinkingSource ? thinkingSource + ' & <think> tags' : '<think> tags';
+        thinkingSource = thinkingSource
+          ? thinkingSource + ' & <think> tags'
+          : '<think> tags';
       }
 
       baseContentForDisplay = replyParts.join('');
@@ -115,37 +117,55 @@ const MessageContent = ({
     if (isThinkingStatus) {
       const lastOpenThinkIndex = baseContentForDisplay.lastIndexOf('<think>');
       if (lastOpenThinkIndex !== -1) {
-        const fragmentAfterLastOpen = baseContentForDisplay.substring(lastOpenThinkIndex);
+        const fragmentAfterLastOpen =
+          baseContentForDisplay.substring(lastOpenThinkIndex);
         if (!fragmentAfterLastOpen.includes('</think>')) {
-          const unclosedThought = fragmentAfterLastOpen.substring('<think>'.length).trim();
+          const unclosedThought = fragmentAfterLastOpen
+            .substring('<think>'.length)
+            .trim();
           if (unclosedThought) {
             if (combinedThinkingContent) {
               combinedThinkingContent += '\n\n---\n\n' + unclosedThought;
             } else {
               combinedThinkingContent = unclosedThought;
             }
-            thinkingSource = thinkingSource ? thinkingSource + ' + streaming <think>' : 'streaming <think>';
+            thinkingSource = thinkingSource
+              ? thinkingSource + ' + streaming <think>'
+              : 'streaming <think>';
           }
-          baseContentForDisplay = baseContentForDisplay.substring(0, lastOpenThinkIndex);
+          baseContentForDisplay = baseContentForDisplay.substring(
+            0,
+            lastOpenThinkIndex
+          );
         }
       }
     }
 
     currentExtractedThinkingContent = combinedThinkingContent || null;
-    currentDisplayableFinalContent = baseContentForDisplay.replace(/<\/?think>/g, '').trim();
+    currentDisplayableFinalContent = baseContentForDisplay
+      .replace(/<\/?think>/g, '')
+      .trim();
   }
 
   const finalExtractedThinkingContent = currentExtractedThinkingContent;
   const finalDisplayableFinalContent = currentDisplayableFinalContent;
 
-  if (message.role === 'assistant' &&
+  if (
+    message.role === 'assistant' &&
     isThinkingStatus &&
     !finalExtractedThinkingContent &&
-    (!finalDisplayableFinalContent || finalDisplayableFinalContent.trim() === '')) {
+    (!finalDisplayableFinalContent ||
+      finalDisplayableFinalContent.trim() === '')
+  ) {
     return (
-      <div className={`${className} flex items-center gap-2 sm:gap-4 bg-gradient-to-r from-purple-50 to-indigo-50`}>
+      <div
+        className={`${className} flex items-center gap-2 sm:gap-4 bg-gradient-to-r from-purple-50 to-indigo-50`}
+      >
         <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg">
-          <Loader2 className="animate-spin text-white" size={styleState.isMobile ? 16 : 20} />
+          <Loader2
+            className="animate-spin text-white"
+            size={styleState.isMobile ? 16 : 20}
+          />
         </div>
       </div>
     );
@@ -155,9 +175,14 @@ const MessageContent = ({
     <div className={className}>
       {message.role === 'system' && (
         <div className="mb-2 sm:mb-4">
-          <div className="flex items-center gap-2 p-2 sm:p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg" style={{ border: '1px solid var(--semi-color-border)' }}>
+          <div
+            className="flex items-center gap-2 p-2 sm:p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg"
+            style={{ border: '1px solid var(--semi-color-border)' }}
+          >
             <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-sm">
-              <Typography.Text className="text-white text-xs font-bold">S</Typography.Text>
+              <Typography.Text className="text-white text-xs font-bold">
+                S
+              </Typography.Text>
             </div>
             <Typography.Text className="text-amber-700 text-xs sm:text-sm font-medium">
               {t('系统消息')}
@@ -217,8 +242,12 @@ const MessageContent = ({
       ) : (
         (() => {
           if (Array.isArray(message.content)) {
-            const textContent = message.content.find(item => item.type === 'text');
-            const imageContents = message.content.filter(item => item.type === 'image_url');
+            const textContent = message.content.find(
+              (item) => item.type === 'text'
+            );
+            const imageContents = message.content.filter(
+              (item) => item.type === 'image_url'
+            );
 
             return (
               <div>
@@ -247,28 +276,42 @@ const MessageContent = ({
                   </div>
                 )}
 
-                {textContent && textContent.text && typeof textContent.text === 'string' && textContent.text.trim() !== '' && (
-                  <div className={`prose prose-xs sm:prose-sm prose-gray max-w-none overflow-x-auto text-xs sm:text-sm ${message.role === 'user' ? 'user-message' : ''}`}>
-                    <MarkdownRenderer
-                      content={textContent.text}
-                      className={message.role === 'user' ? 'user-message' : ''}
-                      animated={false}
-                      previousContentLength={0}
-                    />
-                  </div>
-                )}
+                {textContent &&
+                  textContent.text &&
+                  typeof textContent.text === 'string' &&
+                  textContent.text.trim() !== '' && (
+                    <div
+                      className={`prose prose-xs sm:prose-sm prose-gray max-w-none overflow-x-auto text-xs sm:text-sm ${message.role === 'user' ? 'user-message' : ''}`}
+                    >
+                      <MarkdownRenderer
+                        content={textContent.text}
+                        className={
+                          message.role === 'user' ? 'user-message' : ''
+                        }
+                        animated={false}
+                        previousContentLength={0}
+                      />
+                    </div>
+                  )}
               </div>
             );
           }
 
           if (typeof message.content === 'string') {
             if (message.role === 'assistant') {
-              if (finalDisplayableFinalContent && finalDisplayableFinalContent.trim() !== '') {
+              if (
+                finalDisplayableFinalContent &&
+                finalDisplayableFinalContent.trim() !== ''
+              ) {
                 // 获取上一次的内容长度
                 let prevLength = 0;
                 if (isThinkingStatus && lastContentRef.current) {
                   // 只有当前内容包含上一次内容时，才使用上一次的长度
-                  if (finalDisplayableFinalContent.startsWith(lastContentRef.current)) {
+                  if (
+                    finalDisplayableFinalContent.startsWith(
+                      lastContentRef.current
+                    )
+                  ) {
                     prevLength = lastContentRef.current.length;
                   }
                 }
@@ -291,7 +334,9 @@ const MessageContent = ({
               }
             } else {
               return (
-                <div className={`prose prose-xs sm:prose-sm prose-gray max-w-none overflow-x-auto text-xs sm:text-sm ${message.role === 'user' ? 'user-message' : ''}`}>
+                <div
+                  className={`prose prose-xs sm:prose-sm prose-gray max-w-none overflow-x-auto text-xs sm:text-sm ${message.role === 'user' ? 'user-message' : ''}`}
+                >
                   <MarkdownRenderer
                     content={message.content}
                     className={message.role === 'user' ? 'user-message' : ''}
@@ -310,4 +355,4 @@ const MessageContent = ({
   );
 };
 
-export default MessageContent; 
+export default MessageContent;

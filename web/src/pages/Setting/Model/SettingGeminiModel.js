@@ -104,10 +104,10 @@ export default function SettingGeminiModel(props) {
                   }
                   field={'gemini.safety_settings'}
                   extraText={t(
-                    'default为默认设置，可单独设置每个分类的安全等级',
+                    'default为默认设置，可单独设置每个分类的安全等级'
                   )}
                   autosize={{ minRows: 6, maxRows: 12 }}
-                  trigger='blur'
+                  trigger="blur"
                   stopValidateWithError
                   rules={[
                     {
@@ -133,7 +133,7 @@ export default function SettingGeminiModel(props) {
                   field={'gemini.version_settings'}
                   extraText={t('default为默认设置，可单独设置每个模型的版本')}
                   autosize={{ minRows: 6, maxRows: 12 }}
-                  trigger='blur'
+                  trigger="blur"
                   stopValidateWithError
                   rules={[
                     {
@@ -152,9 +152,22 @@ export default function SettingGeminiModel(props) {
                 <Form.TextArea
                   field={'gemini.supported_imagine_models'}
                   label={t('支持的图像模型')}
-                  placeholder={t('例如：') + '\n' + JSON.stringify(['gemini-2.0-flash-exp-image-generation'], null, 2)}
-                  onChange={(value) => setInputs({ ...inputs, 'gemini.supported_imagine_models': value })}
-                  trigger='blur'
+                  placeholder={
+                    t('例如：') +
+                    '\n' +
+                    JSON.stringify(
+                      ['gemini-2.0-flash-exp-image-generation'],
+                      null,
+                      2
+                    )
+                  }
+                  onChange={(value) =>
+                    setInputs({
+                      ...inputs,
+                      'gemini.supported_imagine_models': value,
+                    })
+                  }
+                  trigger="blur"
                   stopValidateWithError
                   rules={[
                     {
@@ -172,9 +185,9 @@ export default function SettingGeminiModel(props) {
               <Col span={16}>
                 <Text>
                   {t(
-                    "和Claude不同，默认情况下Gemini的思考模型会自动决定要不要思考，就算不开启适配模型也可以正常使用，" +
-                    "如果您需要计费，推荐设置无后缀模型价格按思考价格设置。" +
-                    "支持使用 gemini-2.5-pro-preview-06-05-thinking-128 格式来精确传递思考预算。"
+                    '和Claude不同，默认情况下Gemini的思考模型会自动决定要不要思考，就算不开启适配模型也可以正常使用，' +
+                      '如果您需要计费，推荐设置无后缀模型价格按思考价格设置。' +
+                      '支持使用 gemini-2.5-pro-preview-06-05-thinking-128 格式来精确传递思考预算。'
                   )}
                 </Text>
               </Col>
@@ -184,7 +197,9 @@ export default function SettingGeminiModel(props) {
                 <Form.Switch
                   label={t('启用Gemini思考后缀适配')}
                   field={'gemini.thinking_adapter_enabled'}
-                  extraText={t('适配 -thinking、-thinking-预算数字 和 -nothinking 后缀')}
+                  extraText={t(
+                    '适配 -thinking、-thinking-预算数字 和 -nothinking 后缀'
+                  )}
                   onChange={(value) =>
                     setInputs({
                       ...inputs,
@@ -198,7 +213,7 @@ export default function SettingGeminiModel(props) {
               <Col span={16}>
                 <Text>
                   {t(
-                    'Gemini思考适配 BudgetTokens = MaxTokens * BudgetTokens 百分比',
+                    'Gemini思考适配 BudgetTokens = MaxTokens * BudgetTokens 百分比'
                   )}
                 </Text>
               </Col>
@@ -209,7 +224,7 @@ export default function SettingGeminiModel(props) {
                   label={t('思考预算占比')}
                   field={'gemini.thinking_adapter_budget_tokens_percentage'}
                   initValue={''}
-                  extraText={t('0.002-1之间的小数')} 
+                  extraText={t('0.002-1之间的小数')}
                   min={0.002}
                   max={1}
                   onChange={(value) =>
@@ -224,7 +239,7 @@ export default function SettingGeminiModel(props) {
           </Form.Section>
 
           <Row>
-            <Button size='default' onClick={onSubmit}>
+            <Button size="default" onClick={onSubmit}>
               {t('保存')}
             </Button>
           </Row>

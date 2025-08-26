@@ -23,7 +23,7 @@ export default function SettingsLog(props) {
 
   function onSubmit() {
     const updateArray = compareObjects(inputs, inputsRow).filter(
-      (item) => item.key !== 'historyTimestamp',
+      (item) => item.key !== 'historyTimestamp'
     );
 
     if (!updateArray.length) return showWarning(t('你似乎并没有修改什么'));
@@ -63,7 +63,7 @@ export default function SettingsLog(props) {
       setLoadingCleanHistoryLog(true);
       if (!inputs.historyTimestamp) throw new Error(t('请选择日志记录时间'));
       const res = await API.delete(
-        `/api/log/?target_timestamp=${Date.parse(inputs.historyTimestamp) / 1000}`,
+        `/api/log/?target_timestamp=${Date.parse(inputs.historyTimestamp) / 1000}`
       );
       const { success, message, data } = res.data;
       if (success) {
@@ -105,9 +105,9 @@ export default function SettingsLog(props) {
                 <Form.Switch
                   field={'LogConsumeEnabled'}
                   label={t('启用额度消费日志记录')}
-                  size='default'
-                  checkedText='｜'
-                  uncheckedText='〇'
+                  size="default"
+                  checkedText="｜"
+                  uncheckedText="〇"
                   onChange={(value) => {
                     setInputs({
                       ...inputs,
@@ -121,7 +121,7 @@ export default function SettingsLog(props) {
                   <Form.DatePicker
                     label={t('日志记录时间')}
                     field={'historyTimestamp'}
-                    type='dateTime'
+                    type="dateTime"
                     inputReadOnly={true}
                     onChange={(value) => {
                       setInputs({
@@ -130,7 +130,7 @@ export default function SettingsLog(props) {
                       });
                     }}
                   />
-                  <Button size='default' onClick={onCleanHistoryLog}>
+                  <Button size="default" onClick={onCleanHistoryLog}>
                     {t('清除历史日志')}
                   </Button>
                 </Spin>
@@ -138,7 +138,7 @@ export default function SettingsLog(props) {
             </Row>
 
             <Row>
-              <Button size='default' onClick={onSubmit}>
+              <Button size="default" onClick={onSubmit}>
                 {t('保存日志设置')}
               </Button>
             </Row>

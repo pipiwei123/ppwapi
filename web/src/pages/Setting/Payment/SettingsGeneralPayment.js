@@ -1,9 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  Button,
-  Form,
-  Spin,
-} from '@douyinfe/semi-ui';
+import { Button, Form, Spin } from '@douyinfe/semi-ui';
 import {
   API,
   removeTrailingSlash,
@@ -22,7 +18,9 @@ export default function SettingsGeneralPayment(props) {
 
   useEffect(() => {
     if (props.options && formApiRef.current) {
-      const currentInputs = { ServerAddress: props.options.ServerAddress || '' };
+      const currentInputs = {
+        ServerAddress: props.options.ServerAddress || '',
+      };
       setInputs(currentInputs);
       formApiRef.current.setValues(currentInputs);
     }
@@ -61,15 +59,17 @@ export default function SettingsGeneralPayment(props) {
       >
         <Form.Section text={t('通用设置')}>
           <Form.Input
-            field='ServerAddress'
+            field="ServerAddress"
             label={t('服务器地址')}
             placeholder={'https://yourdomain.com'}
             style={{ width: '100%' }}
-            extraText={t('该服务器地址将影响支付回调地址以及默认首页展示的地址，请确保正确配置')}
+            extraText={t(
+              '该服务器地址将影响支付回调地址以及默认首页展示的地址，请确保正确配置'
+            )}
           />
           <Button onClick={submitServerAddress}>{t('更新服务器地址')}</Button>
         </Form.Section>
       </Form>
     </Spin>
   );
-} 
+}

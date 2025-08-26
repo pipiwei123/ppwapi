@@ -1,6 +1,15 @@
 import React, { useContext, useEffect, useRef, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API, copy, showError, showInfo, showSuccess, getModelCategories, renderModelTag, stringToColor } from '../../helpers';
+import {
+  API,
+  copy,
+  showError,
+  showInfo,
+  showSuccess,
+  getModelCategories,
+  renderModelTag,
+  stringToColor,
+} from '../../helpers';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -19,11 +28,11 @@ import {
   TabPane,
   Empty,
   Switch,
-  Select
+  Select,
 } from '@douyinfe/semi-ui';
 import {
   IllustrationNoResult,
-  IllustrationNoResultDark
+  IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
 import {
   IconVerify,
@@ -32,7 +41,7 @@ import {
   IconCopy,
   IconInfoCircle,
   IconLayers,
-  IconComment
+  IconComment,
 } from '@douyinfe/semi-icons';
 import { UserContext } from '../../context/User/index.js';
 import { AlertCircle } from 'lucide-react';
@@ -55,8 +64,14 @@ const ModelPricing = () => {
   const [tokenUnit, setTokenUnit] = useState('M');
   const [statusState] = useContext(StatusContext);
   // 充值汇率（price）与美元兑人民币汇率（usd_exchange_rate）
-  const priceRate = useMemo(() => statusState?.status?.price ?? 1, [statusState]);
-  const usdExchangeRate = useMemo(() => statusState?.status?.usd_exchange_rate ?? priceRate, [statusState, priceRate]);
+  const priceRate = useMemo(
+    () => statusState?.status?.price ?? 1,
+    [statusState]
+  );
+  const usdExchangeRate = useMemo(
+    () => statusState?.status?.usd_exchange_rate ?? priceRate,
+    [statusState, priceRate]
+  );
 
   const rowSelection = useMemo(
     () => ({
@@ -64,7 +79,7 @@ const ModelPricing = () => {
         setSelectedRowKeys(selectedRowKeys);
       },
     }),
-    [],
+    []
   );
 
   const handleChange = (value) => {
@@ -90,13 +105,13 @@ const ModelPricing = () => {
     switch (type) {
       case 1:
         return (
-          <Tag color='teal' shape='circle'>
+          <Tag color="teal" shape="circle">
             {t('按次计费')}
           </Tag>
         );
       case 0:
         return (
-          <Tag color='violet' shape='circle'>
+          <Tag color="violet" shape="circle">
             {t('按量计费')}
           </Tag>
         );
@@ -111,11 +126,11 @@ const ModelPricing = () => {
         content={
           <div style={{ padding: 8 }}>{t('您的分组可以使用该模型')}</div>
         }
-        position='top'
+        position="top"
         key={available}
         className="bg-green-50"
       >
-        <IconVerify style={{ color: 'rgb(22 163 74)' }} size='large' />
+        <IconVerify style={{ color: 'rgb(22 163 74)' }} size="large" />
       </Popover>
     ) : null;
   }
@@ -127,11 +142,7 @@ const ModelPricing = () => {
     return (
       <Space wrap>
         {endpoints.map((endpoint, idx) => (
-          <Tag
-            key={endpoint}
-            color={stringToColor(endpoint)}
-            shape='circle'
-          >
+          <Tag key={endpoint} color={stringToColor(endpoint)} shape="circle">
             {endpoint}
           </Tag>
         ))}
@@ -142,7 +153,7 @@ const ModelPricing = () => {
   const displayPrice = (usdPrice) => {
     let priceInUSD = usdPrice;
     if (showWithRecharge) {
-      priceInUSD = usdPrice * priceRate / usdExchangeRate;
+      priceInUSD = (usdPrice * priceRate) / usdExchangeRate;
     }
 
     if (currency === 'CNY') {
@@ -179,7 +190,7 @@ const ModelPricing = () => {
         return renderModelTag(text, {
           onClick: () => {
             copyText(text);
-          }
+          },
         });
       },
       onFilter: (value, record) =>
@@ -204,22 +215,26 @@ const ModelPricing = () => {
               if (usableGroup[group]) {
                 if (group === selectedGroup) {
                   return (
-                    <Tag color='blue' shape='circle' prefixIcon={<IconVerify />}>
+                    <Tag
+                      color="blue"
+                      shape="circle"
+                      prefixIcon={<IconVerify />}
+                    >
                       {group}
                     </Tag>
                   );
                 } else {
                   return (
                     <Tag
-                      color='blue'
-                      shape='circle'
+                      color="blue"
+                      shape="circle"
                       onClick={() => {
                         setSelectedGroup(group);
                         showInfo(
                           t('当前查看的分组为：{{group}}，倍率为：{{ratio}}', {
                             group: group,
                             ratio: groupRatio[group],
-                          }),
+                          })
                         );
                       }}
                       className="cursor-pointer hover:opacity-80 transition-opacity"
@@ -287,9 +302,13 @@ const ModelPricing = () => {
       render: (text, record, index) => {
         let content = text;
         if (record.quota_type === 0) {
-          let inputRatioPriceUSD = record.model_ratio * 2 * groupRatio[selectedGroup];
+          let inputRatioPriceUSD =
+            record.model_ratio * 2 * groupRatio[selectedGroup];
           let completionRatioPriceUSD =
-            record.model_ratio * record.completion_ratio * 2 * groupRatio[selectedGroup];
+            record.model_ratio *
+            record.completion_ratio *
+            2 *
+            groupRatio[selectedGroup];
 
           const unitDivisor = tokenUnit === 'K' ? 1000 : 1;
           const unitLabel = tokenUnit === 'K' ? 'K' : 'M';
@@ -298,8 +317,10 @@ const ModelPricing = () => {
           let displayCompletion = displayPrice(completionRatioPriceUSD);
 
           const divisor = unitDivisor;
-          const numInput = parseFloat(displayInput.replace(/[^0-9.]/g, '')) / divisor;
-          const numCompletion = parseFloat(displayCompletion.replace(/[^0-9.]/g, '')) / divisor;
+          const numInput =
+            parseFloat(displayInput.replace(/[^0-9.]/g, '')) / divisor;
+          const numCompletion =
+            parseFloat(displayCompletion.replace(/[^0-9.]/g, '')) / divisor;
 
           displayInput = `${currency === 'CNY' ? '¥' : '$'}${numInput.toFixed(3)}`;
           displayCompletion = `${currency === 'CNY' ? '¥' : '$'}${numCompletion.toFixed(3)}`;
@@ -333,7 +354,11 @@ const ModelPricing = () => {
         const isAvailable = record.enable_groups.includes(selectedGroup);
         return (
           <Space>
-            <Tooltip content={isAvailable ? t('开始聊天') : t('当前分组无法使用此模型')}>
+            <Tooltip
+              content={
+                isAvailable ? t('开始聊天') : t('当前分组无法使用此模型')
+              }
+            >
               <Button
                 type="primary"
                 theme="solid"
@@ -341,7 +366,7 @@ const ModelPricing = () => {
                 icon={<IconComment />}
                 onClick={() => handleChatWithModel(record.model_name)}
                 disabled={!isAvailable}
-                className={isAvailable ? "!bg-blue-500 hover:!bg-blue-600" : ""}
+                className={isAvailable ? '!bg-blue-500 hover:!bg-blue-600' : ''}
               >
                 {t('聊天')}
               </Button>
@@ -414,14 +439,14 @@ const ModelPricing = () => {
   // 跳转到聊天页面
   const handleChatWithModel = (modelName) => {
     const params = new URLSearchParams({
-      model: modelName
+      model: modelName,
     });
-    
+
     // 添加分组参数，如果不是默认分组
     if (selectedGroup && selectedGroup !== 'default') {
       params.append('group', selectedGroup);
     }
-    
+
     navigate(`/console/playground?${params.toString()}`);
   };
 
@@ -438,7 +463,7 @@ const ModelPricing = () => {
 
       Object.entries(modelCategories).forEach(([key, category]) => {
         if (key !== 'all') {
-          counts[key] = models.filter(model => category.filter(model)).length;
+          counts[key] = models.filter((model) => category.filter(model)).length;
         }
       });
     }
@@ -448,10 +473,12 @@ const ModelPricing = () => {
   const availableCategories = useMemo(() => {
     if (!models.length) return ['all'];
 
-    return Object.entries(modelCategories).filter(([key, category]) => {
-      if (key === 'all') return true;
-      return models.some(model => category.filter(model));
-    }).map(([key]) => key);
+    return Object.entries(modelCategories)
+      .filter(([key, category]) => {
+        if (key === 'all') return true;
+        return models.some((model) => category.filter(model));
+      })
+      .map(([key]) => key);
   }, [models]);
 
   const renderTabs = () => {
@@ -460,7 +487,7 @@ const ModelPricing = () => {
         activeKey={activeKey}
         type="card"
         collapsible
-        onChange={key => setActiveKey(key)}
+        onChange={(key) => setActiveKey(key)}
         className="mt-2"
       >
         {Object.entries(modelCategories)
@@ -472,11 +499,13 @@ const ModelPricing = () => {
               <TabPane
                 tab={
                   <span className="flex items-center gap-2">
-                    {category.icon && <span className="w-4 h-4">{category.icon}</span>}
+                    {category.icon && (
+                      <span className="w-4 h-4">{category.icon}</span>
+                    )}
                     {category.label}
                     <Tag
                       color={activeKey === key ? 'red' : 'grey'}
-                      shape='circle'
+                      shape="circle"
                     >
                       {modelCount}
                     </Tag>
@@ -495,12 +524,14 @@ const ModelPricing = () => {
     let result = models;
 
     if (activeKey !== 'all') {
-      result = result.filter(model => modelCategories[activeKey].filter(model));
+      result = result.filter((model) =>
+        modelCategories[activeKey].filter(model)
+      );
     }
 
     if (filteredValue.length > 0) {
       const searchTerm = filteredValue[0].toLowerCase();
-      result = result.filter(model =>
+      result = result.filter((model) =>
         model.model_name.toLowerCase().includes(searchTerm)
       );
     }
@@ -508,86 +539,96 @@ const ModelPricing = () => {
     return result;
   }, [activeKey, models, filteredValue]);
 
-  const SearchAndActions = useMemo(() => (
-    <Card className="!rounded-xl mb-6" bordered={false}>
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="flex-1 min-w-[200px]">
-          <Input
-            prefix={<IconSearch />}
-            placeholder={t('模糊搜索模型名称')}
-            onCompositionStart={handleCompositionStart}
-            onCompositionEnd={handleCompositionEnd}
-            onChange={handleChange}
-            showClear
-          />
-        </div>
-        <Button
-          theme='light'
-          type='primary'
-          icon={<IconCopy />}
-          onClick={() => copyText(selectedRowKeys)}
-          disabled={selectedRowKeys.length === 0}
-          className="!bg-blue-500 hover:!bg-blue-600 text-white"
-        >
-          {t('复制选中模型')}
-        </Button>
+  const SearchAndActions = useMemo(
+    () => (
+      <Card className="!rounded-xl mb-6" bordered={false}>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex-1 min-w-[200px]">
+            <Input
+              prefix={<IconSearch />}
+              placeholder={t('模糊搜索模型名称')}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
+              onChange={handleChange}
+              showClear
+            />
+          </div>
+          <Button
+            theme="light"
+            type="primary"
+            icon={<IconCopy />}
+            onClick={() => copyText(selectedRowKeys)}
+            disabled={selectedRowKeys.length === 0}
+            className="!bg-blue-500 hover:!bg-blue-600 text-white"
+          >
+            {t('复制选中模型')}
+          </Button>
 
-        {/* 充值价格显示开关 */}
-        <Space align="center">
-          <span>{t('以充值价格显示')}</span>
-          <Switch
-            checked={showWithRecharge}
-            onChange={setShowWithRecharge}
-            size="small"
-          />
-          {showWithRecharge && (
-            <Select
-              value={currency}
-              onChange={setCurrency}
+          {/* 充值价格显示开关 */}
+          <Space align="center">
+            <span>{t('以充值价格显示')}</span>
+            <Switch
+              checked={showWithRecharge}
+              onChange={setShowWithRecharge}
               size="small"
-              style={{ width: 100 }}
-            >
-              <Select.Option value="USD">USD ($)</Select.Option>
-              <Select.Option value="CNY">CNY (¥)</Select.Option>
-            </Select>
-          )}
-        </Space>
-      </div>
-    </Card>
-  ), [selectedRowKeys, t, showWithRecharge, currency]);
+            />
+            {showWithRecharge && (
+              <Select
+                value={currency}
+                onChange={setCurrency}
+                size="small"
+                style={{ width: 100 }}
+              >
+                <Select.Option value="USD">USD ($)</Select.Option>
+                <Select.Option value="CNY">CNY (¥)</Select.Option>
+              </Select>
+            )}
+          </Space>
+        </div>
+      </Card>
+    ),
+    [selectedRowKeys, t, showWithRecharge, currency]
+  );
 
-  const ModelTable = useMemo(() => (
-    <Card className="!rounded-xl overflow-hidden" bordered={false}>
-      <Table
-        columns={columns}
-        dataSource={filteredModels}
-        loading={loading}
-        rowSelection={rowSelection}
-        className="custom-table"
-        empty={
-          <Empty
-            image={<IllustrationNoResult style={{ width: 150, height: 150 }} />}
-            darkModeImage={<IllustrationNoResultDark style={{ width: 150, height: 150 }} />}
-            description={t('搜索无结果')}
-            style={{ padding: 30 }}
-          />
-        }
-        pagination={{
-          defaultPageSize: 10,
-          pageSize: pageSize,
-          showSizeChanger: true,
-          pageSizeOptions: [10, 20, 50, 100],
-          formatPageText: (page) =>
-            t('第 {{start}} - {{end}} 条，共 {{total}} 条', {
-              start: page.currentStart,
-              end: page.currentEnd,
-              total: filteredModels.length,
-            }),
-          onPageSizeChange: (size) => setPageSize(size),
-        }}
-      />
-    </Card>
-  ), [filteredModels, loading, columns, rowSelection, pageSize, t]);
+  const ModelTable = useMemo(
+    () => (
+      <Card className="!rounded-xl overflow-hidden" bordered={false}>
+        <Table
+          columns={columns}
+          dataSource={filteredModels}
+          loading={loading}
+          rowSelection={rowSelection}
+          className="custom-table"
+          empty={
+            <Empty
+              image={
+                <IllustrationNoResult style={{ width: 150, height: 150 }} />
+              }
+              darkModeImage={
+                <IllustrationNoResultDark style={{ width: 150, height: 150 }} />
+              }
+              description={t('搜索无结果')}
+              style={{ padding: 30 }}
+            />
+          }
+          pagination={{
+            defaultPageSize: 10,
+            pageSize: pageSize,
+            showSizeChanger: true,
+            pageSizeOptions: [10, 20, 50, 100],
+            formatPageText: (page) =>
+              t('第 {{start}} - {{end}} 条，共 {{total}} 条', {
+                start: page.currentStart,
+                end: page.currentEnd,
+                total: filteredModels.length,
+              }),
+            onPageSizeChange: (size) => setPageSize(size),
+          }}
+        />
+      </Card>
+    ),
+    [filteredModels, loading, columns, rowSelection, pageSize, t]
+  );
 
   return (
     <div className="bg-gray-50">
@@ -596,21 +637,31 @@ const ModelPricing = () => {
           <div className="flex justify-center">
             <div className="w-full">
               {/* 主卡片容器 */}
-              <Card bordered={false} className="!rounded-2xl shadow-lg border-0">
+              <Card
+                bordered={false}
+                className="!rounded-2xl shadow-lg border-0"
+              >
                 {/* 顶部状态卡片 */}
                 <Card
                   className="!rounded-2xl !border-0 !shadow-md overflow-hidden mb-6"
                   style={{
-                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #a855f7 50%, #c084fc 75%, #d8b4fe 100%)',
-                    position: 'relative'
+                    background:
+                      'linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #a855f7 50%, #c084fc 75%, #d8b4fe 100%)',
+                    position: 'relative',
                   }}
                   bodyStyle={{ padding: 0 }}
                 >
-                  <div className="relative p-6 sm:p-8" style={{ color: 'white' }}>
+                  <div
+                    className="relative p-6 sm:p-8"
+                    style={{ color: 'white' }}
+                  >
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6">
                       <div className="flex items-start">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 flex items-center justify-center mr-3 sm:mr-4">
-                          <IconLayers size="extra-large" className="text-white" />
+                          <IconLayers
+                            size="extra-large"
+                            className="text-white"
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="text-base sm:text-lg font-semibold mb-1 sm:mb-2">
@@ -619,16 +670,25 @@ const ModelPricing = () => {
                           <div className="text-sm text-white/80">
                             {userState.user ? (
                               <div className="flex items-center">
-                                <IconVerify className="mr-1.5 flex-shrink-0" size="small" />
+                                <IconVerify
+                                  className="mr-1.5 flex-shrink-0"
+                                  size="small"
+                                />
                                 <span className="truncate">
-                                  {t('当前分组')}: {userState.user.group}，{t('倍率')}: {groupRatio[userState.user.group]}
+                                  {t('当前分组')}: {userState.user.group}，
+                                  {t('倍率')}:{' '}
+                                  {groupRatio[userState.user.group]}
                                 </span>
                               </div>
                             ) : (
                               <div className="flex items-center">
-                                <AlertCircle size={14} className="mr-1.5 flex-shrink-0" />
+                                <AlertCircle
+                                  size={14}
+                                  className="mr-1.5 flex-shrink-0"
+                                />
                                 <span className="truncate">
-                                  {t('未登录，使用默认分组倍率：')}{groupRatio['default']}
+                                  {t('未登录，使用默认分组倍率：')}
+                                  {groupRatio['default']}
                                 </span>
                               </div>
                             )}
@@ -641,24 +701,38 @@ const ModelPricing = () => {
                           className="text-center px-2 py-2 sm:px-3 sm:py-2.5 bg-white/10 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors duration-200"
                           style={{ backdropFilter: 'blur(10px)' }}
                         >
-                          <div className="text-xs text-white/70 mb-0.5">{t('分组倍率')}</div>
-                          <div className="text-sm sm:text-base font-semibold">{groupRatio[selectedGroup] || '1.0'}x</div>
-                        </div>
-                        <div
-                          className="text-center px-2 py-2 sm:px-3 sm:py-2.5 bg-white/10 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors duration-200"
-                          style={{ backdropFilter: 'blur(10px)' }}
-                        >
-                          <div className="text-xs text-white/70 mb-0.5">{t('可用模型')}</div>
+                          <div className="text-xs text-white/70 mb-0.5">
+                            {t('分组倍率')}
+                          </div>
                           <div className="text-sm sm:text-base font-semibold">
-                            {models.filter(m => m.enable_groups.includes(selectedGroup)).length}
+                            {groupRatio[selectedGroup] || '1.0'}x
                           </div>
                         </div>
                         <div
                           className="text-center px-2 py-2 sm:px-3 sm:py-2.5 bg-white/10 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors duration-200"
                           style={{ backdropFilter: 'blur(10px)' }}
                         >
-                          <div className="text-xs text-white/70 mb-0.5">{t('计费类型')}</div>
-                          <div className="text-sm sm:text-base font-semibold">2</div>
+                          <div className="text-xs text-white/70 mb-0.5">
+                            {t('可用模型')}
+                          </div>
+                          <div className="text-sm sm:text-base font-semibold">
+                            {
+                              models.filter((m) =>
+                                m.enable_groups.includes(selectedGroup)
+                              ).length
+                            }
+                          </div>
+                        </div>
+                        <div
+                          className="text-center px-2 py-2 sm:px-3 sm:py-2.5 bg-white/10 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors duration-200"
+                          style={{ backdropFilter: 'blur(10px)' }}
+                        >
+                          <div className="text-xs text-white/70 mb-0.5">
+                            {t('计费类型')}
+                          </div>
+                          <div className="text-sm sm:text-base font-semibold">
+                            2
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -671,20 +745,30 @@ const ModelPricing = () => {
                           style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.2)',
                             color: 'white',
-                            backdropFilter: 'blur(10px)'
+                            backdropFilter: 'blur(10px)',
                           }}
                         >
-                          <IconInfoCircle className="flex-shrink-0 mt-0.5" size="small" />
+                          <IconInfoCircle
+                            className="flex-shrink-0 mt-0.5"
+                            size="small"
+                          />
                           <span>
-                            {t('按量计费费用 = 分组倍率 × 模型倍率 × （提示token数 + 补全token数 × 补全倍率）/ 500000 （单位：{{currency}}）', {
-                              currency: currency === 'CNY' ? '人民币' : '美元'
-                            })}
+                            {t(
+                              '按量计费费用 = 分组倍率 × 模型倍率 × （提示token数 + 补全token数 × 补全倍率）/ 500000 （单位：{{currency}}）',
+                              {
+                                currency:
+                                  currency === 'CNY' ? '人民币' : '美元',
+                              }
+                            )}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400" style={{ opacity: 0.6 }}></div>
+                    <div
+                      className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400"
+                      style={{ opacity: 0.6 }}
+                    ></div>
                   </div>
                 </Card>
 
