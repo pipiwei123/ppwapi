@@ -263,6 +263,7 @@ const LogsTable = () => {
     COST: 'cost',
     RETRY: 'retry',
     IP: 'ip',
+    OTHER: 'other',
     DETAILS: 'details',
   };
 
@@ -306,6 +307,7 @@ const LogsTable = () => {
       [COLUMN_KEYS.COST]: true,
       [COLUMN_KEYS.RETRY]: isAdminUser,
       [COLUMN_KEYS.IP]: true,
+      [COLUMN_KEYS.OTHER]: isAdminUser,
       [COLUMN_KEYS.DETAILS]: true,
     };
   };
@@ -333,7 +335,8 @@ const LogsTable = () => {
       if (
         (key === COLUMN_KEYS.CHANNEL ||
           key === COLUMN_KEYS.USERNAME ||
-          key === COLUMN_KEYS.RETRY) &&
+          key === COLUMN_KEYS.RETRY ||
+          key === COLUMN_KEYS.OTHER) &&
         !isAdminUser
       ) {
         updatedColumns[key] = false;
@@ -629,6 +632,47 @@ const LogsTable = () => {
       },
     },
     {
+      key: COLUMN_KEYS.OTHER,
+      title: t('附加信息'),
+      dataIndex: 'other',
+      className: isAdmin() ? 'tableShow' : 'tableHiddle',
+      render: (text, record, index) => {
+        if (!isAdminUser || !text || text === '' || text === '{}') {
+          return <></>;
+        }
+
+        return (
+          <Popover
+            content={
+              <div style={{ maxWidth: 400, maxHeight: 300, overflow: 'auto' }}>
+                <pre
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-all',
+                    fontSize: '12px',
+                    margin: 0,
+                    padding: '8px 0',
+                  }}
+                >
+                  {text}
+                </pre>
+              </div>
+            }
+            title="附加信息详情"
+            trigger="click"
+          >
+            <Button
+              type="tertiary"
+              size="small"
+              onClick={(e) => e.stopPropagation()}
+            >
+              查看
+            </Button>
+          </Popover>
+        );
+      },
+    },
+    {
       key: COLUMN_KEYS.DETAILS,
       title: t('详情'),
       dataIndex: 'content',
@@ -741,7 +785,8 @@ const LogsTable = () => {
               !isAdminUser &&
               (column.key === COLUMN_KEYS.CHANNEL ||
                 column.key === COLUMN_KEYS.USERNAME ||
-                column.key === COLUMN_KEYS.RETRY)
+                column.key === COLUMN_KEYS.RETRY ||
+                column.key === COLUMN_KEYS.OTHER)
             ) {
               return null;
             }
