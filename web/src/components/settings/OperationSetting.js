@@ -14,6 +14,9 @@ const OperationSetting = () => {
     PreConsumedQuota: 0,
     QuotaForInviter: 0,
     QuotaForInvitee: 0,
+    InviteCashbackRatio: 0,
+    MaxInviteRewards: 0,
+    InviteCashbackEnabled: false,
 
     /* 通用设置 */
     TopUpLink: '',

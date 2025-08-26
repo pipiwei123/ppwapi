@@ -96,5 +96,8 @@ func Recharge(referenceId string, customerId string) (err error) {
 
 	RecordLog(topUp.UserId, LogTypeTopup, fmt.Sprintf("使用在线充值成功，充值金额: %v，支付金额：%d", common.FormatQuota(int(quota)), topUp.Amount))
 
+	// 处理邀请返现
+	_ = ProcessCashbackReward(topUp.UserId, int(quota))
+
 	return nil
 }
