@@ -30,15 +30,15 @@ type SubmitReq struct {
 }
 
 type CreateResponse struct {
-	Data    string `json:"data"`    // task_id
-	Code    string `json:"code"`    // IN_PROGRESS
+	Data    string `json:"data"` // task_id
+	Code    string `json:"code"` // IN_PROGRESS
 	Message string `json:"message"`
 }
 
 type StatusResponse struct {
 	FinishTime int64  `json:"finishTime"`
 	StartTime  int64  `json:"startTime"`
-	Status     string `json:"status"`   // SUCCESS/PROCESSING/FAILED
+	Status     string `json:"status"` // SUCCESS/PROCESSING/FAILED
 	TaskId     string `json:"taskId"`
 	VideoUrl   string `json:"videoUrl"`
 }
@@ -106,15 +106,15 @@ func (a *TaskAdaptor) BuildRequestBody(c *gin.Context, info *relaycommon.TaskRel
 	veo3Req := map[string]interface{}{
 		"prompt": req.Prompt,
 	}
-	
+
 	if req.Model != "" {
 		veo3Req["model"] = req.Model
 	}
-	
+
 	if req.EnhancePrompt != nil {
 		veo3Req["enhance_prompt"] = *req.EnhancePrompt
 	}
-	
+
 	if len(req.Images) > 0 {
 		veo3Req["images"] = req.Images
 	}
@@ -148,12 +148,13 @@ func (a *TaskAdaptor) DoResponse(c *gin.Context, resp *http.Response, info *rela
 	}
 
 	// Check if request was successful
-	if veo3Resp.Code != "IN_PROGRESS" {
+	if veo3Resp.Code != "success" {
 		taskErr = service.TaskErrorWrapper(fmt.Errorf(veo3Resp.Message), veo3Resp.Code, http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"task_id": veo3Resp.Data})
+	c.JSON(http.StatusOK, veo3Resp)
+	// Return the task ID from the data field
 	return veo3Resp.Data, responseBody, nil
 }
 

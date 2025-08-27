@@ -249,6 +249,13 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 			if relayMode == relayconstant.RelayModeJimengFetchByID {
 				shouldSelectChannel = false
 			}
+		} else if strings.HasPrefix(modelRequest.Model, "veo3") {
+			platform = string(constant.TaskPlatformVeo3)
+			relayMode = relayconstant.Path2RelayVeo3(c.Request.Method, c.Request.URL.Path)
+			if relayMode == relayconstant.RelayModeVeo3FetchByID {
+				shouldSelectChannel = false
+			}
+
 		} else {
 			platform = string(constant.TaskPlatformKling)
 			relayMode = relayconstant.Path2RelayKling(c.Request.Method, c.Request.URL.Path)

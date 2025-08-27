@@ -97,8 +97,6 @@ func GetAdaptor(apiType int) channel.Adaptor {
 		return &coze.Adaptor{}
 	case constant.APITypeJimeng:
 		return &jimeng.Adaptor{}
-	case constant.APITypeVeo3:
-		return &openai.Adaptor{}  // Use OpenAI adaptor as placeholder for task-based channels
 	}
 	return nil
 }
