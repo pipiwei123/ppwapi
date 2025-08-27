@@ -2,13 +2,7 @@ name: Publish Docker image (alpha)
 
 on:
   push:
-    branches:
-      - alpha
-  workflow_dispatch:
-    inputs:
-      name:
-        description: "reason"
-        required: false
+    branches: [ "*" ]
 
 jobs:
   push_to_registries:
