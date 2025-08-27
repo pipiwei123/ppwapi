@@ -17,8 +17,10 @@ type responseBodyWriter struct {
 }
 
 func (w *responseBodyWriter) Write(data []byte) (int, error) {
-	// 同时写入到缓冲区和原始Writer
-	w.body.Write(data)
+	// 检查当前状态码，只有错误时才缓存
+	if w.Status() >= 400 {
+		w.body.Write(data)
+	}
 	return w.ResponseWriter.Write(data)
 }
 
@@ -62,6 +64,12 @@ func ErrorLogMiddleware() gin.HandlerFunc {
 		if statusCode >= 400 {
 			// 获取请求相关信息
 			userId := c.GetInt("id")
+
+			// 如果userId为0，说明认证失败，不记录错误日志
+			if userId == 0 {
+				return
+			}
+
 			tokenName := c.GetString("token_name")
 			modelName := c.GetString("original_model")
 			tokenId := c.GetInt("token_id")
