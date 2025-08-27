@@ -13,6 +13,7 @@ import (
 	"one-api/relay/channel"
 	relaycommon "one-api/relay/common"
 	"one-api/service"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -26,6 +27,7 @@ type SubmitReq struct {
 	Prompt        string   `json:"prompt"`
 	Model         string   `json:"model,omitempty"`
 	EnhancePrompt *bool    `json:"enhance_prompt,omitempty"`
+	AspectRatio   string   `json:"aspect_ratio,omitempty"`
 	Images        []string `json:"images,omitempty"`
 }
 
@@ -82,8 +84,11 @@ func (a *TaskAdaptor) ValidateRequestAndSetAction(c *gin.Context, info *relaycom
 
 // BuildRequestURL constructs the upstream URL.
 func (a *TaskAdaptor) BuildRequestURL(info *relaycommon.TaskRelayInfo) (string, error) {
-	fullURL := fmt.Sprintf("%s/v1/veo/videos", a.baseURL)
-	return fullURL, nil
+	if strings.Contains(info.OriginModelName, "aspect") {
+		return fmt.Sprintf("%s/v1/veo/videos/aspect", a.baseURL), nil
+	} else {
+		return fmt.Sprintf("%s/v1/veo/videos", a.baseURL), nil
+	}
 }
 
 // BuildRequestHeader sets required headers.
@@ -114,7 +119,9 @@ func (a *TaskAdaptor) BuildRequestBody(c *gin.Context, info *relaycommon.TaskRel
 	if req.EnhancePrompt != nil {
 		veo3Req["enhance_prompt"] = *req.EnhancePrompt
 	}
-
+	if req.AspectRatio != "" {
+		veo3Req["aspect_ratio"] = req.AspectRatio
+	}
 	if len(req.Images) > 0 {
 		veo3Req["images"] = req.Images
 	}

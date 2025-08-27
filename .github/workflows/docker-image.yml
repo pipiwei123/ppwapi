@@ -36,8 +36,8 @@ jobs:
           images: |
             uswccr.ccs.tencentyun.com/newapi/newapi
           tags: |
-            type=raw,value=alpha
-            type=raw,value=alpha-{{date 'YYYYMMDD'}}-{{sha}}
+            type=ref,event=branch
+            type=ref,event=tag
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v5
