@@ -106,7 +106,7 @@ export default function SettingClaudeModel(props) {
                     t('示例') + '\n' + JSON.stringify(CLAUDE_HEADER, null, 2)
                   }
                   autosize={{ minRows: 6, maxRows: 12 }}
-                  trigger='blur'
+                  trigger="blur"
                   stopValidateWithError
                   rules={[
                     {
@@ -139,7 +139,7 @@ export default function SettingClaudeModel(props) {
                     JSON.stringify(CLAUDE_DEFAULT_MAX_TOKENS, null, 2)
                   }
                   autosize={{ minRows: 6, maxRows: 12 }}
-                  trigger='blur'
+                  trigger="blur"
                   stopValidateWithError
                   rules={[
                     {
@@ -172,7 +172,7 @@ export default function SettingClaudeModel(props) {
                 {/*//展示MaxTokens和BudgetTokens的计算公式, 并展示实际数字*/}
                 <Text>
                   {t(
-                    'Claude思考适配 BudgetTokens = MaxTokens * BudgetTokens 百分比',
+                    'Claude思考适配 BudgetTokens = MaxTokens * BudgetTokens 百分比'
                   )}
                 </Text>
               </Col>
@@ -197,7 +197,7 @@ export default function SettingClaudeModel(props) {
             </Row>
 
             <Row>
-              <Button size='default' onClick={onSubmit}>
+              <Button size="default" onClick={onSubmit}>
                 {t('保存')}
               </Button>
             </Row>

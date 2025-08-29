@@ -14,6 +14,9 @@ const OperationSetting = () => {
     PreConsumedQuota: 0,
     QuotaForInviter: 0,
     QuotaForInvitee: 0,
+    InviteCashbackRatio: 0,
+    MaxInviteRewards: 0,
+    InviteCashbackEnabled: false,
 
     /* 通用设置 */
     TopUpLink: '',
@@ -84,7 +87,7 @@ const OperationSetting = () => {
 
   return (
     <>
-      <Spin spinning={loading} size='large'>
+      <Spin spinning={loading} size="large">
         {/* 通用设置 */}
         <Card style={{ marginTop: '10px' }}>
           <SettingsGeneral options={inputs} refresh={onRefresh} />

@@ -13,9 +13,11 @@ import './index.css';
 // 欢迎信息（二次开发者不准将此移除）
 // Welcome message (Secondary developers are not allowed to remove this)
 if (typeof window !== 'undefined') {
-  console.log('%cWe ❤ NewAPI%c Github: https://github.com/QuantumNous/new-api',
+  console.log(
+    '%cWe ❤ NewAPI%c Github: https://github.com/QuantumNous/new-api',
     'color: #10b981; font-weight: bold; font-size: 24px;',
-    'color: inherit; font-size: 14px;');
+    'color: inherit; font-size: 14px;'
+  );
 
   // 在开发环境中过滤 Semi Design 的 findDOMNode 警告
   if (process.env.NODE_ENV === 'development') {
@@ -24,13 +26,17 @@ if (typeof window !== 'undefined') {
       const warnings = [
         'findDOMNode is deprecated',
         'findDOMNode was passed an instance of',
-        'findDOMNode is deprecated in StrictMode'
+        'findDOMNode is deprecated in StrictMode',
       ];
-      
-      if (warnings.some(warning => message.includes && message.includes(warning))) {
+
+      if (
+        warnings.some(
+          (warning) => message.includes && message.includes(warning)
+        )
+      ) {
         return;
       }
-      
+
       originalWarn.apply(console, arguments);
     };
   }
@@ -70,5 +76,5 @@ root.render(
         </BrowserRouter>
       </UserProvider>
     </StatusProvider>
-  </AppWrapper>,
+  </AppWrapper>
 );

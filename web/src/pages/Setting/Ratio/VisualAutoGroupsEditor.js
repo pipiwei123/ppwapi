@@ -11,9 +11,16 @@ import {
   Tag,
   List,
   Empty,
-  Tooltip
+  Tooltip,
 } from '@douyinfe/semi-ui';
-import { IconPlus, IconDelete, IconHandle, IconInfoCircle, IconArrowUp, IconArrowDown } from '@douyinfe/semi-icons';
+import {
+  IconPlus,
+  IconDelete,
+  IconHandle,
+  IconInfoCircle,
+  IconArrowUp,
+  IconArrowDown,
+} from '@douyinfe/semi-icons';
 import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
@@ -30,11 +37,13 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
       if (value && value.trim()) {
         const parsed = JSON.parse(value);
         if (Array.isArray(parsed)) {
-          setData(parsed.map((group, index) => ({
-            key: index.toString(),
-            group: group,
-            order: index + 1
-          })));
+          setData(
+            parsed.map((group, index) => ({
+              key: index.toString(),
+              group: group,
+              order: index + 1,
+            }))
+          );
         } else {
           setData([]);
         }
@@ -49,24 +58,27 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
 
   // 将数组数据转换为JSON字符串
   const updateValue = (newData) => {
-    const groupsArray = newData.map(item => item.group);
+    const groupsArray = newData.map((item) => item.group);
     onChange(JSON.stringify(groupsArray, null, 2));
   };
 
   const handleAdd = () => {
     if (!newGroup.trim()) return;
-    
+
     // 检查是否已存在
-    if (data.some(item => item.group === newGroup.trim())) {
+    if (data.some((item) => item.group === newGroup.trim())) {
       return;
     }
 
     const newKey = Date.now().toString();
-    const newData = [...data, {
-      key: newKey,
-      group: newGroup.trim(),
-      order: data.length + 1
-    }];
+    const newData = [
+      ...data,
+      {
+        key: newKey,
+        group: newGroup.trim(),
+        order: data.length + 1,
+      },
+    ];
     setData(newData);
     updateValue(newData);
     setNewGroup('');
@@ -74,10 +86,11 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
   };
 
   const handleDelete = (key) => {
-    const newData = data.filter(item => item.key !== key)
+    const newData = data
+      .filter((item) => item.key !== key)
       .map((item, index) => ({
         ...item,
-        order: index + 1
+        order: index + 1,
       }));
     setData(newData);
     updateValue(newData);
@@ -124,16 +137,26 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
   return (
     <Card>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Title heading={6}>{t('自动分组降级顺序配置')}</Title>
-            <Tooltip content={t('当令牌选择auto分组时，系统会按此顺序依次尝试各分组的渠道')}>
-              <IconInfoCircle size='small' />
+            <Tooltip
+              content={t(
+                '当令牌选择auto分组时，系统会按此顺序依次尝试各分组的渠道'
+              )}
+            >
+              <IconInfoCircle size="small" />
             </Tooltip>
           </div>
           <Button
-            theme='solid'
-            type='primary'
+            theme="solid"
+            type="primary"
             icon={<IconPlus />}
             onClick={() => setShowAddModal(true)}
             disabled={disabled}
@@ -141,8 +164,10 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
             {t('添加分组')}
           </Button>
         </div>
-        <Text type='secondary' size='small'>
-          {t('配置auto分组的降级顺序，系统会从第一个分组开始尝试，失败后依次切换到下一个分组')}
+        <Text type="secondary" size="small">
+          {t(
+            '配置auto分组的降级顺序，系统会从第一个分组开始尝试，失败后依次切换到下一个分组'
+          )}
         </Text>
       </div>
 
@@ -163,17 +188,17 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
                 border: '1px solid var(--semi-color-border)',
                 borderRadius: '6px',
                 marginBottom: '8px',
-                backgroundColor: 'var(--semi-color-bg-2)'
+                backgroundColor: 'var(--semi-color-bg-2)',
               }}
               main={
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <Tag color={getOrderColor(item.order)} size='large'>
+                  <Tag color={getOrderColor(item.order)} size="large">
                     #{item.order}
                   </Tag>
-                  <Tag color='cyan' size='large'>
+                  <Tag color="cyan" size="large">
                     {item.group}
                   </Tag>
-                  <Text type='secondary' size='small'>
+                  <Text type="secondary" size="small">
                     {getOrderText(item.order)}
                   </Text>
                 </div>
@@ -181,9 +206,9 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
               extra={
                 <Space>
                   <Button
-                    theme='light'
-                    type='primary'
-                    size='small'
+                    theme="light"
+                    type="primary"
+                    size="small"
                     icon={<IconArrowUp />}
                     onClick={() => moveUp(index)}
                     disabled={disabled || index === 0}
@@ -191,9 +216,9 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
                     {t('上移')}
                   </Button>
                   <Button
-                    theme='light'
-                    type='primary'
-                    size='small'
+                    theme="light"
+                    type="primary"
+                    size="small"
                     icon={<IconArrowDown />}
                     onClick={() => moveDown(index)}
                     disabled={disabled || index === data.length - 1}
@@ -206,9 +231,9 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
                     disabled={disabled}
                   >
                     <Button
-                      theme='light'
-                      type='danger'
-                      size='small'
+                      theme="light"
+                      type="danger"
+                      size="small"
                       icon={<IconDelete />}
                       disabled={disabled}
                     >
@@ -232,11 +257,7 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
         footer={null}
         width={480}
       >
-        <Form
-          onSubmit={handleAdd}
-          labelPosition='left'
-          labelWidth={100}
-        >
+        <Form onSubmit={handleAdd} labelPosition="left" labelWidth={100}>
           <Form.Input
             field="group"
             label={t('分组名称')}
@@ -245,21 +266,21 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
             onChange={setNewGroup}
             rules={[
               { required: true, message: t('分组名称不能为空') },
-              { 
+              {
                 validator: (rule, value) => {
                   if (value) {
-                    const exists = data.some(item => item.group === value);
+                    const exists = data.some((item) => item.group === value);
                     if (exists) {
                       return Promise.reject(t('分组名称已存在'));
                     }
                   }
                   return Promise.resolve();
-                }
-              }
+                },
+              },
             ]}
           />
           <div style={{ marginTop: 24 }}>
-            <Text type='secondary' size='small'>
+            <Text type="secondary" size="small">
               {t('新添加的分组将排在列表末尾，可通过上移/下移调整顺序')}
             </Text>
           </div>
@@ -274,10 +295,13 @@ const VisualAutoGroupsEditor = ({ value, onChange, disabled = false }) => {
               {t('取消')}
             </Button>
             <Button
-              theme='solid'
-              type='primary'
+              theme="solid"
+              type="primary"
               onClick={handleAdd}
-              disabled={!newGroup.trim() || data.some(item => item.group === newGroup.trim())}
+              disabled={
+                !newGroup.trim() ||
+                data.some((item) => item.group === newGroup.trim())
+              }
             >
               {t('添加')}
             </Button>

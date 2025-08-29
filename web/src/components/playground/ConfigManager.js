@@ -1,19 +1,14 @@
 import React, { useRef } from 'react';
-import {
-  Button,
-  Typography,
-  Toast,
-  Modal,
-  Dropdown,
-} from '@douyinfe/semi-ui';
-import {
-  Download,
-  Upload,
-  RotateCcw,
-  Settings2,
-} from 'lucide-react';
+import { Button, Typography, Toast, Modal, Dropdown } from '@douyinfe/semi-ui';
+import { Download, Upload, RotateCcw, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { exportConfig, importConfig, clearConfig, hasStoredConfig, getConfigTimestamp } from './configStorage';
+import {
+  exportConfig,
+  importConfig,
+  clearConfig,
+  hasStoredConfig,
+  getConfigTimestamp,
+} from './configStorage';
 
 const ConfigManager = ({
   currentConfig,
@@ -32,7 +27,10 @@ const ConfigManager = ({
         ...currentConfig,
         timestamp: new Date().toISOString(),
       };
-      localStorage.setItem('playground_config', JSON.stringify(configWithTimestamp));
+      localStorage.setItem(
+        'playground_config',
+        JSON.stringify(configWithTimestamp)
+      );
 
       exportConfig(currentConfig, messages);
       Toast.success({
@@ -85,7 +83,9 @@ const ConfigManager = ({
   const handleReset = () => {
     Modal.confirm({
       title: t('重置配置'),
-      content: t('将清除所有保存的配置并恢复默认设置，此操作不可撤销。是否继续？'),
+      content: t(
+        '将清除所有保存的配置并恢复默认设置，此操作不可撤销。是否继续？'
+      ),
       okText: t('确定重置'),
       cancelText: t('取消'),
       okButtonProps: {
@@ -95,7 +95,9 @@ const ConfigManager = ({
         // 询问是否同时重置消息
         Modal.confirm({
           title: t('重置选项'),
-          content: t('是否同时重置对话消息？选择"是"将清空所有对话记录并恢复默认示例；选择"否"将保留当前对话记录。'),
+          content: t(
+            '是否同时重置对话消息？选择"是"将清空所有对话记录并恢复默认示例；选择"否"将保留当前对话记录。'
+          ),
           okText: t('同时重置消息'),
           cancelText: t('仅重置配置'),
           okButtonProps: {
@@ -257,4 +259,4 @@ const ConfigManager = ({
   );
 };
 
-export default ConfigManager; 
+export default ConfigManager;

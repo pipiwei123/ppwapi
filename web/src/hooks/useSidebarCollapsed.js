@@ -3,10 +3,12 @@ import { useState, useCallback } from 'react';
 const KEY = 'default_collapse_sidebar';
 
 export const useSidebarCollapsed = () => {
-  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(KEY) === 'true');
+  const [collapsed, setCollapsed] = useState(
+    () => localStorage.getItem(KEY) === 'true'
+  );
 
   const toggle = useCallback(() => {
-    setCollapsed(prev => {
+    setCollapsed((prev) => {
       const next = !prev;
       localStorage.setItem(KEY, next.toString());
       return next;
@@ -19,4 +21,4 @@ export const useSidebarCollapsed = () => {
   }, []);
 
   return [collapsed, toggle, set];
-}; 
+};

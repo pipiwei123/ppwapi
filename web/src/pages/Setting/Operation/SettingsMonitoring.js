@@ -87,7 +87,7 @@ export default function SettingsMonitoring(props) {
                   min={0}
                   suffix={t('秒')}
                   extraText={t(
-                    '当运行通道全部测试时，超过此时间将自动禁用通道',
+                    '当运行通道全部测试时，超过此时间将自动禁用通道'
                   )}
                   placeholder={''}
                   field={'ChannelDisableThreshold'}
@@ -122,9 +122,9 @@ export default function SettingsMonitoring(props) {
                 <Form.Switch
                   field={'AutomaticDisableChannelEnabled'}
                   label={t('失败时自动禁用通道')}
-                  size='default'
-                  checkedText='｜'
-                  uncheckedText='〇'
+                  size="default"
+                  checkedText="｜"
+                  uncheckedText="〇"
                   onChange={(value) => {
                     setInputs({
                       ...inputs,
@@ -137,9 +137,9 @@ export default function SettingsMonitoring(props) {
                 <Form.Switch
                   field={'AutomaticEnableChannelEnabled'}
                   label={t('成功时自动启用通道')}
-                  size='default'
-                  checkedText='｜'
-                  uncheckedText='〇'
+                  size="default"
+                  checkedText="｜"
+                  uncheckedText="〇"
                   onChange={(value) =>
                     setInputs({
                       ...inputs,
@@ -155,7 +155,7 @@ export default function SettingsMonitoring(props) {
                   label={t('自动禁用关键词')}
                   placeholder={t('一行一个，不区分大小写')}
                   extraText={t(
-                    '当上游通道返回错误中包含这些关键词时（不区分大小写），自动禁用通道',
+                    '当上游通道返回错误中包含这些关键词时（不区分大小写），自动禁用通道'
                   )}
                   field={'AutomaticDisableKeywords'}
                   autosize={{ minRows: 6, maxRows: 12 }}
@@ -166,7 +166,7 @@ export default function SettingsMonitoring(props) {
               </Col>
             </Row>
             <Row>
-              <Button size='default' onClick={onSubmit}>
+              <Button size="default" onClick={onSubmit}>
                 {t('保存监控设置')}
               </Button>
             </Row>

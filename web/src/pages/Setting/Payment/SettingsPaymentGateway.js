@@ -1,12 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  Button,
-  Form,
-  Row,
-  Col,
-  Typography,
-  Spin,
-} from '@douyinfe/semi-ui';
+import { Button, Form, Row, Col, Typography, Spin } from '@douyinfe/semi-ui';
 const { Text } = Typography;
 import {
   API,
@@ -39,8 +32,14 @@ export default function SettingsPaymentGateway(props) {
         PayAddress: props.options.PayAddress || '',
         EpayId: props.options.EpayId || '',
         EpayKey: props.options.EpayKey || '',
-        Price: props.options.Price !== undefined ? parseFloat(props.options.Price) : 7.3,
-        MinTopUp: props.options.MinTopUp !== undefined ? parseFloat(props.options.MinTopUp) : 1,
+        Price:
+          props.options.Price !== undefined
+            ? parseFloat(props.options.Price)
+            : 7.3,
+        MinTopUp:
+          props.options.MinTopUp !== undefined
+            ? parseFloat(props.options.MinTopUp)
+            : 1,
         TopupGroupRatio: props.options.TopupGroupRatio || '',
         CustomCallbackAddress: props.options.CustomCallbackAddress || '',
         PayMethods: props.options.PayMethods || '',
@@ -107,7 +106,7 @@ export default function SettingsPaymentGateway(props) {
       }
 
       // 发送请求
-      const requestQueue = options.map(opt =>
+      const requestQueue = options.map((opt) =>
         API.put('/api/option/', {
           key: opt.key,
           value: opt.value,
@@ -117,9 +116,9 @@ export default function SettingsPaymentGateway(props) {
       const results = await Promise.all(requestQueue);
 
       // 检查所有请求是否成功
-      const errorResults = results.filter(res => !res.data.success);
+      const errorResults = results.filter((res) => !res.data.success);
       if (errorResults.length > 0) {
-        errorResults.forEach(res => {
+        errorResults.forEach((res) => {
           showError(res.data.message);
         });
       } else {
@@ -143,31 +142,31 @@ export default function SettingsPaymentGateway(props) {
       >
         <Form.Section text={t('支付设置')}>
           <Text>
-            {t('（当前仅支持易支付接口，默认使用上方服务器地址作为回调地址！）')}
+            {t(
+              '（当前仅支持易支付接口，默认使用上方服务器地址作为回调地址！）'
+            )}
           </Text>
-          <Row
-            gutter={{ xs: 8, sm: 16, md: 24, lg: 24, xl: 24, xxl: 24 }}
-          >
+          <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 24, xl: 24, xxl: 24 }}>
             <Col xs={24} sm={24} md={8} lg={8} xl={8}>
               <Form.Input
-                field='PayAddress'
+                field="PayAddress"
                 label={t('支付地址')}
                 placeholder={t('例如：https://yourdomain.com')}
               />
             </Col>
             <Col xs={24} sm={24} md={8} lg={8} xl={8}>
               <Form.Input
-                field='EpayId'
+                field="EpayId"
                 label={t('易支付商户ID')}
                 placeholder={t('例如：0001')}
               />
             </Col>
             <Col xs={24} sm={24} md={8} lg={8} xl={8}>
               <Form.Input
-                field='EpayKey'
+                field="EpayKey"
                 label={t('易支付商户密钥')}
                 placeholder={t('敏感信息不会发送到前端显示')}
-                type='password'
+                type="password"
               />
             </Col>
           </Row>
@@ -177,14 +176,14 @@ export default function SettingsPaymentGateway(props) {
           >
             <Col xs={24} sm={24} md={8} lg={8} xl={8}>
               <Form.Input
-                field='CustomCallbackAddress'
+                field="CustomCallbackAddress"
                 label={t('回调地址')}
                 placeholder={t('例如：https://yourdomain.com')}
               />
             </Col>
             <Col xs={24} sm={24} md={8} lg={8} xl={8}>
               <Form.InputNumber
-                field='Price'
+                field="Price"
                 precision={2}
                 label={t('充值价格（x元/美金）')}
                 placeholder={t('例如：7，就是7元/美金')}
@@ -192,20 +191,20 @@ export default function SettingsPaymentGateway(props) {
             </Col>
             <Col xs={24} sm={24} md={8} lg={8} xl={8}>
               <Form.InputNumber
-                field='MinTopUp'
+                field="MinTopUp"
                 label={t('最低充值美元数量')}
                 placeholder={t('例如：2，就是最低充值2$')}
               />
             </Col>
           </Row>
           <Form.TextArea
-            field='TopupGroupRatio'
+            field="TopupGroupRatio"
             label={t('充值分组倍率')}
             placeholder={t('为一个 JSON 文本，键为组名称，值为倍率')}
             autosize
           />
           <Form.TextArea
-            field='PayMethods'
+            field="PayMethods"
             label={t('充值方式设置')}
             placeholder={t('为一个 JSON 文本')}
             autosize
@@ -215,4 +214,4 @@ export default function SettingsPaymentGateway(props) {
       </Form>
     </Spin>
   );
-} 
+}

@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { API, showError } from '../../helpers';
 import { marked } from 'marked';
 import { Empty } from '@douyinfe/semi-ui';
-import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
+import {
+  IllustrationConstruction,
+  IllustrationConstructionDark,
+} from '@douyinfe/semi-illustrations';
 import { useTranslation } from 'react-i18next';
 
 const About = () => {
@@ -34,7 +37,7 @@ const About = () => {
   }, []);
 
   const emptyStyle = {
-    padding: '24px'
+    padding: '24px',
   };
 
   const customDescription = (
@@ -42,7 +45,7 @@ const About = () => {
       <p>{t('可在设置页面设置关于内容，支持 HTML & Markdown')}</p>
       {t('New API项目仓库地址：')}
       <a
-        href='https://github.com/QuantumNous/new-api'
+        href="https://github.com/QuantumNous/new-api"
         target="_blank"
         rel="noopener noreferrer"
         className="!text-semi-color-primary"
@@ -57,21 +60,27 @@ const About = () => {
           className="!text-semi-color-primary"
         >
           NewAPI
-        </a> {t('© {{currentYear}}', { currentYear })} <a
+        </a>{' '}
+        {t('© {{currentYear}}', { currentYear })}{' '}
+        <a
           href="https://github.com/QuantumNous"
           target="_blank"
           rel="noopener noreferrer"
           className="!text-semi-color-primary"
         >
           QuantumNous
-        </a> {t('| 基于')} <a
+        </a>{' '}
+        {t('| 基于')}{' '}
+        <a
           href="https://github.com/songquanpeng/one-api/releases/tag/v0.5.4"
           target="_blank"
           rel="noopener noreferrer"
           className="!text-semi-color-primary"
         >
           One API v0.5.4
-        </a> © 2023 <a
+        </a>{' '}
+        © 2023{' '}
+        <a
           href="https://github.com/songquanpeng"
           target="_blank"
           rel="noopener noreferrer"
@@ -109,8 +118,14 @@ const About = () => {
       {aboutLoaded && about === '' ? (
         <div className="flex justify-center items-center h-screen p-8">
           <Empty
-            image={<IllustrationConstruction style={{ width: 150, height: 150 }} />}
-            darkModeImage={<IllustrationConstructionDark style={{ width: 150, height: 150 }} />}
+            image={
+              <IllustrationConstruction style={{ width: 150, height: 150 }} />
+            }
+            darkModeImage={
+              <IllustrationConstructionDark
+                style={{ width: 150, height: 150 }}
+              />
+            }
             description={t('管理员暂时未设置任何关于内容')}
             style={emptyStyle}
           >

@@ -12,11 +12,11 @@ export function setStatusData(data) {
   localStorage.setItem('pay_methods', JSON.stringify(data.pay_methods));
   localStorage.setItem(
     'data_export_default_time',
-    data.data_export_default_time,
+    data.data_export_default_time
   );
   localStorage.setItem(
     'default_collapse_sidebar',
-    data.default_collapse_sidebar,
+    data.default_collapse_sidebar
   );
   localStorage.setItem('mj_notify_enabled', data.mj_notify_enabled);
   if (data.chat_link) {

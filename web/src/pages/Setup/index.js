@@ -144,8 +144,9 @@ const Setup = () => {
                 <Card
                   className="!rounded-2xl !border-0 !shadow-2xl overflow-hidden mb-6"
                   style={{
-                    background: 'linear-gradient(135deg, #f97316 0%, #f59e0b 25%, #f43f5e 50%, #ec4899 75%, #e879f9 100%)',
-                    position: 'relative'
+                    background:
+                      'linear-gradient(135deg, #f97316 0%, #f59e0b 25%, #f43f5e 50%, #ec4899 75%, #e879f9 100%)',
+                    position: 'relative',
                   }}
                   bodyStyle={{ padding: 0 }}
                 >
@@ -156,15 +157,26 @@ const Setup = () => {
                     <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-yellow-400 opacity-10 rounded-full"></div>
                   </div>
 
-                  <div className="relative py-5 px-6 flex items-center" style={{ color: 'white' }}>
+                  <div
+                    className="relative py-5 px-6 flex items-center"
+                    style={{ color: 'white' }}
+                  >
                     <div className="w-14 h-14 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-5 shadow-lg flex-shrink-0">
                       <IconSetting size="large" style={{ color: 'white' }} />
                     </div>
                     <div className="text-left">
-                      <Title heading={3} style={{ color: 'white', marginBottom: '2px' }}>
+                      <Title
+                        heading={3}
+                        style={{ color: 'white', marginBottom: '2px' }}
+                      >
                         {t('系统初始化')}
                       </Title>
-                      <Text style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '15px' }}>
+                      <Text
+                        style={{
+                          color: 'rgba(255, 255, 255, 0.9)',
+                          fontSize: '15px',
+                        }}
+                      >
                         {t('欢迎使用，请完成以下设置以开始使用系统')}
                       </Text>
                     </div>
@@ -173,7 +185,7 @@ const Setup = () => {
                   {setupStatus.database_type === 'sqlite' && (
                     <div className="px-4">
                       <Banner
-                        type='warning'
+                        type="warning"
                         icon={
                           <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center">
                             <Database size={22} className="text-orange-500" />
@@ -182,8 +194,10 @@ const Setup = () => {
                         closeIcon={null}
                         title={
                           <div className="flex items-center">
-                            <span className="font-medium">{t('数据库警告')}</span>
-                            <Tag color='orange' shape='circle' className="ml-2">
+                            <span className="font-medium">
+                              {t('数据库警告')}
+                            </span>
+                            <Tag color="orange" shape="circle" className="ml-2">
                               SQLite
                             </Tag>
                           </div>
@@ -192,13 +206,15 @@ const Setup = () => {
                           <div>
                             <p>
                               {t(
-                                '您正在使用 SQLite 数据库。如果您在容器环境中运行，请确保已正确设置数据库文件的持久化映射，否则容器重启后所有数据将丢失！',
+                                '您正在使用 SQLite 数据库。如果您在容器环境中运行，请确保已正确设置数据库文件的持久化映射，否则容器重启后所有数据将丢失！'
                               )}
                             </p>
                             <p className="mt-1">
-                              <strong>{t(
-                                '建议在生产环境中使用 MySQL 或 PostgreSQL 数据库，或确保 SQLite 数据库文件已映射到宿主机的持久化存储。',
-                              )}</strong>
+                              <strong>
+                                {t(
+                                  '建议在生产环境中使用 MySQL 或 PostgreSQL 数据库，或确保 SQLite 数据库文件已映射到宿主机的持久化存储。'
+                                )}
+                              </strong>
                             </p>
                           </div>
                         }
@@ -212,7 +228,7 @@ const Setup = () => {
                   {setupStatus.database_type === 'mysql' && (
                     <div className="px-4">
                       <Banner
-                        type='info'
+                        type="info"
                         icon={
                           <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
                             <Database size={22} className="text-blue-500" />
@@ -221,8 +237,10 @@ const Setup = () => {
                         closeIcon={null}
                         title={
                           <div className="flex items-center">
-                            <span className="font-medium">{t('数据库信息')}</span>
-                            <Tag color='blue' shape='circle' className="ml-2">
+                            <span className="font-medium">
+                              {t('数据库信息')}
+                            </span>
+                            <Tag color="blue" shape="circle" className="ml-2">
                               MySQL
                             </Tag>
                           </div>
@@ -231,7 +249,7 @@ const Setup = () => {
                           <div>
                             <p>
                               {t(
-                                '您正在使用 MySQL 数据库。MySQL 是一个可靠的关系型数据库管理系统，适合生产环境使用。',
+                                '您正在使用 MySQL 数据库。MySQL 是一个可靠的关系型数据库管理系统，适合生产环境使用。'
                               )}
                             </p>
                           </div>
@@ -246,7 +264,7 @@ const Setup = () => {
                   {setupStatus.database_type === 'postgres' && (
                     <div className="px-4">
                       <Banner
-                        type='success'
+                        type="success"
                         icon={
                           <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center">
                             <Database size={22} className="text-green-500" />
@@ -255,8 +273,10 @@ const Setup = () => {
                         closeIcon={null}
                         title={
                           <div className="flex items-center">
-                            <span className="font-medium">{t('数据库信息')}</span>
-                            <Tag color='green' shape='circle' className="ml-2">
+                            <span className="font-medium">
+                              {t('数据库信息')}
+                            </span>
+                            <Tag color="green" shape="circle" className="ml-2">
                               PostgreSQL
                             </Tag>
                           </div>
@@ -265,7 +285,7 @@ const Setup = () => {
                           <div>
                             <p>
                               {t(
-                                '您正在使用 PostgreSQL 数据库。PostgreSQL 是一个功能强大的开源关系型数据库系统，提供了出色的可靠性和数据完整性，适合生产环境使用。',
+                                '您正在使用 PostgreSQL 数据库。PostgreSQL 是一个功能强大的开源关系型数据库系统，提供了出色的可靠性和数据完整性，适合生产环境使用。'
                               )}
                             </p>
                           </div>
@@ -288,10 +308,14 @@ const Setup = () => {
                 >
                   {/* 管理员账号设置 */}
                   <Card className="!rounded-2xl shadow-sm border-0 mb-6">
-                    <div className="flex items-center mb-4 p-6 rounded-xl" style={{
-                      background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)',
-                      position: 'relative'
-                    }}>
+                    <div
+                      className="flex items-center mb-4 p-6 rounded-xl"
+                      style={{
+                        background:
+                          'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)',
+                        position: 'relative',
+                      }}
+                    >
                       <div className="absolute inset-0 overflow-hidden">
                         <div className="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-5 rounded-full"></div>
                         <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-white opacity-10 rounded-full"></div>
@@ -300,24 +324,41 @@ const Setup = () => {
                         <IconUser size="large" style={{ color: '#ffffff' }} />
                       </div>
                       <div className="relative">
-                        <Text style={{ color: '#ffffff' }} className="text-lg font-medium">{t('管理员账号')}</Text>
-                        <div style={{ color: '#ffffff' }} className="text-sm opacity-80">{t('设置系统管理员的登录信息')}</div>
+                        <Text
+                          style={{ color: '#ffffff' }}
+                          className="text-lg font-medium"
+                        >
+                          {t('管理员账号')}
+                        </Text>
+                        <div
+                          style={{ color: '#ffffff' }}
+                          className="text-sm opacity-80"
+                        >
+                          {t('设置系统管理员的登录信息')}
+                        </div>
                       </div>
                     </div>
 
                     {setupStatus.root_init ? (
                       <>
                         <Banner
-                          type='info'
+                          type="info"
                           icon={
                             <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                              <IconCheckCircleStroked size="large" className="text-blue-500" />
+                              <IconCheckCircleStroked
+                                size="large"
+                                className="text-blue-500"
+                              />
                             </div>
                           }
                           closeIcon={null}
                           description={
                             <div className="flex items-center">
-                              <span>{t('管理员账号已经初始化过，请继续设置其他参数')}</span>
+                              <span>
+                                {t(
+                                  '管理员账号已经初始化过，请继续设置其他参数'
+                                )}
+                              </span>
                             </div>
                           }
                           className="!rounded-lg"
@@ -326,12 +367,12 @@ const Setup = () => {
                     ) : (
                       <>
                         <Form.Input
-                          field='username'
+                          field="username"
                           label={t('用户名')}
                           placeholder={t('请输入管理员用户名')}
                           prefix={<IconUser />}
                           showClear
-                          size='large'
+                          size="large"
                           className="mb-4 !rounded-lg"
                           noLabel={false}
                           validateStatus="default"
@@ -340,13 +381,13 @@ const Setup = () => {
                           }
                         />
                         <Form.Input
-                          field='password'
+                          field="password"
                           label={t('密码')}
                           placeholder={t('请输入管理员密码')}
-                          type='password'
+                          type="password"
                           prefix={<IconLock />}
                           showClear
-                          size='large'
+                          size="large"
                           className="mb-4 !rounded-lg"
                           noLabel={false}
                           mode="password"
@@ -356,13 +397,13 @@ const Setup = () => {
                           }
                         />
                         <Form.Input
-                          field='confirmPassword'
+                          field="confirmPassword"
                           label={t('确认密码')}
                           placeholder={t('请确认管理员密码')}
-                          type='password'
+                          type="password"
                           prefix={<IconLock />}
                           showClear
-                          size='large'
+                          size="large"
                           className="!rounded-lg"
                           noLabel={false}
                           mode="password"
@@ -377,10 +418,14 @@ const Setup = () => {
 
                   {/* 使用模式 */}
                   <Card className="!rounded-2xl shadow-sm border-0 mb-6">
-                    <div className="flex items-center mb-4 p-6 rounded-xl" style={{
-                      background: 'linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%)',
-                      position: 'relative'
-                    }}>
+                    <div
+                      className="flex items-center mb-4 p-6 rounded-xl"
+                      style={{
+                        background:
+                          'linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%)',
+                        position: 'relative',
+                      }}
+                    >
                       <div className="absolute inset-0 overflow-hidden">
                         <div className="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-5 rounded-full"></div>
                         <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-white opacity-10 rounded-full"></div>
@@ -390,32 +435,47 @@ const Setup = () => {
                       </div>
                       <div className="relative">
                         <div className="flex items-center">
-                          <Text style={{ color: '#ffffff' }} className="text-lg font-medium">{t('使用模式')}</Text>
+                          <Text
+                            style={{ color: '#ffffff' }}
+                            className="text-lg font-medium"
+                          >
+                            {t('使用模式')}
+                          </Text>
                           <Button
-                            theme='borderless'
-                            type='tertiary'
-                            icon={<IconHelpCircle size="small" style={{ color: '#ffffff' }} />}
-                            size='small'
+                            theme="borderless"
+                            type="tertiary"
+                            icon={
+                              <IconHelpCircle
+                                size="small"
+                                style={{ color: '#ffffff' }}
+                              />
+                            }
+                            size="small"
                             onClick={() => setUsageModeInfoVisible(true)}
                             className="!rounded-full"
                           />
                         </div>
-                        <div style={{ color: '#ffffff' }} className="text-sm opacity-80">{t('选择适合您使用场景的模式')}</div>
+                        <div
+                          style={{ color: '#ffffff' }}
+                          className="text-sm opacity-80"
+                        >
+                          {t('选择适合您使用场景的模式')}
+                        </div>
                       </div>
                     </div>
 
                     <Form.RadioGroup
-                      field='usageMode'
+                      field="usageMode"
                       noLabel={true}
-                      initValue='external'
+                      initValue="external"
                       onChange={handleUsageModeChange}
-                      type='pureCard'
+                      type="pureCard"
                       className="[&_.semi-radio-addon-buttonRadio-wrapper]:!rounded-xl"
                       validateStatus="default"
                     >
                       <div className="space-y-3 mt-2">
                         <Form.Radio
-                          value='external'
+                          value="external"
                           className="!p-4 !rounded-xl hover:!bg-blue-50 transition-colors w-full"
                           extra={
                             <div className="flex items-start">
@@ -423,9 +483,17 @@ const Setup = () => {
                                 <Rocket size={20} className="text-blue-500" />
                               </div>
                               <div className="flex-1">
-                                <div className="font-medium text-gray-900 mb-1">{t('对外运营模式')}</div>
-                                <div className="text-sm text-gray-500">{t('适用于为多个用户提供服务的场景')}</div>
-                                <Tag color='blue' shape='circle' className="mt-2">
+                                <div className="font-medium text-gray-900 mb-1">
+                                  {t('对外运营模式')}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {t('适用于为多个用户提供服务的场景')}
+                                </div>
+                                <Tag
+                                  color="blue"
+                                  shape="circle"
+                                  className="mt-2"
+                                >
                                   {t('默认模式')}
                                 </Tag>
                               </div>
@@ -433,7 +501,7 @@ const Setup = () => {
                           }
                         />
                         <Form.Radio
-                          value='self'
+                          value="self"
                           className="!p-4 !rounded-xl hover:!bg-green-50 transition-colors w-full"
                           extra={
                             <div className="flex items-start">
@@ -441,9 +509,19 @@ const Setup = () => {
                                 <Shield size={20} className="text-green-500" />
                               </div>
                               <div className="flex-1">
-                                <div className="font-medium text-gray-900 mb-1">{t('自用模式')}</div>
-                                <div className="text-sm text-gray-500">{t('适用于个人使用的场景，不需要设置模型价格')}</div>
-                                <Tag color='green' shape='circle' className="mt-2">
+                                <div className="font-medium text-gray-900 mb-1">
+                                  {t('自用模式')}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {t(
+                                    '适用于个人使用的场景，不需要设置模型价格'
+                                  )}
+                                </div>
+                                <Tag
+                                  color="green"
+                                  shape="circle"
+                                  className="mt-2"
+                                >
                                   {t('无需计费')}
                                 </Tag>
                               </div>
@@ -451,17 +529,30 @@ const Setup = () => {
                           }
                         />
                         <Form.Radio
-                          value='demo'
+                          value="demo"
                           className="!p-4 !rounded-xl hover:!bg-purple-50 transition-colors w-full"
                           extra={
                             <div className="flex items-start">
                               <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center mr-3 flex-shrink-0">
-                                <FlaskConical size={20} className="text-purple-500" />
+                                <FlaskConical
+                                  size={20}
+                                  className="text-purple-500"
+                                />
                               </div>
                               <div className="flex-1">
-                                <div className="font-medium text-gray-900 mb-1">{t('演示站点模式')}</div>
-                                <div className="text-sm text-gray-500">{t('适用于展示系统功能的场景，提供基础功能演示')}</div>
-                                <Tag color='purple' shape='circle' className="mt-2">
+                                <div className="font-medium text-gray-900 mb-1">
+                                  {t('演示站点模式')}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {t(
+                                    '适用于展示系统功能的场景，提供基础功能演示'
+                                  )}
+                                </div>
+                                <Tag
+                                  color="purple"
+                                  shape="circle"
+                                  className="mt-2"
+                                >
                                   {t('演示体验')}
                                 </Tag>
                               </div>
@@ -475,10 +566,10 @@ const Setup = () => {
 
                 <div className="flex justify-center mt-6">
                   <Button
-                    type='primary'
+                    type="primary"
                     onClick={onSubmit}
                     loading={loading}
-                    size='large'
+                    size="large"
                     className="!rounded-lg !bg-gradient-to-r !from-orange-500 !to-pink-500 hover:!from-orange-600 hover:!to-pink-600 !border-0 !px-8"
                     icon={<IconCheckCircleStroked />}
                   >
@@ -506,7 +597,7 @@ const Setup = () => {
         okText={t('我已了解')}
         cancelText={null}
         centered={true}
-        size='medium'
+        size="medium"
         className="[&_.semi-modal-body]:!p-6"
       >
         <div className="space-y-6">
@@ -517,13 +608,23 @@ const Setup = () => {
                 <Rocket size={20} className="text-blue-600" />
               </div>
               <div>
-                <Title heading={6} className="text-blue-900 mb-2">{t('对外运营模式')}</Title>
+                <Title heading={6} className="text-blue-900 mb-2">
+                  {t('对外运营模式')}
+                </Title>
                 <div className="space-y-2 text-sm text-gray-700">
                   <p>{t('默认模式，适用于为多个用户提供服务的场景。')}</p>
-                  <p>{t('此模式下，系统将计算每次调用的用量，您需要对每个模型都设置价格，如果没有设置价格，用户将无法使用该模型。')}</p>
+                  <p>
+                    {t(
+                      '此模式下，系统将计算每次调用的用量，您需要对每个模型都设置价格，如果没有设置价格，用户将无法使用该模型。'
+                    )}
+                  </p>
                   <div className="mt-3">
-                    <Tag color='blue' shape='circle' className="mr-2">{t('计费模式')}</Tag>
-                    <Tag color='blue' shape='circle'>{t('多用户支持')}</Tag>
+                    <Tag color="blue" shape="circle" className="mr-2">
+                      {t('计费模式')}
+                    </Tag>
+                    <Tag color="blue" shape="circle">
+                      {t('多用户支持')}
+                    </Tag>
                   </div>
                 </div>
               </div>
@@ -537,13 +638,23 @@ const Setup = () => {
                 <Shield size={20} className="text-green-600" />
               </div>
               <div>
-                <Title heading={6} className="text-green-900 mb-2">{t('自用模式')}</Title>
+                <Title heading={6} className="text-green-900 mb-2">
+                  {t('自用模式')}
+                </Title>
                 <div className="space-y-2 text-sm text-gray-700">
                   <p>{t('适用于个人使用的场景。')}</p>
-                  <p>{t('不需要设置模型价格，系统将弱化用量计算，您可专注于使用模型。')}</p>
+                  <p>
+                    {t(
+                      '不需要设置模型价格，系统将弱化用量计算，您可专注于使用模型。'
+                    )}
+                  </p>
                   <div className="mt-3">
-                    <Tag color='green' shape='circle' className="mr-2">{t('无需计费')}</Tag>
-                    <Tag color='green' shape='circle'>{t('个人使用')}</Tag>
+                    <Tag color="green" shape="circle" className="mr-2">
+                      {t('无需计费')}
+                    </Tag>
+                    <Tag color="green" shape="circle">
+                      {t('个人使用')}
+                    </Tag>
                   </div>
                 </div>
               </div>
@@ -557,13 +668,19 @@ const Setup = () => {
                 <FlaskConical size={20} className="text-purple-600" />
               </div>
               <div>
-                <Title heading={6} className="text-purple-900 mb-2">{t('演示站点模式')}</Title>
+                <Title heading={6} className="text-purple-900 mb-2">
+                  {t('演示站点模式')}
+                </Title>
                 <div className="space-y-2 text-sm text-gray-700">
                   <p>{t('适用于展示系统功能的场景。')}</p>
                   <p>{t('提供基础功能演示，方便用户了解系统特性。')}</p>
                   <div className="mt-3">
-                    <Tag color='purple' shape='circle' className="mr-2">{t('功能演示')}</Tag>
-                    <Tag color='purple' shape='circle'>{t('体验试用')}</Tag>
+                    <Tag color="purple" shape="circle" className="mr-2">
+                      {t('功能演示')}
+                    </Tag>
+                    <Tag color="purple" shape="circle">
+                      {t('体验试用')}
+                    </Tag>
                   </div>
                 </div>
               </div>

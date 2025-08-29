@@ -17,4 +17,4 @@ export {
   getConfigTimestamp,
   exportConfig,
   importConfig,
-} from './configStorage'; 
+} from './configStorage';

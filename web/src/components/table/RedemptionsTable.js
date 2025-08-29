@@ -5,7 +5,7 @@ import {
   showError,
   showSuccess,
   timestamp2string,
-  renderQuota
+  renderQuota,
 } from '../../helpers';
 
 import { Ticket } from 'lucide-react';
@@ -23,16 +23,13 @@ import {
   Space,
   Table,
   Tag,
-  Typography
+  Typography,
 } from '@douyinfe/semi-ui';
 import {
   IllustrationNoResult,
-  IllustrationNoResultDark
+  IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
-import {
-  IconSearch,
-  IconMore,
-} from '@douyinfe/semi-icons';
+import { IconSearch, IconMore } from '@douyinfe/semi-icons';
 import EditRedemption from '../../pages/Redemption/EditRedemption';
 import { useTranslation } from 'react-i18next';
 import { useTableCompactMode } from '../../hooks/useTableCompactMode';
@@ -47,37 +44,43 @@ const RedemptionsTable = () => {
   const { t } = useTranslation();
 
   const isExpired = (rec) => {
-    return rec.status === 1 && rec.expired_time !== 0 && rec.expired_time < Math.floor(Date.now() / 1000);
+    return (
+      rec.status === 1 &&
+      rec.expired_time !== 0 &&
+      rec.expired_time < Math.floor(Date.now() / 1000)
+    );
   };
 
   const renderStatus = (status, record) => {
     if (isExpired(record)) {
       return (
-        <Tag color='orange' shape='circle'>{t('已过期')}</Tag>
+        <Tag color="orange" shape="circle">
+          {t('已过期')}
+        </Tag>
       );
     }
     switch (status) {
       case 1:
         return (
-          <Tag color='green' shape='circle'>
+          <Tag color="green" shape="circle">
             {t('未使用')}
           </Tag>
         );
       case 2:
         return (
-          <Tag color='red' shape='circle'>
+          <Tag color="red" shape="circle">
             {t('已禁用')}
           </Tag>
         );
       case 3:
         return (
-          <Tag color='grey' shape='circle'>
+          <Tag color="grey" shape="circle">
             {t('已使用')}
           </Tag>
         );
       default:
         return (
-          <Tag color='black' shape='circle'>
+          <Tag color="black" shape="circle">
             {t('未知状态')}
           </Tag>
         );
@@ -107,7 +110,7 @@ const RedemptionsTable = () => {
       render: (text, record, index) => {
         return (
           <div>
-            <Tag color='grey' shape='circle'>
+            <Tag color="grey" shape="circle">
               {renderQuota(parseInt(text))}
             </Tag>
           </div>
@@ -164,7 +167,7 @@ const RedemptionsTable = () => {
                 },
               });
             },
-          }
+          },
         ];
 
         if (record.status === 1 && !isExpired(record)) {
@@ -190,11 +193,12 @@ const RedemptionsTable = () => {
 
         return (
           <Space>
-            <Popover content={record.key} style={{ padding: 20 }} position='top'>
-              <Button
-                type='tertiary'
-                size="small"
-              >
+            <Popover
+              content={record.key}
+              style={{ padding: 20 }}
+              position="top"
+            >
+              <Button type="tertiary" size="small">
                 {t('查看')}
               </Button>
             </Popover>
@@ -207,7 +211,7 @@ const RedemptionsTable = () => {
               {t('复制')}
             </Button>
             <Button
-              type='tertiary'
+              type="tertiary"
               size="small"
               onClick={() => {
                 setEditingRedemption(record);
@@ -218,15 +222,11 @@ const RedemptionsTable = () => {
               {t('编辑')}
             </Button>
             <Dropdown
-              trigger='click'
-              position='bottomRight'
+              trigger="click"
+              position="bottomRight"
               menu={moreMenuItems}
             >
-              <Button
-                type='tertiary'
-                size="small"
-                icon={<IconMore />}
-              />
+              <Button type="tertiary" size="small" icon={<IconMore />} />
             </Dropdown>
           </Space>
         );
@@ -276,7 +276,7 @@ const RedemptionsTable = () => {
   const loadRedemptions = async (page = 1, pageSize) => {
     setLoading(true);
     const res = await API.get(
-      `/api/redemption/?p=${page}&page_size=${pageSize}`,
+      `/api/redemption/?p=${page}&page_size=${pageSize}`
     );
     const { success, message, data } = res.data;
     if (success) {
@@ -309,7 +309,7 @@ const RedemptionsTable = () => {
       Modal.error({
         title: t('无法复制到剪贴板，请手动复制'),
         content: text,
-        size: 'large'
+        size: 'large',
       });
     }
   };
@@ -377,7 +377,7 @@ const RedemptionsTable = () => {
     }
     setSearching(true);
     const res = await API.get(
-      `/api/redemption/search?keyword=${keyword}&p=${page}&page_size=${pageSize}`,
+      `/api/redemption/search?keyword=${keyword}&p=${page}&page_size=${pageSize}`
     );
     const { success, message, data } = res.data;
     if (success) {
@@ -403,8 +403,8 @@ const RedemptionsTable = () => {
 
   let pageData = redemptions;
   const rowSelection = {
-    onSelect: (record, selected) => { },
-    onSelectAll: (selected, selectedRows) => { },
+    onSelect: (record, selected) => {},
+    onSelectAll: (selected, selectedRows) => {},
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectedKeys(selectedRows);
     },
@@ -428,10 +428,12 @@ const RedemptionsTable = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 w-full">
           <div className="flex items-center text-orange-500">
             <Ticket size={16} className="mr-2" />
-            <Text>{t('兑换码可以批量生成和分发，适合用于推广活动或批量充值。')}</Text>
+            <Text>
+              {t('兑换码可以批量生成和分发，适合用于推广活动或批量充值。')}
+            </Text>
           </div>
           <Button
-            type='tertiary'
+            type="tertiary"
             className="w-full md:w-auto"
             onClick={() => setCompactMode(!compactMode)}
             size="small"
@@ -447,7 +449,7 @@ const RedemptionsTable = () => {
         <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto order-2 md:order-1">
           <div className="flex gap-2 w-full sm:w-auto">
             <Button
-              type='primary'
+              type="primary"
               className="w-full sm:w-auto"
               onClick={() => {
                 setEditingRedemption({
@@ -460,7 +462,7 @@ const RedemptionsTable = () => {
               {t('添加兑换码')}
             </Button>
             <Button
-              type='tertiary'
+              type="tertiary"
               className="w-full sm:w-auto"
               onClick={async () => {
                 if (selectedKeys.length === 0) {
@@ -480,18 +482,22 @@ const RedemptionsTable = () => {
             </Button>
           </div>
           <Button
-            type='danger'
+            type="danger"
             className="w-full sm:w-auto"
             onClick={() => {
               Modal.confirm({
                 title: t('确定清除所有失效兑换码？'),
-                content: t('将删除已使用、已禁用及过期的兑换码，此操作不可撤销。'),
+                content: t(
+                  '将删除已使用、已禁用及过期的兑换码，此操作不可撤销。'
+                ),
                 onOk: async () => {
                   setLoading(true);
                   const res = await API.delete('/api/redemption/invalid');
                   const { success, message, data } = res.data;
                   if (success) {
-                    showSuccess(t('已删除 {{count}} 条失效兑换码', { count: data }));
+                    showSuccess(
+                      t('已删除 {{count}} 条失效兑换码', { count: data })
+                    );
                     await refresh();
                   } else {
                     showError(message);
@@ -576,11 +582,13 @@ const RedemptionsTable = () => {
       <Card
         className="!rounded-2xl"
         title={renderHeader()}
-        shadows='always'
+        shadows="always"
         bordered={false}
       >
         <Table
-          columns={compactMode ? columns.map(({ fixed, ...rest }) => rest) : columns}
+          columns={
+            compactMode ? columns.map(({ fixed, ...rest }) => rest) : columns
+          }
           dataSource={pageData}
           scroll={compactMode ? undefined : { x: 'max-content' }}
           pagination={{
@@ -612,8 +620,12 @@ const RedemptionsTable = () => {
           onRow={handleRow}
           empty={
             <Empty
-              image={<IllustrationNoResult style={{ width: 150, height: 150 }} />}
-              darkModeImage={<IllustrationNoResultDark style={{ width: 150, height: 150 }} />}
+              image={
+                <IllustrationNoResult style={{ width: 150, height: 150 }} />
+              }
+              darkModeImage={
+                <IllustrationNoResultDark style={{ width: 150, height: 150 }} />
+              }
               description={t('搜索无结果')}
               style={{ padding: 30 }}
             />

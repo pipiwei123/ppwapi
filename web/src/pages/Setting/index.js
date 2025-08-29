@@ -12,7 +12,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   Palette,
-  CreditCard
+  CreditCard,
 } from 'lucide-react';
 
 import SystemSetting from '../../components/settings/SystemSetting.js';
@@ -154,7 +154,7 @@ const Setting = () => {
       <Layout>
         <Layout.Content>
           <Tabs
-            type='card'
+            type="card"
             collapsible
             activeKey={tabActiveKey}
             onChange={(key) => onChangeTab(key)}

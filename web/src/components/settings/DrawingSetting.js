@@ -52,7 +52,7 @@ const DrawingSetting = () => {
 
   return (
     <>
-      <Spin spinning={loading} size='large'>
+      <Spin spinning={loading} size="large">
         {/* 绘图设置 */}
         <Card style={{ marginTop: '10px' }}>
           <SettingsDrawing options={inputs} refresh={onRefresh} />
@@ -62,4 +62,4 @@ const DrawingSetting = () => {
   );
 };
 
-export default DrawingSetting; 
+export default DrawingSetting;

@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useCallback, useRef, useState } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Layout, Toast, Modal } from '@douyinfe/semi-ui';
@@ -18,7 +24,7 @@ import { useDataLoader } from '../../hooks/useDataLoader.js';
 // Constants and utils
 import {
   MESSAGE_ROLES,
-  ERROR_MESSAGES
+  ERROR_MESSAGES,
 } from '../../constants/playground.constants.js';
 import {
   getLogo,
@@ -27,7 +33,7 @@ import {
   createMessage,
   createLoadingAssistantMessage,
   getTextContent,
-  buildApiPayload
+  buildApiPayload,
 } from '../../helpers';
 
 // Components
@@ -35,7 +41,7 @@ import {
   OptimizedSettingsPanel,
   OptimizedDebugPanel,
   OptimizedMessageContent,
-  OptimizedMessageActions
+  OptimizedMessageActions,
 } from '../../components/playground/OptimizedComponents.js';
 import ChatArea from '../../components/playground/ChatArea.js';
 import FloatingButtons from '../../components/playground/FloatingButtons.js';
@@ -119,19 +125,26 @@ const Playground = () => {
     setEditValue,
     handleMessageEdit,
     handleEditSave,
-    handleEditCancel
-  } = useMessageEdit(setMessage, inputs, parameterEnabled, sendRequest, saveMessagesImmediately);
+    handleEditCancel,
+  } = useMessageEdit(
+    setMessage,
+    inputs,
+    parameterEnabled,
+    sendRequest,
+    saveMessagesImmediately
+  );
 
   // 消息和自定义请求体同步
-  const { syncMessageToCustomBody, syncCustomBodyToMessage } = useSyncMessageAndCustomBody(
-    customRequestMode,
-    customRequestBody,
-    message,
-    inputs,
-    setCustomRequestBody,
-    setMessage,
-    debouncedSaveConfig
-  );
+  const { syncMessageToCustomBody, syncCustomBodyToMessage } =
+    useSyncMessageAndCustomBody(
+      customRequestMode,
+      customRequestBody,
+      message,
+      inputs,
+      setCustomRequestBody,
+      setMessage,
+      debouncedSaveConfig
+    );
 
   // 角色信息
   const roleInfo = {
@@ -150,7 +163,12 @@ const Playground = () => {
   };
 
   // 消息操作
-  const messageActions = useMessageActions(message, setMessage, onMessageSend, saveMessagesImmediately);
+  const messageActions = useMessageActions(
+    message,
+    setMessage,
+    onMessageSend,
+    saveMessagesImmediately
+  );
 
   // 构建预览请求体
   const constructPreviewPayload = useCallback(() => {
@@ -168,15 +186,26 @@ const Playground = () => {
       let messages = [...message];
 
       // 如果存在用户消息
-      if (!(messages.length === 0 || messages.every(msg => msg.role !== MESSAGE_ROLES.USER))) {
+      if (
+        !(
+          messages.length === 0 ||
+          messages.every((msg) => msg.role !== MESSAGE_ROLES.USER)
+        )
+      ) {
         // 处理最后一个用户消息的图片
         for (let i = messages.length - 1; i >= 0; i--) {
           if (messages[i].role === MESSAGE_ROLES.USER) {
             if (inputs.imageEnabled && inputs.imageUrls) {
-              const validImageUrls = inputs.imageUrls.filter(url => url.trim() !== '');
+              const validImageUrls = inputs.imageUrls.filter(
+                (url) => url.trim() !== ''
+              );
               if (validImageUrls.length > 0) {
                 const textContent = getTextContent(messages[i]) || '示例消息';
-                const content = buildMessageContent(textContent, validImageUrls, true);
+                const content = buildMessageContent(
+                  textContent,
+                  validImageUrls,
+                  true
+                );
                 messages[i] = { ...messages[i], content };
               }
             }
@@ -205,7 +234,7 @@ const Playground = () => {
       try {
         const customPayload = JSON.parse(customRequestBody);
 
-        setMessage(prevMessage => {
+        setMessage((prevMessage) => {
           const newMessages = [...prevMessage, userMessage, loadingMessage];
 
           // 发送自定义请求体
@@ -225,14 +254,26 @@ const Playground = () => {
     }
 
     // 默认模式
-    const validImageUrls = inputs.imageUrls.filter(url => url.trim() !== '');
-    const messageContent = buildMessageContent(content, validImageUrls, inputs.imageEnabled);
-    const userMessageWithImages = createMessage(MESSAGE_ROLES.USER, messageContent);
+    const validImageUrls = inputs.imageUrls.filter((url) => url.trim() !== '');
+    const messageContent = buildMessageContent(
+      content,
+      validImageUrls,
+      inputs.imageEnabled
+    );
+    const userMessageWithImages = createMessage(
+      MESSAGE_ROLES.USER,
+      messageContent
+    );
 
-    setMessage(prevMessage => {
+    setMessage((prevMessage) => {
       const newMessages = [...prevMessage, userMessageWithImages];
 
-      const payload = buildApiPayload(newMessages, null, inputs, parameterEnabled);
+      const payload = buildApiPayload(
+        newMessages,
+        null,
+        inputs,
+        parameterEnabled
+      );
       sendRequest(payload, inputs.stream);
 
       // 禁用图片模式
@@ -251,15 +292,18 @@ const Playground = () => {
   }
 
   // 切换推理展开状态
-  const toggleReasoningExpansion = useCallback((messageId) => {
-    setMessage(prevMessages =>
-      prevMessages.map(msg =>
-        msg.id === messageId && msg.role === MESSAGE_ROLES.ASSISTANT
-          ? { ...msg, isReasoningExpanded: !msg.isReasoningExpanded }
-          : msg
-      )
-    );
-  }, [setMessage]);
+  const toggleReasoningExpansion = useCallback(
+    (messageId) => {
+      setMessage((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === messageId && msg.role === MESSAGE_ROLES.ASSISTANT
+            ? { ...msg, isReasoningExpanded: !msg.isReasoningExpanded }
+            : msg
+        )
+      );
+    },
+    [setMessage]
+  );
 
   // 渲染函数
   const renderCustomChatContent = useCallback(
@@ -280,30 +324,41 @@ const Playground = () => {
         />
       );
     },
-    [styleState, editingMessageId, editValue, handleEditSave, handleEditCancel, setEditValue, toggleReasoningExpansion],
+    [
+      styleState,
+      editingMessageId,
+      editValue,
+      handleEditSave,
+      handleEditCancel,
+      setEditValue,
+      toggleReasoningExpansion,
+    ]
   );
 
-  const renderChatBoxAction = useCallback((props) => {
-    const { message: currentMessage } = props;
-    const isAnyMessageGenerating = message.some(msg =>
-      msg.status === 'loading' || msg.status === 'incomplete'
-    );
-    const isCurrentlyEditing = editingMessageId === currentMessage.id;
+  const renderChatBoxAction = useCallback(
+    (props) => {
+      const { message: currentMessage } = props;
+      const isAnyMessageGenerating = message.some(
+        (msg) => msg.status === 'loading' || msg.status === 'incomplete'
+      );
+      const isCurrentlyEditing = editingMessageId === currentMessage.id;
 
-    return (
-      <OptimizedMessageActions
-        message={currentMessage}
-        styleState={styleState}
-        onMessageReset={messageActions.handleMessageReset}
-        onMessageCopy={messageActions.handleMessageCopy}
-        onMessageDelete={messageActions.handleMessageDelete}
-        onRoleToggle={messageActions.handleRoleToggle}
-        onMessageEdit={handleMessageEdit}
-        isAnyMessageGenerating={isAnyMessageGenerating}
-        isEditing={isCurrentlyEditing}
-      />
-    );
-  }, [messageActions, styleState, message, editingMessageId, handleMessageEdit]);
+      return (
+        <OptimizedMessageActions
+          message={currentMessage}
+          styleState={styleState}
+          onMessageReset={messageActions.handleMessageReset}
+          onMessageCopy={messageActions.handleMessageCopy}
+          onMessageDelete={messageActions.handleMessageDelete}
+          onRoleToggle={messageActions.handleRoleToggle}
+          onMessageEdit={handleMessageEdit}
+          isAnyMessageGenerating={isAnyMessageGenerating}
+          isEditing={isCurrentlyEditing}
+        />
+      );
+    },
+    [messageActions, styleState, message, editingMessageId, handleMessageEdit]
+  );
 
   // Effects
 
@@ -321,53 +376,69 @@ const Playground = () => {
     if (searchParams.get('expired')) {
       Toast.warning(t('登录过期，请重新登录！'));
     }
-    
+
     // 只在还未处理过URL参数且数据已加载时处理
     if (!urlParamsProcessed && models.length > 0 && groups.length > 0) {
       let hasUpdates = false;
       const newSearchParams = new URLSearchParams(searchParams);
-      
+
       // 处理模型参数
       const modelParam = searchParams.get('model');
       if (modelParam) {
         // 检查模型是否存在于可用模型列表中
-        const availableModel = models.find(model => model.value === modelParam);
+        const availableModel = models.find(
+          (model) => model.value === modelParam
+        );
         if (availableModel) {
           handleInputChange('model', modelParam);
           Toast.success(t('已自动选择模型：{{model}}', { model: modelParam }));
           hasUpdates = true;
         } else {
-          Toast.warning(t('指定的模型不可用：{{model}}', { model: modelParam }));
+          Toast.warning(
+            t('指定的模型不可用：{{model}}', { model: modelParam })
+          );
         }
         // 从URL中移除模型参数
         newSearchParams.delete('model');
       }
-      
+
       // 处理分组参数
       const groupParam = searchParams.get('group');
       if (groupParam) {
         // 检查分组是否存在于可用分组列表中
-        const availableGroup = groups.find(group => group.value === groupParam);
+        const availableGroup = groups.find(
+          (group) => group.value === groupParam
+        );
         if (availableGroup) {
           handleInputChange('group', groupParam);
           Toast.success(t('已自动选择分组：{{group}}', { group: groupParam }));
           hasUpdates = true;
         } else {
-          Toast.warning(t('指定的分组不可用：{{group}}', { group: groupParam }));
+          Toast.warning(
+            t('指定的分组不可用：{{group}}', { group: groupParam })
+          );
         }
         // 从URL中移除分组参数
         newSearchParams.delete('group');
       }
-      
+
       // 更新URL，移除已处理的参数
       if (modelParam || groupParam) {
         setSearchParams(newSearchParams, { replace: true });
       }
-      
+
       // 标记已处理过URL参数
       setUrlParamsProcessed(true);
     }
-  }, [searchParams, setSearchParams, t, models, groups, handleInputChange, urlParamsProcessed]);
+  }, [
+    searchParams,
+    setSearchParams,
+    t,
+    models,
+    groups,
+    handleInputChange,
+    urlParamsProcessed,
+  ]);
 
   // Playground 组件无需再监听窗口变化，isMobile 由 useIsMobile Hook 自动更新
 
@@ -376,20 +447,36 @@ const Playground = () => {
     const timer = setTimeout(() => {
       const preview = constructPreviewPayload();
       setPreviewPayload(preview);
-      setDebugData(prev => ({
+      setDebugData((prev) => ({
         ...prev,
         previewRequest: preview ? JSON.stringify(preview, null, 2) : null,
-        previewTimestamp: preview ? new Date().toISOString() : null
+        previewTimestamp: preview ? new Date().toISOString() : null,
       }));
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [message, inputs, parameterEnabled, customRequestMode, customRequestBody, constructPreviewPayload, setPreviewPayload, setDebugData]);
+  }, [
+    message,
+    inputs,
+    parameterEnabled,
+    customRequestMode,
+    customRequestBody,
+    constructPreviewPayload,
+    setPreviewPayload,
+    setDebugData,
+  ]);
 
   // 自动保存配置
   useEffect(() => {
     debouncedSaveConfig();
-  }, [inputs, parameterEnabled, showDebugPanel, customRequestMode, customRequestBody, debouncedSaveConfig]);
+  }, [
+    inputs,
+    parameterEnabled,
+    showDebugPanel,
+    customRequestMode,
+    customRequestBody,
+    debouncedSaveConfig,
+  ]);
 
   // 清空对话的处理函数
   const handleClearMessages = useCallback(() => {
@@ -400,7 +487,10 @@ const Playground = () => {
 
   return (
     <div className="h-full bg-gray-50 mt-[64px]">
-      <Layout style={{ height: '100%', background: 'transparent' }} className="flex flex-col md:flex-row">
+      <Layout
+        style={{ height: '100%', background: 'transparent' }}
+        className="flex flex-col md:flex-row"
+      >
         {(showSettings || !isMobile) && (
           <Layout.Sider
             style={{

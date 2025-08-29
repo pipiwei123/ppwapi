@@ -90,7 +90,9 @@ const EditRedemption = (props) => {
     if (!localInputs.expired_time) {
       localInputs.expired_time = 0;
     } else {
-      localInputs.expired_time = Math.floor(localInputs.expired_time.getTime() / 1000);
+      localInputs.expired_time = Math.floor(
+        localInputs.expired_time.getTime() / 1000
+      );
     }
     let res;
     if (isEdit) {
@@ -145,10 +147,15 @@ const EditRedemption = (props) => {
         placement={isEdit ? 'right' : 'left'}
         title={
           <Space>
-            {isEdit ?
-              <Tag color="blue" shape="circle">{t('更新')}</Tag> :
-              <Tag color="green" shape="circle">{t('新建')}</Tag>
-            }
+            {isEdit ? (
+              <Tag color="blue" shape="circle">
+                {t('更新')}
+              </Tag>
+            ) : (
+              <Tag color="green" shape="circle">
+                {t('新建')}
+              </Tag>
+            )}
             <Title heading={4} className="m-0">
               {isEdit ? t('更新兑换码信息') : t('创建新的兑换码')}
             </Title>
@@ -185,7 +192,7 @@ const EditRedemption = (props) => {
         <Spin spinning={loading}>
           <Form
             initValues={getInitValues()}
-            getFormApi={(api) => formApiRef.current = api}
+            getFormApi={(api) => (formApiRef.current = api)}
             onSubmit={submit}
           >
             {({ values }) => (
@@ -193,31 +200,43 @@ const EditRedemption = (props) => {
                 <Card className="!rounded-2xl shadow-sm border-0 mb-6">
                   {/* Header: Basic Info */}
                   <div className="flex items-center mb-2">
-                    <Avatar size="small" color="blue" className="mr-2 shadow-md">
+                    <Avatar
+                      size="small"
+                      color="blue"
+                      className="mr-2 shadow-md"
+                    >
                       <IconGift size={16} />
                     </Avatar>
                     <div>
-                      <Text className="text-lg font-medium">{t('基本信息')}</Text>
-                      <div className="text-xs text-gray-600">{t('设置兑换码的基本信息')}</div>
+                      <Text className="text-lg font-medium">
+                        {t('基本信息')}
+                      </Text>
+                      <div className="text-xs text-gray-600">
+                        {t('设置兑换码的基本信息')}
+                      </div>
                     </div>
                   </div>
 
                   <Row gutter={12}>
                     <Col span={24}>
                       <Form.Input
-                        field='name'
+                        field="name"
                         label={t('名称')}
                         placeholder={t('请输入名称')}
                         style={{ width: '100%' }}
-                        rules={!isEdit ? [] : [{ required: true, message: t('请输入名称') }]}
+                        rules={
+                          !isEdit
+                            ? []
+                            : [{ required: true, message: t('请输入名称') }]
+                        }
                         showClear
                       />
                     </Col>
                     <Col span={24}>
                       <Form.DatePicker
-                        field='expired_time'
+                        field="expired_time"
                         label={t('过期时间')}
-                        type='dateTime'
+                        type="dateTime"
                         placeholder={t('选择过期时间（可选，留空为永久）')}
                         style={{ width: '100%' }}
                         showClear
@@ -229,23 +248,31 @@ const EditRedemption = (props) => {
                 <Card className="!rounded-2xl shadow-sm border-0">
                   {/* Header: Quota Settings */}
                   <div className="flex items-center mb-2">
-                    <Avatar size="small" color="green" className="mr-2 shadow-md">
+                    <Avatar
+                      size="small"
+                      color="green"
+                      className="mr-2 shadow-md"
+                    >
                       <IconCreditCard size={16} />
                     </Avatar>
                     <div>
-                      <Text className="text-lg font-medium">{t('额度设置')}</Text>
-                      <div className="text-xs text-gray-600">{t('设置兑换码的额度和数量')}</div>
+                      <Text className="text-lg font-medium">
+                        {t('额度设置')}
+                      </Text>
+                      <div className="text-xs text-gray-600">
+                        {t('设置兑换码的额度和数量')}
+                      </div>
                     </div>
                   </div>
 
                   <Row gutter={12}>
                     <Col span={12}>
                       <Form.AutoComplete
-                        field='quota'
+                        field="quota"
                         label={t('额度')}
                         placeholder={t('请输入额度')}
                         style={{ width: '100%' }}
-                        type='number'
+                        type="number"
                         rules={[
                           { required: true, message: t('请输入额度') },
                           {
@@ -257,7 +284,9 @@ const EditRedemption = (props) => {
                             },
                           },
                         ]}
-                        extraText={renderQuotaWithPrompt(Number(values.quota) || 0)}
+                        extraText={renderQuotaWithPrompt(
+                          Number(values.quota) || 0
+                        )}
                         data={[
                           { value: 500000, label: '1$' },
                           { value: 5000000, label: '10$' },
@@ -272,7 +301,7 @@ const EditRedemption = (props) => {
                     {!isEdit && (
                       <Col span={12}>
                         <Form.InputNumber
-                          field='count'
+                          field="count"
                           label={t('生成数量')}
                           min={1}
                           rules={[

@@ -1,18 +1,6 @@
 import React from 'react';
-import {
-  Card,
-  Select,
-  Typography,
-  Button,
-  Switch,
-} from '@douyinfe/semi-ui';
-import {
-  Sparkles,
-  Users,
-  ToggleLeft,
-  X,
-  Settings,
-} from 'lucide-react';
+import { Card, Select, Typography, Button, Switch } from '@douyinfe/semi-ui';
+import { Sparkles, Users, ToggleLeft, X, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { renderGroupOption } from '../../helpers';
 import ParameterControl from './ParameterControl';
@@ -57,7 +45,7 @@ const SettingsPanel = ({
         padding: styleState.isMobile ? '16px' : '24px',
         height: '100%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
       }}
     >
       {/* 标题区域 - 与调试面板保持一致 */}
@@ -121,12 +109,12 @@ const SettingsPanel = ({
           </div>
           <Select
             placeholder={t('请选择分组')}
-            name='group'
+            name="group"
             required
             selection
             onChange={(value) => onInputChange('group', value)}
             value={inputs.group}
-            autoComplete='new-password'
+            autoComplete="new-password"
             optionList={groups}
             renderOptionItem={renderGroupOption}
             style={{ width: '100%' }}
@@ -151,14 +139,14 @@ const SettingsPanel = ({
           </div>
           <Select
             placeholder={t('请选择模型')}
-            name='model'
+            name="model"
             required
             selection
-            searchPosition='dropdown'
+            searchPosition="dropdown"
             filter
             onChange={(value) => onInputChange('model', value)}
             value={inputs.model}
-            autoComplete='new-password'
+            autoComplete="new-password"
             optionList={models}
             style={{ width: '100%' }}
             dropdownStyle={{ width: '100%', maxWidth: '100%' }}
@@ -173,7 +161,9 @@ const SettingsPanel = ({
             imageUrls={inputs.imageUrls}
             imageEnabled={inputs.imageEnabled}
             onImageUrlsChange={(urls) => onInputChange('imageUrls', urls)}
-            onImageEnabledChange={(enabled) => onInputChange('imageEnabled', enabled)}
+            onImageEnabledChange={(enabled) =>
+              onInputChange('imageEnabled', enabled)
+            }
             disabled={customRequestMode}
           />
         </div>
@@ -231,4 +221,4 @@ const SettingsPanel = ({
   );
 };
 
-export default SettingsPanel; 
+export default SettingsPanel;

@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {API, showError, showSuccess, renderGroup, renderNumber, renderQuota, timestamp2string} from '../../helpers';
+import {
+  API,
+  showError,
+  showSuccess,
+  renderGroup,
+  renderNumber,
+  renderQuota,
+  timestamp2string,
+} from '../../helpers';
 
 import {
   User,
@@ -27,17 +35,13 @@ import {
   Table,
   Tag,
   Tooltip,
-  Typography
+  Typography,
 } from '@douyinfe/semi-ui';
 import {
   IllustrationNoResult,
-  IllustrationNoResultDark
+  IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
-import {
-  IconSearch,
-  IconUserAdd,
-  IconMore,
-} from '@douyinfe/semi-icons';
+import { IconSearch, IconUserAdd, IconMore } from '@douyinfe/semi-icons';
 import { ITEMS_PER_PAGE } from '../../constants';
 import AddUser from '../../pages/User/AddUser';
 import EditUser from '../../pages/User/EditUser';
@@ -54,25 +58,25 @@ const UsersTable = () => {
     switch (role) {
       case 1:
         return (
-          <Tag color='blue' shape='circle' prefixIcon={<User size={14} />}>
+          <Tag color="blue" shape="circle" prefixIcon={<User size={14} />}>
             {t('普通用户')}
           </Tag>
         );
       case 10:
         return (
-          <Tag color='yellow' shape='circle' prefixIcon={<Shield size={14} />}>
+          <Tag color="yellow" shape="circle" prefixIcon={<Shield size={14} />}>
             {t('管理员')}
           </Tag>
         );
       case 100:
         return (
-          <Tag color='orange' shape='circle' prefixIcon={<Crown size={14} />}>
+          <Tag color="orange" shape="circle" prefixIcon={<Crown size={14} />}>
             {t('超级管理员')}
           </Tag>
         );
       default:
         return (
-          <Tag color='red' shape='circle' prefixIcon={<HelpCircle size={14} />}>
+          <Tag color="red" shape="circle" prefixIcon={<HelpCircle size={14} />}>
             {t('未知身份')}
           </Tag>
         );
@@ -82,16 +86,28 @@ const UsersTable = () => {
   const renderStatus = (status) => {
     switch (status) {
       case 1:
-        return <Tag color='green' shape='circle' prefixIcon={<CheckCircle size={14} />}>{t('已激活')}</Tag>;
+        return (
+          <Tag
+            color="green"
+            shape="circle"
+            prefixIcon={<CheckCircle size={14} />}
+          >
+            {t('已激活')}
+          </Tag>
+        );
       case 2:
         return (
-          <Tag color='red' shape='circle' prefixIcon={<XCircle size={14} />}>
+          <Tag color="red" shape="circle" prefixIcon={<XCircle size={14} />}>
             {t('已封禁')}
           </Tag>
         );
       default:
         return (
-          <Tag color='grey' shape='circle' prefixIcon={<HelpCircle size={14} />}>
+          <Tag
+            color="grey"
+            shape="circle"
+            prefixIcon={<HelpCircle size={14} />}
+          >
             {t('未知状态')}
           </Tag>
         );
@@ -116,14 +132,18 @@ const UsersTable = () => {
           return <span>{text}</span>;
         }
         const maxLen = 10;
-        const displayRemark = remark.length > maxLen ? remark.slice(0, maxLen) + '…' : remark;
+        const displayRemark =
+          remark.length > maxLen ? remark.slice(0, maxLen) + '…' : remark;
         return (
           <Space spacing={2}>
             <span>{text}</span>
             <Tooltip content={remark} position="top" showArrow>
-              <Tag color='white' shape='circle' className="!text-xs">
+              <Tag color="white" shape="circle" className="!text-xs">
                 <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 flex-shrink-0 rounded-full" style={{ backgroundColor: '#10b981' }} />
+                  <div
+                    className="w-2 h-2 flex-shrink-0 rounded-full"
+                    style={{ backgroundColor: '#10b981' }}
+                  />
                   {displayRemark}
                 </div>
               </Tag>
@@ -146,13 +166,28 @@ const UsersTable = () => {
         return (
           <div>
             <Space spacing={1}>
-              <Tag color='white' shape='circle' className="!text-xs" prefixIcon={<Coins size={14} />}>
+              <Tag
+                color="white"
+                shape="circle"
+                className="!text-xs"
+                prefixIcon={<Coins size={14} />}
+              >
                 {t('剩余')}: {renderQuota(record.quota)}
               </Tag>
-              <Tag color='white' shape='circle' className="!text-xs" prefixIcon={<Coins size={14} />}>
+              <Tag
+                color="white"
+                shape="circle"
+                className="!text-xs"
+                prefixIcon={<Coins size={14} />}
+              >
                 {t('已用')}: {renderQuota(record.used_quota)}
               </Tag>
-              <Tag color='white' shape='circle' className="!text-xs" prefixIcon={<Activity size={14} />}>
+              <Tag
+                color="white"
+                shape="circle"
+                className="!text-xs"
+                prefixIcon={<Activity size={14} />}
+              >
                 {t('调用')}: {renderNumber(record.request_count)}
               </Tag>
             </Space>
@@ -174,14 +209,31 @@ const UsersTable = () => {
         return (
           <div>
             <Space spacing={1}>
-              <Tag color='white' shape='circle' className="!text-xs" prefixIcon={<Users size={14} />}>
+              <Tag
+                color="white"
+                shape="circle"
+                className="!text-xs"
+                prefixIcon={<Users size={14} />}
+              >
                 {t('邀请')}: {renderNumber(record.aff_count)}
               </Tag>
-              <Tag color='white' shape='circle' className="!text-xs" prefixIcon={<DollarSign size={14} />}>
+              <Tag
+                color="white"
+                shape="circle"
+                className="!text-xs"
+                prefixIcon={<DollarSign size={14} />}
+              >
                 {t('收益')}: {renderQuota(record.aff_history_quota)}
               </Tag>
-              <Tag color='white' shape='circle' className="!text-xs" prefixIcon={<UserPlus size={14} />}>
-                {record.inviter_id === 0 ? t('无邀请人') : `邀请人: ${record.inviter_id}`}
+              <Tag
+                color="white"
+                shape="circle"
+                className="!text-xs"
+                prefixIcon={<UserPlus size={14} />}
+              >
+                {record.inviter_id === 0
+                  ? t('无邀请人')
+                  : `邀请人: ${record.inviter_id}`}
               </Tag>
             </Space>
           </div>
@@ -202,7 +254,9 @@ const UsersTable = () => {
         return (
           <div>
             {record.DeletedAt !== null ? (
-              <Tag color='red' shape='circle' prefixIcon={<Minus size={14} />}>{t('已注销')}</Tag>
+              <Tag color="red" shape="circle" prefixIcon={<Minus size={14} />}>
+                {t('已注销')}
+              </Tag>
             ) : (
               renderStatus(text)
             )}
@@ -270,7 +324,7 @@ const UsersTable = () => {
                 },
               });
             },
-          }
+          },
         ];
 
         // 动态添加启用/禁用按钮
@@ -298,7 +352,7 @@ const UsersTable = () => {
         return (
           <Space>
             <Button
-              type='tertiary'
+              type="tertiary"
               size="small"
               onClick={() => {
                 setEditingUser(record);
@@ -308,15 +362,11 @@ const UsersTable = () => {
               {t('编辑')}
             </Button>
             <Dropdown
-              trigger='click'
-              position='bottomRight'
+              trigger="click"
+              position="bottomRight"
               menu={moreMenuItems}
             >
-              <Button
-                type='tertiary'
-                size="small"
-                icon={<IconMore />}
-              />
+              <Button type="tertiary" size="small" icon={<IconMore />} />
             </Dropdown>
           </Space>
         );
@@ -423,7 +473,7 @@ const UsersTable = () => {
     startIdx,
     pageSize,
     searchKeyword = null,
-    searchGroup = null,
+    searchGroup = null
   ) => {
     // 如果没有传递参数，从表单获取值
     if (searchKeyword === null || searchGroup === null) {
@@ -439,7 +489,7 @@ const UsersTable = () => {
     }
     setSearching(true);
     const res = await API.get(
-      `/api/user/search?keyword=${searchKeyword}&group=${searchGroup}&p=${startIdx}&page_size=${pageSize}`,
+      `/api/user/search?keyword=${searchKeyword}&group=${searchGroup}&p=${startIdx}&page_size=${pageSize}`
     );
     const { success, message, data } = res.data;
     if (success) {
@@ -495,7 +545,7 @@ const UsersTable = () => {
         res.data.data.map((group) => ({
           label: group,
           value: group,
-        })),
+        }))
       );
     } catch (error) {
       showError(error.message);
@@ -531,10 +581,14 @@ const UsersTable = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 w-full">
           <div className="flex items-center text-blue-500">
             <IconUserAdd className="mr-2" />
-            <Text>{t('用户管理页面，可以查看和管理所有注册用户的信息、权限和状态。')}</Text>
+            <Text>
+              {t(
+                '用户管理页面，可以查看和管理所有注册用户的信息、权限和状态。'
+              )}
+            </Text>
           </div>
           <Button
-            type='tertiary'
+            type="tertiary"
             className="w-full md:w-auto"
             onClick={() => setCompactMode(!compactMode)}
             size="small"
@@ -613,7 +667,7 @@ const UsersTable = () => {
                 {t('查询')}
               </Button>
               <Button
-                type='tertiary'
+                type="tertiary"
                 onClick={() => {
                   if (formApi) {
                     formApi.reset();
@@ -652,11 +706,13 @@ const UsersTable = () => {
       <Card
         className="!rounded-2xl"
         title={renderHeader()}
-        shadows='always'
+        shadows="always"
         bordered={false}
       >
         <Table
-          columns={compactMode ? columns.map(({ fixed, ...rest }) => rest) : columns}
+          columns={
+            compactMode ? columns.map(({ fixed, ...rest }) => rest) : columns
+          }
           dataSource={users}
           scroll={compactMode ? undefined : { x: 'max-content' }}
           pagination={{
@@ -680,8 +736,12 @@ const UsersTable = () => {
           onRow={handleRow}
           empty={
             <Empty
-              image={<IllustrationNoResult style={{ width: 150, height: 150 }} />}
-              darkModeImage={<IllustrationNoResultDark style={{ width: 150, height: 150 }} />}
+              image={
+                <IllustrationNoResult style={{ width: 150, height: 150 }} />
+              }
+              darkModeImage={
+                <IllustrationNoResultDark style={{ width: 150, height: 150 }} />
+              }
               description={t('搜索无结果')}
               style={{ padding: 30 }}
             />

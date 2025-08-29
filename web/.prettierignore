@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+bun.lock
+
+# Production builds
+dist/
+build/
+
+# Generated files
+*.min.js
+*.min.css
+
+# Config files that should keep their format
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Other
+public/
+*.d.ts

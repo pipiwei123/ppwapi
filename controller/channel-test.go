@@ -69,6 +69,13 @@ func testChannel(channel *model.Channel, testModel string) testResult {
 			newAPIError: nil,
 		}
 	}
+	if channel.Type == constant.ChannelTypeVeo3 {
+		return testResult{
+			localErr:    errors.New("veo3 channel test is not supported"),
+			newAPIError: nil,
+		}
+	}
+
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 

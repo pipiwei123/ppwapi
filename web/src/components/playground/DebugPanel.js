@@ -7,14 +7,7 @@ import {
   Button,
   Dropdown,
 } from '@douyinfe/semi-ui';
-import {
-  Code,
-  Zap,
-  Clock,
-  X,
-  Eye,
-  Send,
-} from 'lucide-react';
+import { Code, Zap, Clock, X, Eye, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import CodeViewer from './CodeViewer';
 
@@ -57,7 +50,7 @@ const DebugPanel = ({
       <Dropdown
         render={
           <Dropdown.Menu>
-            {items.map(item => {
+            {items.map((item) => {
               return (
                 <Dropdown.Item
                   key={item.itemKey}
@@ -91,7 +84,7 @@ const DebugPanel = ({
         padding: styleState.isMobile ? '16px' : '24px',
         height: '100%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
       }}
     >
       <div className="flex items-center justify-between mb-6 flex-shrink-0">
@@ -126,17 +119,20 @@ const DebugPanel = ({
           activeKey={activeKey}
           onChange={handleTabChange}
         >
-          <TabPane tab={
-            <div className="flex items-center gap-2">
-              <Eye size={16} />
-              {t('预览请求体')}
-              {customRequestMode && (
-                <span className="px-1.5 py-0.5 text-xs bg-orange-100 text-orange-600 rounded-full">
-                  自定义
-                </span>
-              )}
-            </div>
-          } itemKey="preview">
+          <TabPane
+            tab={
+              <div className="flex items-center gap-2">
+                <Eye size={16} />
+                {t('预览请求体')}
+                {customRequestMode && (
+                  <span className="px-1.5 py-0.5 text-xs bg-orange-100 text-orange-600 rounded-full">
+                    自定义
+                  </span>
+                )}
+              </div>
+            }
+            itemKey="preview"
+          >
             <CodeViewer
               content={debugData.previewRequest}
               title="preview"
@@ -144,12 +140,15 @@ const DebugPanel = ({
             />
           </TabPane>
 
-          <TabPane tab={
-            <div className="flex items-center gap-2">
-              <Send size={16} />
-              {t('实际请求体')}
-            </div>
-          } itemKey="request">
+          <TabPane
+            tab={
+              <div className="flex items-center gap-2">
+                <Send size={16} />
+                {t('实际请求体')}
+              </div>
+            }
+            itemKey="request"
+          >
             <CodeViewer
               content={debugData.request}
               title="request"
@@ -157,12 +156,15 @@ const DebugPanel = ({
             />
           </TabPane>
 
-          <TabPane tab={
-            <div className="flex items-center gap-2">
-              <Zap size={16} />
-              {t('响应')}
-            </div>
-          } itemKey="response">
+          <TabPane
+            tab={
+              <div className="flex items-center gap-2">
+                <Zap size={16} />
+                {t('响应')}
+              </div>
+            }
+            itemKey="response"
+          >
             <CodeViewer
               content={debugData.response}
               title="response"
@@ -190,4 +192,4 @@ const DebugPanel = ({
   );
 };
 
-export default DebugPanel; 
+export default DebugPanel;

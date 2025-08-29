@@ -1,13 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  Banner,
-  Button,
-  Col,
-  Form,
-  Row,
-  Spin,
-  Modal,
-} from '@douyinfe/semi-ui';
+import { Banner, Button, Col, Form, Row, Spin, Modal } from '@douyinfe/semi-ui';
 import {
   compareObjects,
   API,
@@ -156,9 +148,9 @@ export default function GeneralSettings(props) {
                 <Form.Switch
                   field={'DisplayInCurrencyEnabled'}
                   label={t('以货币形式显示额度')}
-                  size='default'
-                  checkedText='｜'
-                  uncheckedText='〇'
+                  size="default"
+                  checkedText="｜"
+                  uncheckedText="〇"
                   onChange={handleFieldChange('DisplayInCurrencyEnabled')}
                 />
               </Col>
@@ -166,9 +158,9 @@ export default function GeneralSettings(props) {
                 <Form.Switch
                   field={'DisplayTokenStatEnabled'}
                   label={t('额度查询接口返回令牌额度而非用户额度')}
-                  size='default'
-                  checkedText='｜'
-                  uncheckedText='〇'
+                  size="default"
+                  checkedText="｜"
+                  uncheckedText="〇"
                   onChange={handleFieldChange('DisplayTokenStatEnabled')}
                 />
               </Col>
@@ -176,9 +168,9 @@ export default function GeneralSettings(props) {
                 <Form.Switch
                   field={'DefaultCollapseSidebar'}
                   label={t('默认折叠侧边栏')}
-                  size='default'
-                  checkedText='｜'
-                  uncheckedText='〇'
+                  size="default"
+                  checkedText="｜"
+                  uncheckedText="〇"
                   onChange={handleFieldChange('DefaultCollapseSidebar')}
                 />
               </Col>
@@ -188,9 +180,9 @@ export default function GeneralSettings(props) {
                 <Form.Switch
                   field={'DemoSiteEnabled'}
                   label={t('演示站点模式')}
-                  size='default'
-                  checkedText='｜'
-                  uncheckedText='〇'
+                  size="default"
+                  checkedText="｜"
+                  uncheckedText="〇"
                   onChange={handleFieldChange('DemoSiteEnabled')}
                 />
               </Col>
@@ -199,15 +191,15 @@ export default function GeneralSettings(props) {
                   field={'SelfUseModeEnabled'}
                   label={t('自用模式')}
                   extraText={t('开启后不限制：必须设置模型倍率')}
-                  size='default'
-                  checkedText='｜'
-                  uncheckedText='〇'
+                  size="default"
+                  checkedText="｜"
+                  uncheckedText="〇"
                   onChange={handleFieldChange('SelfUseModeEnabled')}
                 />
               </Col>
             </Row>
             <Row>
-              <Button size='default' onClick={onSubmit}>
+              <Button size="default" onClick={onSubmit}>
                 {t('保存通用设置')}
               </Button>
             </Row>
@@ -224,9 +216,9 @@ export default function GeneralSettings(props) {
         width={500}
       >
         <Banner
-          type='warning'
+          type="warning"
           description={t(
-            '此设置用于系统内部计算，默认值500000是为了精确到6位小数点设计，不推荐修改。',
+            '此设置用于系统内部计算，默认值500000是为了精确到6位小数点设计，不推荐修改。'
           )}
           bordered
           fullMode={false}

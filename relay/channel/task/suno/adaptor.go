@@ -2,7 +2,6 @@ package suno
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -15,7 +14,6 @@ import (
 	relaycommon "one-api/relay/common"
 	"one-api/service"
 	"strings"
-	"time"
 )
 
 type TaskAdaptor struct {
@@ -143,12 +141,7 @@ func (a *TaskAdaptor) FetchTask(baseUrl, key string, body map[string]any) (*http
 		return nil, err
 	}
 	defer req.Body.Close()
-	// 设置超时时间
-	timeout := time.Second * 15
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	// 使用带有超时的 context 创建新的请求
-	req = req.WithContext(ctx)
+
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+key)
 	resp, err := service.GetHttpClient().Do(req)

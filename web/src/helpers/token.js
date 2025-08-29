@@ -38,7 +38,7 @@ export async function fetchTokens() {
       created_time: token.created_time,
       used_quota: token.used_quota,
       remain_quota: token.remain_quota,
-      unlimited_quota: token.unlimited_quota
+      unlimited_quota: token.unlimited_quota,
     }));
   } catch (error) {
     console.error('Error fetching tokens:', error);
@@ -68,4 +68,4 @@ export function getServerAddress() {
   }
 
   return serverAddress;
-} 
+}

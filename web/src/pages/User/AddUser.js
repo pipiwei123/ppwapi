@@ -14,11 +14,7 @@ import {
   Row,
   Col,
 } from '@douyinfe/semi-ui';
-import {
-  IconSave,
-  IconClose,
-  IconUserAdd,
-} from '@douyinfe/semi-icons';
+import { IconSave, IconClose, IconUserAdd } from '@douyinfe/semi-icons';
 import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
@@ -61,7 +57,9 @@ const AddUser = (props) => {
         placement={'left'}
         title={
           <Space>
-            <Tag color="green" shape="circle">{t('新建')}</Tag>
+            <Tag color="green" shape="circle">
+              {t('新建')}
+            </Tag>
             <Title heading={4} className="m-0">
               {t('添加用户')}
             </Title>
@@ -98,7 +96,7 @@ const AddUser = (props) => {
         <Spin spinning={loading}>
           <Form
             initValues={getInitValues()}
-            getFormApi={(api) => formApiRef.current = api}
+            getFormApi={(api) => (formApiRef.current = api)}
             onSubmit={submit}
             onSubmitFail={(errs) => {
               const first = Object.values(errs)[0];
@@ -114,14 +112,16 @@ const AddUser = (props) => {
                   </Avatar>
                   <div>
                     <Text className="text-lg font-medium">{t('用户信息')}</Text>
-                    <div className="text-xs text-gray-600">{t('创建新用户账户')}</div>
+                    <div className="text-xs text-gray-600">
+                      {t('创建新用户账户')}
+                    </div>
                   </div>
                 </div>
 
                 <Row gutter={12}>
                   <Col span={24}>
                     <Form.Input
-                      field='username'
+                      field="username"
                       label={t('用户名')}
                       placeholder={t('请输入用户名')}
                       rules={[{ required: true, message: t('请输入用户名') }]}
@@ -130,7 +130,7 @@ const AddUser = (props) => {
                   </Col>
                   <Col span={24}>
                     <Form.Input
-                      field='display_name'
+                      field="display_name"
                       label={t('显示名称')}
                       placeholder={t('请输入显示名称')}
                       showClear
@@ -138,9 +138,9 @@ const AddUser = (props) => {
                   </Col>
                   <Col span={24}>
                     <Form.Input
-                      field='password'
+                      field="password"
                       label={t('密码')}
-                      type='password'
+                      type="password"
                       placeholder={t('请输入密码')}
                       rules={[{ required: true, message: t('请输入密码') }]}
                       showClear
@@ -148,7 +148,7 @@ const AddUser = (props) => {
                   </Col>
                   <Col span={24}>
                     <Form.Input
-                      field='remark'
+                      field="remark"
                       label={t('备注')}
                       placeholder={t('请输入备注（仅管理员可见）')}
                       showClear

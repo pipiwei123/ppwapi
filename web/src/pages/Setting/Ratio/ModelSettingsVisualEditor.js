@@ -10,7 +10,7 @@ import {
   RadioGroup,
   Radio,
   Checkbox,
-  Tag
+  Tag,
 } from '@douyinfe/semi-ui';
 import {
   IconDelete,
@@ -53,7 +53,8 @@ export default function ModelSettingsVisualEditor(props) {
       const modelData = Array.from(modelNames).map((name) => {
         const price = modelPrice[name] === undefined ? '' : modelPrice[name];
         const ratio = modelRatio[name] === undefined ? '' : modelRatio[name];
-        const comp = completionRatio[name] === undefined ? '' : completionRatio[name];
+        const comp =
+          completionRatio[name] === undefined ? '' : completionRatio[name];
 
         return {
           name,
@@ -110,7 +111,7 @@ export default function ModelSettingsVisualEditor(props) {
             output.ModelRatio[model.name] = parseFloat(model.ratio);
           if (model.completionRatio !== '')
             output.CompletionRatio[model.name] = parseFloat(
-              model.completionRatio,
+              model.completionRatio
             );
         }
       });
@@ -167,7 +168,7 @@ export default function ModelSettingsVisualEditor(props) {
         <span>
           {text}
           {record.hasConflict && (
-            <Tag color='red' shape='circle' className='ml-2'>
+            <Tag color="red" shape="circle" className="ml-2">
               {t('矛盾')}
             </Tag>
           )}
@@ -220,13 +221,13 @@ export default function ModelSettingsVisualEditor(props) {
       render: (_, record) => (
         <Space>
           <Button
-            type='primary'
+            type="primary"
             icon={<IconEdit />}
             onClick={() => editModel(record)}
           ></Button>
           <Button
             icon={<IconDelete />}
-            type='danger'
+            type="danger"
             onClick={() => deleteModel(record.name)}
           />
         </Space>
@@ -244,9 +245,10 @@ export default function ModelSettingsVisualEditor(props) {
         if (model.name !== name) return model;
         const updated = { ...model, [field]: value };
         updated.hasConflict =
-          updated.price !== '' && (updated.ratio !== '' || updated.completionRatio !== '');
+          updated.price !== '' &&
+          (updated.ratio !== '' || updated.completionRatio !== '');
         return updated;
-      }),
+      })
     );
   };
 
@@ -260,7 +262,7 @@ export default function ModelSettingsVisualEditor(props) {
 
   const calculateCompletionRatioFromPrices = (
     modelTokenPrice,
-    completionTokenPrice,
+    completionTokenPrice
   ) => {
     if (!modelTokenPrice || modelTokenPrice === '0') {
       showError('模型价格不能为0');
@@ -302,7 +304,7 @@ export default function ModelSettingsVisualEditor(props) {
       if (modelTokenPrice > 0) {
         const completionRatio = calculateCompletionRatioFromPrices(
           modelTokenPrice,
-          completionTokenPrice,
+          completionTokenPrice
         );
         newState.completionRatio = completionRatio;
       }
@@ -315,7 +317,7 @@ export default function ModelSettingsVisualEditor(props) {
   const addOrUpdateModel = (values) => {
     // Check if we're editing an existing model or adding a new one
     const existingModelIndex = models.findIndex(
-      (model) => model.name === values.name,
+      (model) => model.name === values.name
     );
 
     if (existingModelIndex >= 0) {
@@ -330,9 +332,10 @@ export default function ModelSettingsVisualEditor(props) {
             completionRatio: values.completionRatio || '',
           };
           updated.hasConflict =
-            updated.price !== '' && (updated.ratio !== '' || updated.completionRatio !== '');
+            updated.price !== '' &&
+            (updated.ratio !== '' || updated.completionRatio !== '');
           return updated;
-        }),
+        })
       );
       setVisible(false);
       showSuccess(t('更新成功'));
@@ -352,7 +355,8 @@ export default function ModelSettingsVisualEditor(props) {
           completionRatio: values.completionRatio || '',
         };
         newModel.hasConflict =
-          newModel.price !== '' && (newModel.ratio !== '' || newModel.completionRatio !== '');
+          newModel.price !== '' &&
+          (newModel.ratio !== '' || newModel.completionRatio !== '');
         return [newModel, ...prev];
       });
       setVisible(false);
@@ -392,7 +396,7 @@ export default function ModelSettingsVisualEditor(props) {
     // If the model has ratio data and we want to populate token price fields
     if (record.ratio) {
       modelCopy.tokenPrice = calculateTokenPriceFromRatio(
-        parseFloat(record.ratio),
+        parseFloat(record.ratio)
       ).toString();
 
       if (record.completionRatio) {
@@ -432,8 +436,8 @@ export default function ModelSettingsVisualEditor(props) {
 
   return (
     <>
-      <Space vertical align='start' style={{ width: '100%' }}>
-        <Space className='mt-2'>
+      <Space vertical align="start" style={{ width: '100%' }}>
+        <Space className="mt-2">
           <Button
             icon={<IconPlus />}
             onClick={() => {
@@ -443,7 +447,7 @@ export default function ModelSettingsVisualEditor(props) {
           >
             {t('添加模型')}
           </Button>
-          <Button type='primary' icon={<IconSave />} onClick={SubmitData}>
+          <Button type="primary" icon={<IconSave />} onClick={SubmitData}>
             {t('应用更改')}
           </Button>
           <Input
@@ -490,8 +494,8 @@ export default function ModelSettingsVisualEditor(props) {
       <Modal
         title={
           currentModel &&
-            currentModel.name &&
-            models.some((model) => model.name === currentModel.name)
+          currentModel.name &&
+          models.some((model) => model.name === currentModel.name)
             ? t('编辑模型')
             : t('添加模型')
         }
@@ -520,7 +524,7 @@ export default function ModelSettingsVisualEditor(props) {
                 currentModel.tokenPrice
               ) {
                 const completionPrice = parseFloat(
-                  currentModel.completionTokenPrice,
+                  currentModel.completionTokenPrice
                 );
                 const modelPrice = parseFloat(currentModel.tokenPrice);
                 if (modelPrice > 0) {
@@ -546,9 +550,9 @@ export default function ModelSettingsVisualEditor(props) {
       >
         <Form getFormApi={(api) => (formRef.current = api)}>
           <Form.Input
-            field='name'
+            field="name"
             label={t('模型名称')}
-            placeholder='strawberry'
+            placeholder="strawberry"
             required
             disabled={
               currentModel &&
@@ -563,7 +567,7 @@ export default function ModelSettingsVisualEditor(props) {
           <Form.Section text={t('定价模式')}>
             <div style={{ marginBottom: '16px' }}>
               <RadioGroup
-                type='button'
+                type="button"
                 value={pricingMode}
                 onChange={(e) => {
                   const newMode = e.target.value;
@@ -600,8 +604,8 @@ export default function ModelSettingsVisualEditor(props) {
                   }
                 }}
               >
-                <Radio value='per-token'>{t('按量计费')}</Radio>
-                <Radio value='per-request'>{t('按次计费')}</Radio>
+                <Radio value="per-token">{t('按量计费')}</Radio>
+                <Radio value="per-request">{t('按次计费')}</Radio>
               </RadioGroup>
             </div>
           </Form.Section>
@@ -611,7 +615,7 @@ export default function ModelSettingsVisualEditor(props) {
               <Form.Section text={t('价格设置方式')}>
                 <div style={{ marginBottom: '16px' }}>
                   <RadioGroup
-                    type='button'
+                    type="button"
                     value={pricingSubMode}
                     onChange={(e) => {
                       const newSubMode = e.target.value;
@@ -630,7 +634,7 @@ export default function ModelSettingsVisualEditor(props) {
                           if (updatedModel.ratio) {
                             updatedModel.tokenPrice =
                               calculateTokenPriceFromRatio(
-                                parseFloat(updatedModel.ratio),
+                                parseFloat(updatedModel.ratio)
                               ).toString();
 
                             if (updatedModel.completionRatio) {
@@ -669,8 +673,8 @@ export default function ModelSettingsVisualEditor(props) {
                       }
                     }}
                   >
-                    <Radio value='ratio'>{t('按倍率设置')}</Radio>
-                    <Radio value='token-price'>{t('按价格设置')}</Radio>
+                    <Radio value="ratio">{t('按倍率设置')}</Radio>
+                    <Radio value="token-price">{t('按价格设置')}</Radio>
                   </RadioGroup>
                 </div>
               </Form.Section>
@@ -678,7 +682,7 @@ export default function ModelSettingsVisualEditor(props) {
               {pricingSubMode === 'ratio' && (
                 <>
                   <Form.Input
-                    field='ratioInput'
+                    field="ratioInput"
                     label={t('模型倍率')}
                     placeholder={t('输入模型倍率')}
                     onChange={(value) =>
@@ -690,7 +694,7 @@ export default function ModelSettingsVisualEditor(props) {
                     initValue={currentModel?.ratio || ''}
                   />
                   <Form.Input
-                    field='completionRatioInput'
+                    field="completionRatioInput"
                     label={t('补全倍率')}
                     placeholder={t('输入补全倍率')}
                     onChange={(value) =>
@@ -707,7 +711,7 @@ export default function ModelSettingsVisualEditor(props) {
               {pricingSubMode === 'token-price' && (
                 <>
                   <Form.Input
-                    field='modelTokenPrice'
+                    field="modelTokenPrice"
                     label={t('输入价格')}
                     onChange={(value) => {
                       handleTokenPriceChange(value);
@@ -716,7 +720,7 @@ export default function ModelSettingsVisualEditor(props) {
                     suffix={t('$/1M tokens')}
                   />
                   <Form.Input
-                    field='completionTokenPrice'
+                    field="completionTokenPrice"
                     label={t('输出价格')}
                     onChange={(value) => {
                       handleCompletionTokenPriceChange(value);
@@ -731,7 +735,7 @@ export default function ModelSettingsVisualEditor(props) {
 
           {pricingMode === 'per-request' && (
             <Form.Input
-              field='priceInput'
+              field="priceInput"
               label={t('固定价格(每次)')}
               placeholder={t('输入每次价格')}
               onChange={(value) =>

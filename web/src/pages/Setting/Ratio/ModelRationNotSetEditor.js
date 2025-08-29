@@ -113,7 +113,7 @@ export default function ModelRatioNotSetEditor(props) {
   const filteredModels = models.filter((model) =>
     searchText
       ? model.name.toLowerCase().includes(searchText.toLowerCase())
-      : true,
+      : true
   );
 
   // 然后基于过滤后的数据计算分页数据
@@ -139,7 +139,7 @@ export default function ModelRatioNotSetEditor(props) {
             output.ModelRatio[model.name] = parseFloat(model.ratio);
           if (model.completionRatio !== '')
             output.CompletionRatio[model.name] = parseFloat(
-              model.completionRatio,
+              model.completionRatio
             );
         }
       });
@@ -244,8 +244,8 @@ export default function ModelRatioNotSetEditor(props) {
     }
     setModels((prev) =>
       prev.map((model) =>
-        model.name === name ? { ...model, [field]: value } : model,
-      ),
+        model.name === name ? { ...model, [field]: value } : model
+      )
     );
   };
 
@@ -328,7 +328,7 @@ export default function ModelRatioNotSetEditor(props) {
           }
         }
         return model;
-      }),
+      })
     );
 
     setBatchVisible(false);
@@ -371,21 +371,21 @@ export default function ModelRatioNotSetEditor(props) {
 
   return (
     <>
-      <Space vertical align='start' style={{ width: '100%' }}>
-        <Space className='mt-2'>
+      <Space vertical align="start" style={{ width: '100%' }}>
+        <Space className="mt-2">
           <Button icon={<IconPlus />} onClick={() => setVisible(true)}>
             {t('添加模型')}
           </Button>
           <Button
             icon={<IconBolt />}
-            type='secondary'
+            type="secondary"
             onClick={() => setBatchVisible(true)}
             disabled={selectedRowKeys.length === 0}
           >
             {t('批量设置')} ({selectedRowKeys.length})
           </Button>
           <Button
-            type='primary'
+            type="primary"
             icon={<IconSave />}
             onClick={SubmitData}
             loading={loading}
@@ -412,7 +412,7 @@ export default function ModelRatioNotSetEditor(props) {
           columns={columns}
           dataSource={pagedData}
           rowSelection={rowSelection}
-          rowKey='name'
+          rowKey="name"
           pagination={{
             currentPage: currentPage,
             pageSize: pageSize,
@@ -448,16 +448,16 @@ export default function ModelRatioNotSetEditor(props) {
       >
         <Form>
           <Form.Input
-            field='name'
+            field="name"
             label={t('模型名称')}
-            placeholder='strawberry'
+            placeholder="strawberry"
             required
             onChange={(value) =>
               setCurrentModel((prev) => ({ ...prev, name: value }))
             }
           />
           <Form.Switch
-            field='priceMode'
+            field="priceMode"
             label={
               <>
                 {t('定价模式')}：
@@ -476,7 +476,7 @@ export default function ModelRatioNotSetEditor(props) {
           />
           {currentModel?.priceMode ? (
             <Form.Input
-              field='price'
+              field="price"
               label={t('固定价格(每次)')}
               placeholder={t('输入每次价格')}
               onChange={(value) =>
@@ -486,7 +486,7 @@ export default function ModelRatioNotSetEditor(props) {
           ) : (
             <>
               <Form.Input
-                field='ratio'
+                field="ratio"
                 label={t('模型倍率')}
                 placeholder={t('输入模型倍率')}
                 onChange={(value) =>
@@ -494,7 +494,7 @@ export default function ModelRatioNotSetEditor(props) {
                 }
               />
               <Form.Input
-                field='completionRatio'
+                field="completionRatio"
                 label={t('补全倍率')}
                 placeholder={t('输入补全价格')}
                 onChange={(value) =>
@@ -552,14 +552,14 @@ export default function ModelRatioNotSetEditor(props) {
           {batchFillType === 'bothRatio' ? (
             <>
               <Form.Input
-                field='batchRatioValue'
+                field="batchRatioValue"
                 label={t('模型倍率值')}
                 placeholder={t('请输入模型倍率')}
                 value={batchRatioValue}
                 onChange={(value) => setBatchRatioValue(value)}
               />
               <Form.Input
-                field='batchCompletionRatioValue'
+                field="batchCompletionRatioValue"
                 label={t('补全倍率值')}
                 placeholder={t('请输入补全倍率')}
                 value={batchCompletionRatioValue}
@@ -568,7 +568,7 @@ export default function ModelRatioNotSetEditor(props) {
             </>
           ) : (
             <Form.Input
-              field='batchFillValue'
+              field="batchFillValue"
               label={
                 batchFillType === 'price'
                   ? t('固定价格值')
@@ -582,12 +582,12 @@ export default function ModelRatioNotSetEditor(props) {
             />
           )}
 
-          <Text type='tertiary'>
+          <Text type="tertiary">
             {t('将为选中的 ')} <Text strong>{selectedRowKeys.length}</Text>{' '}
             {t(' 个模型设置相同的值')}
           </Text>
           <div style={{ marginTop: '8px' }}>
-            <Text type='tertiary'>
+            <Text type="tertiary">
               {t('当前设置类型: ')}{' '}
               <Text strong>
                 {batchFillType === 'price'

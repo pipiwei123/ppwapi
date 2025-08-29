@@ -17,6 +17,9 @@ export default function SettingsCreditLimit(props) {
     PreConsumedQuota: '',
     QuotaForInviter: '',
     QuotaForInvitee: '',
+    InviteCashbackRatio: '',
+    MaxInviteRewards: '',
+    InviteCashbackEnabled: false,
   });
   const refForm = useRef();
   const [inputsRow, setInputsRow] = useState(inputs);
@@ -148,8 +151,63 @@ export default function SettingsCreditLimit(props) {
               </Col>
             </Row>
 
+            <Row gutter={16}>
+              <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                <Form.Switch
+                  label={t('启用按比例返现')}
+                  field={'InviteCashbackEnabled'}
+                  checkedText={'开'}
+                  uncheckedText={'关'}
+                  extraText={t('启用后将按比例给邀请者返现')}
+                  checked={inputs.InviteCashbackEnabled}
+                  onChange={(checked) =>
+                    setInputs({
+                      ...inputs,
+                      InviteCashbackEnabled: checked,
+                    })
+                  }
+                />
+              </Col>
+              <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                <Form.InputNumber
+                  label={t('返现比例')}
+                  field={'InviteCashbackRatio'}
+                  step={1}
+                  min={0}
+                  max={100}
+                  suffix={'%'}
+                  extraText={t('被邀请用户充值时的返现比例')}
+                  placeholder={t('例如：10')}
+                  onChange={(value) =>
+                    setInputs({
+                      ...inputs,
+                      InviteCashbackRatio: String(value),
+                    })
+                  }
+                />
+              </Col>
+              <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                <Form.InputNumber
+                  label={t('最大返现次数')}
+                  field={'MaxInviteRewards'}
+                  step={1}
+                  min={0}
+                  extraText={t(
+                    '每个被邀请用户最多可以触发多少次返现，0表示不限制'
+                  )}
+                  placeholder={t('例如：10')}
+                  onChange={(value) =>
+                    setInputs({
+                      ...inputs,
+                      MaxInviteRewards: String(value),
+                    })
+                  }
+                />
+              </Col>
+            </Row>
+
             <Row>
-              <Button size='default' onClick={onSubmit}>
+              <Button size="default" onClick={onSubmit}>
                 {t('保存额度设置')}
               </Button>
             </Row>

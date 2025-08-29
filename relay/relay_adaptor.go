@@ -27,6 +27,7 @@ import (
 	taskjimeng "one-api/relay/channel/task/jimeng"
 	"one-api/relay/channel/task/kling"
 	"one-api/relay/channel/task/suno"
+	"one-api/relay/channel/task/veo3"
 	"one-api/relay/channel/tencent"
 	"one-api/relay/channel/vertex"
 	"one-api/relay/channel/volcengine"
@@ -110,6 +111,8 @@ func GetTaskAdaptor(platform commonconstant.TaskPlatform) channel.TaskAdaptor {
 		return &kling.TaskAdaptor{}
 	case commonconstant.TaskPlatformJimeng:
 		return &taskjimeng.TaskAdaptor{}
+	case commonconstant.TaskPlatformVeo3:
+		return &veo3.TaskAdaptor{}
 	}
 	return nil
 }

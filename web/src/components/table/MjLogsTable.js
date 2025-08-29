@@ -30,10 +30,13 @@ import {
 import {
   API,
   copy,
-  isAdmin, renderNumber, renderQuota,
+  isAdmin,
+  renderNumber,
+  renderQuota,
   showError,
-  showSuccess, stringToColor,
-  timestamp2string
+  showSuccess,
+  stringToColor,
+  timestamp2string,
 } from '../../helpers';
 
 import {
@@ -51,17 +54,14 @@ import {
   Skeleton,
   Table,
   Tag,
-  Typography
+  Typography,
 } from '@douyinfe/semi-ui';
 import {
   IllustrationNoResult,
-  IllustrationNoResultDark
+  IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
 import { ITEMS_PER_PAGE } from '../../constants';
-import {
-  IconEyeOpened,
-  IconSearch,
-} from '@douyinfe/semi-icons';
+import { IconEyeOpened, IconSearch } from '@douyinfe/semi-icons';
 import { useTableCompactMode } from '../../hooks/useTableCompactMode';
 
 const { Text } = Typography;
@@ -170,7 +170,10 @@ const LogsTable = () => {
     const updatedColumns = {};
 
     allKeys.forEach((key) => {
-      if ((key === COLUMN_KEYS.CHANNEL || key === COLUMN_KEYS.SUBMIT_RESULT) && !isAdminUser) {
+      if (
+        (key === COLUMN_KEYS.CHANNEL || key === COLUMN_KEYS.SUBMIT_RESULT) &&
+        !isAdminUser
+      ) {
         updatedColumns[key] = false;
       } else {
         updatedColumns[key] = checked;
@@ -183,7 +186,10 @@ const LogsTable = () => {
   // 更新表格时保存列可见性
   useEffect(() => {
     if (Object.keys(visibleColumns).length > 0) {
-      localStorage.setItem('mj-logs-table-columns', JSON.stringify(visibleColumns));
+      localStorage.setItem(
+        'mj-logs-table-columns',
+        JSON.stringify(visibleColumns)
+      );
     }
   }, [visibleColumns]);
 
@@ -191,115 +197,135 @@ const LogsTable = () => {
     switch (type) {
       case 'IMAGINE':
         return (
-          <Tag color='blue' shape='circle' prefixIcon={<Palette size={14} />}>
+          <Tag color="blue" shape="circle" prefixIcon={<Palette size={14} />}>
             {t('绘图')}
           </Tag>
         );
       case 'UPSCALE':
         return (
-          <Tag color='orange' shape='circle' prefixIcon={<ZoomIn size={14} />}>
+          <Tag color="orange" shape="circle" prefixIcon={<ZoomIn size={14} />}>
             {t('放大')}
           </Tag>
         );
       case 'VIDEO':
         return (
-          <Tag color='orange' shape='circle' prefixIcon={<Video size={14} />}>
+          <Tag color="orange" shape="circle" prefixIcon={<Video size={14} />}>
             {t('视频')}
           </Tag>
         );
       case 'EDITS':
         return (
-          <Tag color='orange' shape='circle' prefixIcon={<Video size={14} />}>
+          <Tag color="orange" shape="circle" prefixIcon={<Video size={14} />}>
             {t('编辑')}
           </Tag>
         );
       case 'VARIATION':
         return (
-          <Tag color='purple' shape='circle' prefixIcon={<Shuffle size={14} />}>
+          <Tag color="purple" shape="circle" prefixIcon={<Shuffle size={14} />}>
             {t('变换')}
           </Tag>
         );
       case 'HIGH_VARIATION':
         return (
-          <Tag color='purple' shape='circle' prefixIcon={<Shuffle size={14} />}>
+          <Tag color="purple" shape="circle" prefixIcon={<Shuffle size={14} />}>
             {t('强变换')}
           </Tag>
         );
       case 'LOW_VARIATION':
         return (
-          <Tag color='purple' shape='circle' prefixIcon={<Shuffle size={14} />}>
+          <Tag color="purple" shape="circle" prefixIcon={<Shuffle size={14} />}>
             {t('弱变换')}
           </Tag>
         );
       case 'PAN':
         return (
-          <Tag color='cyan' shape='circle' prefixIcon={<Move size={14} />}>
+          <Tag color="cyan" shape="circle" prefixIcon={<Move size={14} />}>
             {t('平移')}
           </Tag>
         );
       case 'DESCRIBE':
         return (
-          <Tag color='yellow' shape='circle' prefixIcon={<FileText size={14} />}>
+          <Tag
+            color="yellow"
+            shape="circle"
+            prefixIcon={<FileText size={14} />}
+          >
             {t('图生文')}
           </Tag>
         );
       case 'BLEND':
         return (
-          <Tag color='lime' shape='circle' prefixIcon={<Blend size={14} />}>
+          <Tag color="lime" shape="circle" prefixIcon={<Blend size={14} />}>
             {t('图混合')}
           </Tag>
         );
       case 'UPLOAD':
         return (
-          <Tag color='blue' shape='circle' prefixIcon={<Upload size={14} />}>
+          <Tag color="blue" shape="circle" prefixIcon={<Upload size={14} />}>
             上传文件
           </Tag>
         );
       case 'SHORTEN':
         return (
-          <Tag color='pink' shape='circle' prefixIcon={<Minimize2 size={14} />}>
+          <Tag color="pink" shape="circle" prefixIcon={<Minimize2 size={14} />}>
             {t('缩词')}
           </Tag>
         );
       case 'REROLL':
         return (
-          <Tag color='indigo' shape='circle' prefixIcon={<RotateCcw size={14} />}>
+          <Tag
+            color="indigo"
+            shape="circle"
+            prefixIcon={<RotateCcw size={14} />}
+          >
             {t('重绘')}
           </Tag>
         );
       case 'INPAINT':
         return (
-          <Tag color='violet' shape='circle' prefixIcon={<PaintBucket size={14} />}>
+          <Tag
+            color="violet"
+            shape="circle"
+            prefixIcon={<PaintBucket size={14} />}
+          >
             {t('局部重绘-提交')}
           </Tag>
         );
       case 'ZOOM':
         return (
-          <Tag color='teal' shape='circle' prefixIcon={<Focus size={14} />}>
+          <Tag color="teal" shape="circle" prefixIcon={<Focus size={14} />}>
             {t('变焦')}
           </Tag>
         );
       case 'CUSTOM_ZOOM':
         return (
-          <Tag color='teal' shape='circle' prefixIcon={<Move3D size={14} />}>
+          <Tag color="teal" shape="circle" prefixIcon={<Move3D size={14} />}>
             {t('自定义变焦-提交')}
           </Tag>
         );
       case 'MODAL':
         return (
-          <Tag color='green' shape='circle' prefixIcon={<Monitor size={14} />}>
+          <Tag color="green" shape="circle" prefixIcon={<Monitor size={14} />}>
             {t('窗口处理')}
           </Tag>
         );
       case 'SWAP_FACE':
         return (
-          <Tag color='light-green' shape='circle' prefixIcon={<UserCheck size={14} />}>
+          <Tag
+            color="light-green"
+            shape="circle"
+            prefixIcon={<UserCheck size={14} />}
+          >
             {t('换脸')}
           </Tag>
         );
       default:
         return (
-          <Tag color='white' shape='circle' prefixIcon={<HelpCircle size={14} />}>
+          <Tag
+            color="white"
+            shape="circle"
+            prefixIcon={<HelpCircle size={14} />}
+          >
             {t('未知')}
           </Tag>
         );
@@ -310,31 +336,39 @@ const LogsTable = () => {
     switch (code) {
       case 1:
         return (
-          <Tag color='green' shape='circle' prefixIcon={<CheckCircle size={14} />}>
+          <Tag
+            color="green"
+            shape="circle"
+            prefixIcon={<CheckCircle size={14} />}
+          >
             {t('已提交')}
           </Tag>
         );
       case 21:
         return (
-          <Tag color='lime' shape='circle' prefixIcon={<Clock size={14} />}>
+          <Tag color="lime" shape="circle" prefixIcon={<Clock size={14} />}>
             {t('等待中')}
           </Tag>
         );
       case 22:
         return (
-          <Tag color='orange' shape='circle' prefixIcon={<Copy size={14} />}>
+          <Tag color="orange" shape="circle" prefixIcon={<Copy size={14} />}>
             {t('重复提交')}
           </Tag>
         );
       case 0:
         return (
-          <Tag color='yellow' shape='circle' prefixIcon={<FileX size={14} />}>
+          <Tag color="yellow" shape="circle" prefixIcon={<FileX size={14} />}>
             {t('未提交')}
           </Tag>
         );
       default:
         return (
-          <Tag color='white' shape='circle' prefixIcon={<HelpCircle size={14} />}>
+          <Tag
+            color="white"
+            shape="circle"
+            prefixIcon={<HelpCircle size={14} />}
+          >
             {t('未知')}
           </Tag>
         );
@@ -345,43 +379,55 @@ const LogsTable = () => {
     switch (type) {
       case 'SUCCESS':
         return (
-          <Tag color='green' shape='circle' prefixIcon={<CheckCircle size={14} />}>
+          <Tag
+            color="green"
+            shape="circle"
+            prefixIcon={<CheckCircle size={14} />}
+          >
             {t('成功')}
           </Tag>
         );
       case 'NOT_START':
         return (
-          <Tag color='grey' shape='circle' prefixIcon={<Pause size={14} />}>
+          <Tag color="grey" shape="circle" prefixIcon={<Pause size={14} />}>
             {t('未启动')}
           </Tag>
         );
       case 'SUBMITTED':
         return (
-          <Tag color='yellow' shape='circle' prefixIcon={<Clock size={14} />}>
+          <Tag color="yellow" shape="circle" prefixIcon={<Clock size={14} />}>
             {t('队列中')}
           </Tag>
         );
       case 'IN_PROGRESS':
         return (
-          <Tag color='blue' shape='circle' prefixIcon={<Loader size={14} />}>
+          <Tag color="blue" shape="circle" prefixIcon={<Loader size={14} />}>
             {t('执行中')}
           </Tag>
         );
       case 'FAILURE':
         return (
-          <Tag color='red' shape='circle' prefixIcon={<XCircle size={14} />}>
+          <Tag color="red" shape="circle" prefixIcon={<XCircle size={14} />}>
             {t('失败')}
           </Tag>
         );
       case 'MODAL':
         return (
-          <Tag color='yellow' shape='circle' prefixIcon={<AlertCircle size={14} />}>
+          <Tag
+            color="yellow"
+            shape="circle"
+            prefixIcon={<AlertCircle size={14} />}
+          >
             {t('窗口等待')}
           </Tag>
         );
       default:
         return (
-          <Tag color='white' shape='circle' prefixIcon={<HelpCircle size={14} />}>
+          <Tag
+            color="white"
+            shape="circle"
+            prefixIcon={<HelpCircle size={14} />}
+          >
             {t('未知')}
           </Tag>
         );
@@ -411,7 +457,7 @@ const LogsTable = () => {
     const color = durationSec > 60 ? 'red' : 'green';
 
     return (
-      <Tag color={color} shape='circle' prefixIcon={<Clock size={14} />}>
+      <Tag color={color} shape="circle" prefixIcon={<Clock size={14} />}>
         {durationSec} {t('秒')}
       </Tag>
     );
@@ -427,20 +473,20 @@ const LogsTable = () => {
       Modal.info({
         title: t('用户信息'),
         content: (
-            <div style={{ padding: 12 }}>
-              <p>
-                {t('用户名')}: {data.username}
-              </p>
-              <p>
-                {t('余额')}: {renderQuota(data.quota)}
-              </p>
-              <p>
-                {t('已用额度')}：{renderQuota(data.used_quota)}
-              </p>
-              <p>
-                {t('请求次数')}：{renderNumber(data.request_count)}
-              </p>
-            </div>
+          <div style={{ padding: 12 }}>
+            <p>
+              {t('用户名')}: {data.username}
+            </p>
+            <p>
+              {t('余额')}: {renderQuota(data.quota)}
+            </p>
+            <p>
+              {t('已用额度')}：{renderQuota(data.used_quota)}
+            </p>
+            <p>
+              {t('请求次数')}：{renderNumber(data.request_count)}
+            </p>
+          </div>
         ),
         centered: true,
       });
@@ -466,22 +512,22 @@ const LogsTable = () => {
       className: isAdmin() ? 'tableShow' : 'tableHiddle',
       render: (text, record, index) => {
         return isAdminUser ? (
-            <div>
-              <Avatar
-                  size='extra-small'
-                  color={stringToColor(text)}
-                  style={{ marginRight: 4 }}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    showUserInfo(record.user_id);
-                  }}
-              >
-                {typeof text === 'string' && text.slice(0, 1)}
-              </Avatar>
-              {text}
-            </div>
+          <div>
+            <Avatar
+              size="extra-small"
+              color={stringToColor(text)}
+              style={{ marginRight: 4 }}
+              onClick={(event) => {
+                event.stopPropagation();
+                showUserInfo(record.user_id);
+              }}
+            >
+              {typeof text === 'string' && text.slice(0, 1)}
+            </Avatar>
+            {text}
+          </div>
         ) : (
-            <></>
+          <></>
         );
       },
     },
@@ -491,19 +537,19 @@ const LogsTable = () => {
       dataIndex: 'token_name',
       render: (text, record, index) => {
         return (
-            <div>
-              <Tag
-                  color='grey'
-                  shape='circle'
-                  onClick={(event) => {
-                    //cancel the row click event
-                    copyText(text);
-                  }}
-              >
-                {' '}
-                {t(text)}{' '}
-              </Tag>
-            </div>
+          <div>
+            <Tag
+              color="grey"
+              shape="circle"
+              onClick={(event) => {
+                //cancel the row click event
+                copyText(text);
+              }}
+            >
+              {' '}
+              {t(text)}{' '}
+            </Tag>
+          </div>
         );
       },
     },
@@ -525,7 +571,7 @@ const LogsTable = () => {
           <div>
             <Tag
               color={colors[parseInt(text) % colors.length]}
-              shape='circle'
+              shape="circle"
               prefixIcon={<Hash size={14} />}
               onClick={() => {
                 copyText(text);
@@ -590,7 +636,7 @@ const LogsTable = () => {
                 }
                 percent={text ? parseInt(text.replace('%', '')) : 0}
                 showInfo={true}
-                aria-label='drawing progress'
+                aria-label="drawing progress"
                 style={{ minWidth: '160px' }}
               />
             }
@@ -608,20 +654,20 @@ const LogsTable = () => {
           // 图生文操作策略
           isDescribeAction: () => record.action === 'DESCRIBE',
           describeRender: () => t('图生文'),
-          
+
           // 任务未完成策略
           isIncomplete: () => !['SUCCESS'].includes(record.status),
           incompleteRender: () => t('处理中'),
-          
+
           // 多图片策略
           hasMultipleImages: () => {
             const imageUrls = (() => {
               try {
-                const parsed = record.image_urls?.trim() 
-                  ? JSON.parse(record.image_urls) 
+                const parsed = record.image_urls?.trim()
+                  ? JSON.parse(record.image_urls)
                   : [];
-                return Array.isArray(parsed) 
-                  ? parsed.filter(item => item?.url) 
+                return Array.isArray(parsed)
+                  ? parsed.filter((item) => item?.url)
                   : [];
               } catch {
                 return [];
@@ -633,14 +679,14 @@ const LogsTable = () => {
             const imageUrls = (() => {
               try {
                 const parsed = JSON.parse(record.image_urls);
-                return Array.isArray(parsed) 
-                  ? parsed.filter(item => item?.url) 
+                return Array.isArray(parsed)
+                  ? parsed.filter((item) => item?.url)
                   : [];
               } catch {
                 return [];
               }
             })();
-            
+
             return (
               <div className="flex gap-1">
                 <Button
@@ -657,7 +703,7 @@ const LogsTable = () => {
               </div>
             );
           },
-          
+
           // 单图片策略
           hasSingleImage: () => text && !text.endsWith('/'),
           singleImageRender: () => (
@@ -672,29 +718,29 @@ const LogsTable = () => {
               {t('查看图片')}
             </Button>
           ),
-          
+
           // 默认策略
-          defaultRender: () => t('无')
+          defaultRender: () => t('无'),
         };
-        
+
         // 执行渲染策略链
         const executeStrategy = (strategies) => {
           const strategyPairs = [
             ['isDescribeAction', 'describeRender'],
             ['isIncomplete', 'incompleteRender'],
             ['hasMultipleImages', 'multiImageRender'],
-            ['hasSingleImage', 'singleImageRender']
+            ['hasSingleImage', 'singleImageRender'],
           ];
-          
-          const matchedStrategy = strategyPairs.find(([condition]) => 
+
+          const matchedStrategy = strategyPairs.find(([condition]) =>
             strategies[condition]()
           );
-          
-          return matchedStrategy 
-            ? strategies[matchedStrategy[1]]() 
+
+          return matchedStrategy
+            ? strategies[matchedStrategy[1]]()
             : strategies.defaultRender();
         };
-        
+
         return executeStrategy(renderStrategies);
       },
     },
@@ -795,7 +841,7 @@ const LogsTable = () => {
     mj_id: '',
     dateRange: [
       timestamp2string(now.getTime() / 1000 - 2592000),
-      timestamp2string(now.getTime() / 1000 + 3600)
+      timestamp2string(now.getTime() / 1000 + 3600),
     ],
   };
 
@@ -815,7 +861,11 @@ const LogsTable = () => {
     let start_timestamp = timestamp2string(now.getTime() / 1000 - 2592000);
     let end_timestamp = timestamp2string(now.getTime() / 1000 + 3600);
 
-    if (formValues.dateRange && Array.isArray(formValues.dateRange) && formValues.dateRange.length === 2) {
+    if (
+      formValues.dateRange &&
+      Array.isArray(formValues.dateRange) &&
+      formValues.dateRange.length === 2
+    ) {
       start_timestamp = formValues.dateRange[0];
       end_timestamp = formValues.dateRange[1];
     }
@@ -846,7 +896,8 @@ const LogsTable = () => {
 
   const loadLogs = async (page = 1, size = pageSize) => {
     setLoading(true);
-    const { channel_id, mj_id, start_timestamp, end_timestamp } = getFormValues();
+    const { channel_id, mj_id, start_timestamp, end_timestamp } =
+      getFormValues();
     let localStartTimestamp = Date.parse(start_timestamp);
     let localEndTimestamp = Date.parse(end_timestamp);
     const url = isAdminUser
@@ -887,7 +938,8 @@ const LogsTable = () => {
   };
 
   useEffect(() => {
-    const localPageSize = parseInt(localStorage.getItem('mj-page-size')) || ITEMS_PER_PAGE;
+    const localPageSize =
+      parseInt(localStorage.getItem('mj-page-size')) || ITEMS_PER_PAGE;
     setPageSize(localPageSize);
     loadLogs(1, localPageSize).then();
   }, []);
@@ -908,9 +960,7 @@ const LogsTable = () => {
         onCancel={() => setShowColumnSelector(false)}
         footer={
           <div className="flex justify-end">
-            <Button onClick={() => initDefaultColumns()}>
-              {t('重置')}
-            </Button>
+            <Button onClick={() => initDefaultColumns()}>{t('重置')}</Button>
             <Button onClick={() => setShowColumnSelector(false)}>
               {t('取消')}
             </Button>
@@ -932,7 +982,10 @@ const LogsTable = () => {
             {t('全选')}
           </Checkbox>
         </div>
-        <div className="flex flex-wrap max-h-96 overflow-y-auto rounded-lg p-4" style={{ border: '1px solid var(--semi-color-border)' }}>
+        <div
+          className="flex flex-wrap max-h-96 overflow-y-auto rounded-lg p-4"
+          style={{ border: '1px solid var(--semi-color-border)' }}
+        >
           {allColumns.map((column) => {
             // 为非管理员用户跳过管理员专用列
             if (
@@ -977,19 +1030,21 @@ const LogsTable = () => {
                       style={{
                         width: 300,
                         marginBottom: 0,
-                        marginTop: 0
+                        marginTop: 0,
                       }}
                     />
                   ) : (
                     <Text>
                       {isAdminUser && showBanner
-                        ? t('当前未开启Midjourney回调，部分项目可能无法获得绘图结果，可在运营设置中开启。')
+                        ? t(
+                            '当前未开启Midjourney回调，部分项目可能无法获得绘图结果，可在运营设置中开启。'
+                          )
                         : t('Midjourney 任务记录')}
                     </Text>
                   )}
                 </div>
                 <Button
-                  type='tertiary'
+                  type="tertiary"
                   className="w-full md:w-auto"
                   onClick={() => setCompactMode(!compactMode)}
                   size="small"
@@ -1016,9 +1071,9 @@ const LogsTable = () => {
                     {/* 时间选择器 */}
                     <div className="col-span-1 lg:col-span-2">
                       <Form.DatePicker
-                        field='dateRange'
+                        field="dateRange"
                         className="w-full"
-                        type='dateTimeRange'
+                        type="dateTimeRange"
                         placeholder={[t('开始时间'), t('结束时间')]}
                         showClear
                         pure
@@ -1028,7 +1083,7 @@ const LogsTable = () => {
 
                     {/* 任务 ID */}
                     <Form.Input
-                      field='mj_id'
+                      field="mj_id"
                       prefix={<IconSearch />}
                       placeholder={t('任务 ID')}
                       showClear
@@ -1039,7 +1094,7 @@ const LogsTable = () => {
                     {/* 渠道 ID - 仅管理员可见 */}
                     {isAdminUser && (
                       <Form.Input
-                        field='channel_id'
+                        field="channel_id"
                         prefix={<IconSearch />}
                         placeholder={t('渠道 ID')}
                         showClear
@@ -1054,15 +1109,15 @@ const LogsTable = () => {
                     <div></div>
                     <div className="flex gap-2">
                       <Button
-                        type='tertiary'
-                        htmlType='submit'
+                        type="tertiary"
+                        htmlType="submit"
                         loading={loading}
                         size="small"
                       >
                         {t('查询')}
                       </Button>
                       <Button
-                        type='tertiary'
+                        type="tertiary"
                         onClick={() => {
                           if (formApi) {
                             formApi.reset();
@@ -1077,7 +1132,7 @@ const LogsTable = () => {
                         {t('重置')}
                       </Button>
                       <Button
-                        type='tertiary'
+                        type="tertiary"
                         onClick={() => setShowColumnSelector(true)}
                         size="small"
                       >
@@ -1089,21 +1144,31 @@ const LogsTable = () => {
               </Form>
             </div>
           }
-          shadows='always'
+          shadows="always"
           bordered={false}
         >
           <Table
-            columns={compactMode ? getVisibleColumns().map(({ fixed, ...rest }) => rest) : getVisibleColumns()}
+            columns={
+              compactMode
+                ? getVisibleColumns().map(({ fixed, ...rest }) => rest)
+                : getVisibleColumns()
+            }
             dataSource={logs}
-            rowKey='key'
+            rowKey="key"
             loading={loading}
             scroll={compactMode ? undefined : { x: 'max-content' }}
             className="rounded-xl overflow-hidden"
             size="middle"
             empty={
               <Empty
-                image={<IllustrationNoResult style={{ width: 150, height: 150 }} />}
-                darkModeImage={<IllustrationNoResultDark style={{ width: 150, height: 150 }} />}
+                image={
+                  <IllustrationNoResult style={{ width: 150, height: 150 }} />
+                }
+                darkModeImage={
+                  <IllustrationNoResultDark
+                    style={{ width: 150, height: 150 }}
+                  />
+                }
                 description={t('搜索无结果')}
                 style={{ padding: 30 }}
               />
@@ -1143,35 +1208,40 @@ const LogsTable = () => {
             onCancel={() => setIsModalOpenurl(false)}
             footer={null}
             width="95vw"
-            style={{ 
+            style={{
               maxWidth: '1400px',
-              top: '20px'
+              top: '20px',
             }}
             bodyStyle={{
               maxHeight: '80vh',
               overflow: 'auto',
-              padding: '24px'
+              padding: '24px',
             }}
             title={t('图片预览')}
           >
-            <div 
+            <div
               className="grid gap-4"
               style={{
-                gridTemplateColumns: modalImageUrls.length === 1 ? '1fr' : 
-                                   modalImageUrls.length === 2 ? 'repeat(2, 1fr)' :
-                                   modalImageUrls.length === 3 ? 'repeat(2, 1fr)' :
-                                   'repeat(2, 1fr)',
-                minHeight: '400px'
+                gridTemplateColumns:
+                  modalImageUrls.length === 1
+                    ? '1fr'
+                    : modalImageUrls.length === 2
+                      ? 'repeat(2, 1fr)'
+                      : modalImageUrls.length === 3
+                        ? 'repeat(2, 1fr)'
+                        : 'repeat(2, 1fr)',
+                minHeight: '400px',
               }}
             >
               {modalImageUrls.map((imgItem, index) => {
                 // 确保imgItem有url属性
-                const imageUrl = typeof imgItem === 'string' ? imgItem : imgItem.url;
+                const imageUrl =
+                  typeof imgItem === 'string' ? imgItem : imgItem.url;
                 if (!imageUrl) {
                   console.warn('Invalid image item at index', index, imgItem);
                   return null;
                 }
-                
+
                 return (
                   <div key={index} className="relative">
                     <img
@@ -1185,7 +1255,7 @@ const LogsTable = () => {
                         borderRadius: '8px',
                         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                         cursor: 'pointer',
-                        transition: 'opacity 0.2s'
+                        transition: 'opacity 0.2s',
                       }}
                       onClick={() => {
                         // 点击单张图片时切换到单图预览
@@ -1208,7 +1278,7 @@ const LogsTable = () => {
                         e.target.innerHTML = '图片加载失败';
                       }}
                     />
-                    <div 
+                    <div
                       style={{
                         position: 'absolute',
                         top: '8px',
@@ -1218,7 +1288,7 @@ const LogsTable = () => {
                         padding: '4px 8px',
                         borderRadius: '4px',
                         fontSize: '12px',
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
                       }}
                     >
                       {index + 1}

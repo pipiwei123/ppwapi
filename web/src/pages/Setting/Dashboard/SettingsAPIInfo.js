@@ -10,19 +10,13 @@ import {
   Avatar,
   Modal,
   Tag,
-  Switch
+  Switch,
 } from '@douyinfe/semi-ui';
 import {
   IllustrationNoResult,
-  IllustrationNoResultDark
+  IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Save,
-  Settings
-} from 'lucide-react';
+import { Plus, Edit, Trash2, Save, Settings } from 'lucide-react';
 import { API, showError, showSuccess } from '../../../helpers';
 import { useTranslation } from 'react-i18next';
 
@@ -43,7 +37,7 @@ const SettingsAPIInfo = ({ options, refresh }) => {
     url: '',
     description: '',
     route: '',
-    color: 'blue'
+    color: 'blue',
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -68,7 +62,7 @@ const SettingsAPIInfo = ({ options, refresh }) => {
     { value: 'light-blue', label: 'light-blue' },
     { value: 'indigo', label: 'indigo' },
     { value: 'violet', label: 'violet' },
-    { value: 'grey', label: 'grey' }
+    { value: 'grey', label: 'grey' },
   ];
 
   const updateOption = async (key, value) => {
@@ -105,7 +99,7 @@ const SettingsAPIInfo = ({ options, refresh }) => {
       url: '',
       description: '',
       route: '',
-      color: 'blue'
+      color: 'blue',
     });
     setShowApiModal(true);
   };
@@ -116,7 +110,7 @@ const SettingsAPIInfo = ({ options, refresh }) => {
       url: api.url,
       description: api.description,
       route: api.route,
-      color: api.color
+      color: api.color,
     });
     setShowApiModal(true);
   };
@@ -128,7 +122,7 @@ const SettingsAPIInfo = ({ options, refresh }) => {
 
   const confirmDeleteApi = () => {
     if (deletingApi) {
-      const newList = apiInfoList.filter(api => api.id !== deletingApi.id);
+      const newList = apiInfoList.filter((api) => api.id !== deletingApi.id);
       setApiInfoList(newList);
       setHasChanges(true);
       showSuccess('API信息已删除，请及时点击“保存设置”进行保存');
@@ -148,16 +142,14 @@ const SettingsAPIInfo = ({ options, refresh }) => {
 
       let newList;
       if (editingApi) {
-        newList = apiInfoList.map(api =>
-          api.id === editingApi.id
-            ? { ...api, ...apiForm }
-            : api
+        newList = apiInfoList.map((api) =>
+          api.id === editingApi.id ? { ...api, ...apiForm } : api
         );
       } else {
-        const newId = Math.max(...apiInfoList.map(api => api.id), 0) + 1;
+        const newId = Math.max(...apiInfoList.map((api) => api.id), 0) + 1;
         const newApi = {
           id: newId,
-          ...apiForm
+          ...apiForm,
         };
         newList = [...apiInfoList, newApi];
       }
@@ -165,7 +157,11 @@ const SettingsAPIInfo = ({ options, refresh }) => {
       setApiInfoList(newList);
       setHasChanges(true);
       setShowApiModal(false);
-      showSuccess(editingApi ? 'API信息已更新，请及时点击“保存设置”进行保存' : 'API信息已添加，请及时点击“保存设置”进行保存');
+      showSuccess(
+        editingApi
+          ? 'API信息已更新，请及时点击“保存设置”进行保存'
+          : 'API信息已添加，请及时点击“保存设置”进行保存'
+      );
     } catch (error) {
       showError('操作失败: ' + error.message);
     } finally {
@@ -197,7 +193,11 @@ const SettingsAPIInfo = ({ options, refresh }) => {
 
   useEffect(() => {
     const enabledStr = options['console_setting.api_info_enabled'];
-    setPanelEnabled(enabledStr === undefined ? true : enabledStr === 'true' || enabledStr === true);
+    setPanelEnabled(
+      enabledStr === undefined
+        ? true
+        : enabledStr === 'true' || enabledStr === true
+    );
   }, [options['console_setting.api_info_enabled']]);
 
   const handleToggleEnabled = async (checked) => {
@@ -228,11 +228,7 @@ const SettingsAPIInfo = ({ options, refresh }) => {
       title: t('API地址'),
       dataIndex: 'url',
       render: (text, record) => (
-        <Tag
-          color={record.color}
-          shape='circle'
-          style={{ maxWidth: '280px' }}
-        >
+        <Tag color={record.color} shape="circle" style={{ maxWidth: '280px' }}>
           {text}
         </Tag>
       ),
@@ -240,31 +236,18 @@ const SettingsAPIInfo = ({ options, refresh }) => {
     {
       title: t('线路描述'),
       dataIndex: 'route',
-      render: (text, record) => (
-        <Tag shape='circle'>
-          {text}
-        </Tag>
-      ),
+      render: (text, record) => <Tag shape="circle">{text}</Tag>,
     },
     {
       title: t('说明'),
       dataIndex: 'description',
       ellipsis: true,
-      render: (text, record) => (
-        <Tag shape='circle'>
-          {text || '-'}
-        </Tag>
-      ),
+      render: (text, record) => <Tag shape="circle">{text || '-'}</Tag>,
     },
     {
       title: t('颜色'),
       dataIndex: 'color',
-      render: (color) => (
-        <Avatar
-          size="extra-extra-small"
-          color={color}
-        />
-      ),
+      render: (color) => <Avatar size="extra-extra-small" color={color} />,
     },
     {
       title: t('操作'),
@@ -274,18 +257,18 @@ const SettingsAPIInfo = ({ options, refresh }) => {
         <Space>
           <Button
             icon={<Edit size={14} />}
-            theme='light'
-            type='tertiary'
-            size='small'
+            theme="light"
+            type="tertiary"
+            size="small"
             onClick={() => handleEditApi(record)}
           >
             {t('编辑')}
           </Button>
           <Button
             icon={<Trash2 size={14} />}
-            type='danger'
-            theme='light'
-            size='small'
+            type="danger"
+            theme="light"
+            size="small"
             onClick={() => handleDeleteApi(record)}
           >
             {t('删除')}
@@ -301,11 +284,15 @@ const SettingsAPIInfo = ({ options, refresh }) => {
       return;
     }
 
-    const newList = apiInfoList.filter(api => !selectedRowKeys.includes(api.id));
+    const newList = apiInfoList.filter(
+      (api) => !selectedRowKeys.includes(api.id)
+    );
     setApiInfoList(newList);
     setSelectedRowKeys([]);
     setHasChanges(true);
-    showSuccess(`已删除 ${selectedRowKeys.length} 个API信息，请及时点击“保存设置”进行保存`);
+    showSuccess(
+      `已删除 ${selectedRowKeys.length} 个API信息，请及时点击“保存设置”进行保存`
+    );
   };
 
   const renderHeader = () => (
@@ -313,7 +300,11 @@ const SettingsAPIInfo = ({ options, refresh }) => {
       <div className="mb-2">
         <div className="flex items-center text-blue-500">
           <Settings size={16} className="mr-2" />
-          <Text>{t('API信息管理，可以配置多个API地址用于状态展示和负载均衡（最多50个）')}</Text>
+          <Text>
+            {t(
+              'API信息管理，可以配置多个API地址用于状态展示和负载均衡（最多50个）'
+            )}
+          </Text>
         </div>
       </div>
 
@@ -322,8 +313,8 @@ const SettingsAPIInfo = ({ options, refresh }) => {
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
         <div className="flex gap-2 w-full md:w-auto order-2 md:order-1">
           <Button
-            theme='light'
-            type='primary'
+            theme="light"
+            type="primary"
             icon={<Plus size={14} />}
             className="w-full md:w-auto"
             onClick={handleAddApi}
@@ -332,20 +323,21 @@ const SettingsAPIInfo = ({ options, refresh }) => {
           </Button>
           <Button
             icon={<Trash2 size={14} />}
-            type='danger'
-            theme='light'
+            type="danger"
+            theme="light"
             onClick={handleBatchDelete}
             disabled={selectedRowKeys.length === 0}
             className="w-full md:w-auto"
           >
-            {t('批量删除')} {selectedRowKeys.length > 0 && `(${selectedRowKeys.length})`}
+            {t('批量删除')}{' '}
+            {selectedRowKeys.length > 0 && `(${selectedRowKeys.length})`}
           </Button>
           <Button
             icon={<Save size={14} />}
             onClick={submitApiInfo}
             loading={loading}
             disabled={!hasChanges}
-            type='secondary'
+            type="secondary"
             className="w-full md:w-auto"
           >
             {t('保存设置')}
@@ -354,10 +346,7 @@ const SettingsAPIInfo = ({ options, refresh }) => {
 
         {/* 启用开关 */}
         <div className="order-1 md:order-2 flex items-center gap-2">
-          <Switch
-            checked={panelEnabled}
-            onChange={handleToggleEnabled}
-          />
+          <Switch checked={panelEnabled} onChange={handleToggleEnabled} />
           <Text>{panelEnabled ? t('已启用') : t('已禁用')}</Text>
         </div>
       </div>
@@ -403,11 +392,12 @@ const SettingsAPIInfo = ({ options, refresh }) => {
             total: apiInfoList.length,
             showSizeChanger: true,
             showQuickJumper: true,
-            formatPageText: (page) => t('第 {{start}} - {{end}} 条，共 {{total}} 条', {
-              start: page.currentStart,
-              end: page.currentEnd,
-              total: apiInfoList.length,
-            }),
+            formatPageText: (page) =>
+              t('第 {{start}} - {{end}} 条，共 {{total}} 条', {
+                start: page.currentStart,
+                end: page.currentEnd,
+                total: apiInfoList.length,
+              }),
             pageSizeOptions: ['5', '10', '20', '50'],
             onChange: (page, size) => {
               setCurrentPage(page);
@@ -416,14 +406,18 @@ const SettingsAPIInfo = ({ options, refresh }) => {
             onShowSizeChange: (current, size) => {
               setCurrentPage(1);
               setPageSize(size);
-            }
+            },
           }}
-          size='middle'
+          size="middle"
           loading={loading}
           empty={
             <Empty
-              image={<IllustrationNoResult style={{ width: 150, height: 150 }} />}
-              darkModeImage={<IllustrationNoResultDark style={{ width: 150, height: 150 }} />}
+              image={
+                <IllustrationNoResult style={{ width: 150, height: 150 }} />
+              }
+              darkModeImage={
+                <IllustrationNoResultDark style={{ width: 150, height: 150 }} />
+              }
               description={t('暂无API信息')}
               style={{ padding: 30 }}
             />
@@ -441,39 +435,40 @@ const SettingsAPIInfo = ({ options, refresh }) => {
         cancelText={t('取消')}
         confirmLoading={modalLoading}
       >
-        <Form layout='vertical' initValues={apiForm} key={editingApi ? editingApi.id : 'new'}>
+        <Form
+          layout="vertical"
+          initValues={apiForm}
+          key={editingApi ? editingApi.id : 'new'}
+        >
           <Form.Input
-            field='url'
+            field="url"
             label={t('API地址')}
-            placeholder='https://api.example.com'
+            placeholder="https://api.example.com"
             rules={[{ required: true, message: t('请输入API地址') }]}
             onChange={(value) => setApiForm({ ...apiForm, url: value })}
           />
           <Form.Input
-            field='route'
+            field="route"
             label={t('线路描述')}
             placeholder={t('如：香港线路')}
             rules={[{ required: true, message: t('请输入线路描述') }]}
             onChange={(value) => setApiForm({ ...apiForm, route: value })}
           />
           <Form.Input
-            field='description'
+            field="description"
             label={t('说明')}
             placeholder={t('如：大带宽批量分析图片推荐')}
             rules={[{ required: true, message: t('请输入说明') }]}
             onChange={(value) => setApiForm({ ...apiForm, description: value })}
           />
           <Form.Select
-            field='color'
+            field="color"
             label={t('标识颜色')}
             optionList={colorOptions}
             onChange={(value) => setApiForm({ ...apiForm, color: value })}
             render={(option) => (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Avatar
-                  size="extra-extra-small"
-                  color={option.value}
-                />
+                <Avatar size="extra-extra-small" color={option.value} />
                 {option.label}
               </div>
             )}
@@ -494,7 +489,7 @@ const SettingsAPIInfo = ({ options, refresh }) => {
         type="warning"
         okButtonProps={{
           type: 'danger',
-          theme: 'solid'
+          theme: 'solid',
         }}
       >
         <Text>{t('确定要删除此API信息吗？')}</Text>
@@ -503,4 +498,4 @@ const SettingsAPIInfo = ({ options, refresh }) => {
   );
 };
 
-export default SettingsAPIInfo; 
+export default SettingsAPIInfo;

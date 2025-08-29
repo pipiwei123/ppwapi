@@ -59,6 +59,47 @@ func UpdateTaskBulk() {
 					common.LogInfo(ctx, fmt.Sprintf("Fix null task_id task success: %v", nullTaskIds))
 				}
 			}
+
+			// 检查超时任务
+			timeoutTaskIds := make([]int64, 0)
+			currentTime := time.Now().Unix()
+			for _, task := range tasks {
+				// 只处理正在处理中且提交时间超过20分钟的任务
+				if task.Status == model.TaskStatusInProgress {
+					// 检查提交时间是否超过20分钟
+					if currentTime-task.SubmitTime > int64(common.TaskTimeoutDuration) {
+						timeoutTaskIds = append(timeoutTaskIds, task.ID)
+					}
+				}
+			}
+			if len(timeoutTaskIds) > 0 {
+				err := model.TaskBulkUpdateByID(timeoutTaskIds, map[string]any{
+					"status":      "FAILURE",
+					"progress":    "100%",
+					"fail_reason": "任务执行超时",
+					"finish_time": currentTime,
+				})
+				if err != nil {
+					common.LogError(ctx, fmt.Sprintf("Update timeout tasks failed: %v", err))
+				} else {
+					common.LogInfo(ctx, fmt.Sprintf("Mark %d tasks as timeout failed: %v", len(timeoutTaskIds), timeoutTaskIds))
+					// 补偿用户配额
+					for _, task := range tasks {
+						for _, timeoutTaskId := range timeoutTaskIds {
+							if task.ID == timeoutTaskId && task.Quota > 0 {
+								err = model.IncreaseUserQuota(task.UserId, task.Quota, false)
+								if err != nil {
+									common.LogError(ctx, fmt.Sprintf("Failed to increase user quota for timeout task %d: %v", task.ID, err))
+								} else {
+									logContent := fmt.Sprintf("异步任务执行超时 %s，补偿 %s", task.TaskID, common.LogQuota(task.Quota))
+									model.RecordLog(task.UserId, model.LogTypeSystem, logContent)
+								}
+							}
+						}
+					}
+				}
+			}
+
 			if len(taskChannelM) == 0 {
 				continue
 			}
@@ -75,7 +116,7 @@ func UpdateTaskByPlatform(platform constant.TaskPlatform, taskChannelM map[int][
 		//_ = UpdateMidjourneyTaskAll(context.Background(), tasks)
 	case constant.TaskPlatformSuno:
 		_ = UpdateSunoTaskAll(context.Background(), taskChannelM, taskM)
-	case constant.TaskPlatformKling, constant.TaskPlatformJimeng:
+	case constant.TaskPlatformKling, constant.TaskPlatformJimeng, constant.TaskPlatformVeo3:
 		_ = UpdateVideoTaskAll(context.Background(), platform, taskChannelM, taskM)
 	default:
 		common.SysLog("未知平台")

@@ -100,6 +100,9 @@ var TelegramBotName = ""
 var QuotaForNewUser = 0
 var QuotaForInviter = 0
 var QuotaForInvitee = 0
+var InviteCashbackRatio = 0       // 邀请返现比例 (0-100)
+var MaxInviteRewards = 0          // 每个用户最大返现次数限制
+var InviteCashbackEnabled = false // 是否启用按比例返现
 var ChannelDisableThreshold = 5.0
 var AutomaticDisableChannelEnabled = false
 var AutomaticEnableChannelEnabled = false
@@ -121,6 +124,8 @@ var BatchUpdateEnabled = false
 var BatchUpdateInterval int
 
 var RelayTimeout int // unit is second
+
+var TaskTimeoutDuration = 20 * 60 // unit is second, default 30 minutes
 
 var GeminiSafetySetting string
 

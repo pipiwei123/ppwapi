@@ -1,4 +1,7 @@
-import { STORAGE_KEYS, DEFAULT_CONFIG } from '../../constants/playground.constants';
+import {
+  STORAGE_KEYS,
+  DEFAULT_CONFIG,
+} from '../../constants/playground.constants';
 
 const MESSAGES_STORAGE_KEY = 'playground_messages';
 
@@ -53,9 +56,12 @@ export const loadConfig = () => {
           ...DEFAULT_CONFIG.parameterEnabled,
           ...parsedConfig.parameterEnabled,
         },
-        showDebugPanel: parsedConfig.showDebugPanel || DEFAULT_CONFIG.showDebugPanel,
-        customRequestMode: parsedConfig.customRequestMode || DEFAULT_CONFIG.customRequestMode,
-        customRequestBody: parsedConfig.customRequestBody || DEFAULT_CONFIG.customRequestBody,
+        showDebugPanel:
+          parsedConfig.showDebugPanel || DEFAULT_CONFIG.showDebugPanel,
+        customRequestMode:
+          parsedConfig.customRequestMode || DEFAULT_CONFIG.customRequestMode,
+        customRequestBody:
+          parsedConfig.customRequestBody || DEFAULT_CONFIG.customRequestBody,
       };
 
       return mergedConfig;
@@ -161,7 +167,6 @@ export const exportConfig = (config, messages = null) => {
     link.click();
 
     URL.revokeObjectURL(link.href);
-
   } catch (error) {
     console.error('导出配置失败:', error);
   }
@@ -182,7 +187,10 @@ export const importConfig = (file) => {
 
           if (importedConfig.inputs && importedConfig.parameterEnabled) {
             // 如果导入的配置包含消息，也一起导入
-            if (importedConfig.messages && Array.isArray(importedConfig.messages)) {
+            if (
+              importedConfig.messages &&
+              Array.isArray(importedConfig.messages)
+            ) {
               saveMessages(importedConfig.messages);
             }
 
@@ -200,4 +208,4 @@ export const importConfig = (file) => {
       reject(new Error('导入配置失败: ' + error.message));
     }
   });
-}; 
+};

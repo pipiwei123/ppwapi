@@ -43,8 +43,7 @@ const DashboardSetting = () => {
         if (item.key in inputs) {
           newInputs[item.key] = item.value;
         }
-        if (item.key.endsWith('Enabled') &&
-          (item.key === 'DataExportEnabled')) {
+        if (item.key.endsWith('Enabled') && item.key === 'DataExportEnabled') {
           newInputs[item.key] = toBoolean(item.value);
         }
       });
@@ -72,8 +71,14 @@ const DashboardSetting = () => {
 
   // 用于迁移检测的旧键，下个版本会删除
   const hasLegacyData = useMemo(() => {
-    const legacyKeys = ['ApiInfo', 'Announcements', 'FAQ', 'UptimeKumaUrl', 'UptimeKumaSlug'];
-    return legacyKeys.some(k => inputs[k]);
+    const legacyKeys = [
+      'ApiInfo',
+      'Announcements',
+      'FAQ',
+      'UptimeKumaUrl',
+      'UptimeKumaSlug',
+    ];
+    return legacyKeys.some((k) => inputs[k]);
   }, [inputs]);
 
   useEffect(() => {
@@ -99,7 +104,7 @@ const DashboardSetting = () => {
 
   return (
     <>
-      <Spin spinning={loading} size='large'>
+      <Spin spinning={loading} size="large">
         {/* 用于迁移检测的旧键模态框，下个版本会删除 */}
         <Modal
           title="配置迁移确认"
@@ -112,7 +117,8 @@ const DashboardSetting = () => {
         >
           <p>检测到旧版本的配置数据，是否要迁移到新的配置格式？</p>
           <p style={{ color: '#f57c00', marginTop: '10px' }}>
-            <strong>注意：</strong>迁移过程中会自动处理数据格式转换，迁移完成后旧配置将被清除，请在迁移前在数据库中备份好旧配置。
+            <strong>注意：</strong>
+            迁移过程中会自动处理数据格式转换，迁移完成后旧配置将被清除，请在迁移前在数据库中备份好旧配置。
           </p>
         </Modal>
 
@@ -145,4 +151,4 @@ const DashboardSetting = () => {
   );
 };
 
-export default DashboardSetting; 
+export default DashboardSetting;

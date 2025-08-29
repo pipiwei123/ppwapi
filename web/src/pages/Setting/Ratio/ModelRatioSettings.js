@@ -55,7 +55,7 @@ export default function ModelRatioSettings(props) {
                 return showError(
                   requestQueue.length > 1
                     ? t('部分保存失败，请重试')
-                    : t('保存失败'),
+                    : t('保存失败')
                 );
               }
 
@@ -124,11 +124,11 @@ export default function ModelRatioSettings(props) {
               label={t('模型固定价格')}
               extraText={t('一次调用消耗多少刀，优先级大于模型倍率')}
               placeholder={t(
-                '为一个 JSON 文本，键为模型名称，值为一次调用消耗多少刀，比如 "gpt-4-gizmo-*": 0.1，一次消耗0.1刀',
+                '为一个 JSON 文本，键为模型名称，值为一次调用消耗多少刀，比如 "gpt-4-gizmo-*": 0.1，一次消耗0.1刀'
               )}
               field={'ModelPrice'}
               autosize={{ minRows: 6, maxRows: 12 }}
-              trigger='blur'
+              trigger="blur"
               stopValidateWithError
               rules={[
                 {
@@ -136,9 +136,7 @@ export default function ModelRatioSettings(props) {
                   message: '不是合法的 JSON 字符串',
                 },
               ]}
-              onChange={(value) =>
-                setInputs({ ...inputs, ModelPrice: value })
-              }
+              onChange={(value) => setInputs({ ...inputs, ModelPrice: value })}
             />
           </Col>
         </Row>
@@ -149,7 +147,7 @@ export default function ModelRatioSettings(props) {
               placeholder={t('为一个 JSON 文本，键为模型名称，值为倍率')}
               field={'ModelRatio'}
               autosize={{ minRows: 6, maxRows: 12 }}
-              trigger='blur'
+              trigger="blur"
               stopValidateWithError
               rules={[
                 {
@@ -157,9 +155,7 @@ export default function ModelRatioSettings(props) {
                   message: '不是合法的 JSON 字符串',
                 },
               ]}
-              onChange={(value) =>
-                setInputs({ ...inputs, ModelRatio: value })
-              }
+              onChange={(value) => setInputs({ ...inputs, ModelRatio: value })}
             />
           </Col>
         </Row>
@@ -170,7 +166,7 @@ export default function ModelRatioSettings(props) {
               placeholder={t('为一个 JSON 文本，键为模型名称，值为倍率')}
               field={'CacheRatio'}
               autosize={{ minRows: 6, maxRows: 12 }}
-              trigger='blur'
+              trigger="blur"
               stopValidateWithError
               rules={[
                 {
@@ -178,9 +174,7 @@ export default function ModelRatioSettings(props) {
                   message: '不是合法的 JSON 字符串',
                 },
               ]}
-              onChange={(value) =>
-                setInputs({ ...inputs, CacheRatio: value })
-              }
+              onChange={(value) => setInputs({ ...inputs, CacheRatio: value })}
             />
           </Col>
         </Row>
@@ -192,7 +186,7 @@ export default function ModelRatioSettings(props) {
               placeholder={t('为一个 JSON 文本，键为模型名称，值为倍率')}
               field={'CompletionRatio'}
               autosize={{ minRows: 6, maxRows: 12 }}
-              trigger='blur'
+              trigger="blur"
               stopValidateWithError
               rules={[
                 {

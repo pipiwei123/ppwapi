@@ -7,7 +7,7 @@ import {
   timestamp2string,
   renderGroup,
   renderQuota,
-  getModelCategories
+  getModelCategories,
 } from '../../helpers';
 import { ITEMS_PER_PAGE } from '../../constants';
 import {
@@ -28,11 +28,11 @@ import {
   Progress,
   Switch,
   Input,
-  Typography
+  Typography,
 } from '@douyinfe/semi-ui';
 import {
   IllustrationNoResult,
-  IllustrationNoResultDark
+  IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
 import {
   IconSearch,
@@ -103,14 +103,14 @@ const TokensTable = () => {
         };
 
         const quotaSuffix = record.unlimited_quota ? (
-          <div className='text-xs'>{t('无限额度')}</div>
+          <div className="text-xs">{t('无限额度')}</div>
         ) : (
-          <div className='flex flex-col items-end'>
-            <span className='text-xs leading-none'>{`${renderQuota(remain)} / ${renderQuota(total)}`}</span>
+          <div className="flex flex-col items-end">
+            <span className="text-xs leading-none">{`${renderQuota(remain)} / ${renderQuota(total)}`}</span>
             <Progress
               percent={percent}
               stroke={getProgressColor(percent)}
-              aria-label='quota usage'
+              aria-label="quota usage"
               format={() => `${percent.toFixed(0)}%`}
               style={{ width: '100%', marginTop: '1px', marginBottom: 0 }}
             />
@@ -120,14 +120,14 @@ const TokensTable = () => {
         const content = (
           <Tag
             color={tagColor}
-            shape='circle'
-            size='large'
+            shape="circle"
+            size="large"
             prefixIcon={
               <Switch
-                size='small'
+                size="small"
                 checked={enabled}
                 onChange={handleToggle}
-                aria-label='token status switch'
+                aria-label="token status switch"
               />
             }
             suffixIcon={quotaSuffix}
@@ -143,10 +143,16 @@ const TokensTable = () => {
         return (
           <Tooltip
             content={
-              <div className='text-xs'>
-                <div>{t('已用额度')}: {renderQuota(used)}</div>
-                <div>{t('剩余额度')}: {renderQuota(remain)} ({percent.toFixed(0)}%)</div>
-                <div>{t('总额度')}: {renderQuota(total)}</div>
+              <div className="text-xs">
+                <div>
+                  {t('已用额度')}: {renderQuota(used)}
+                </div>
+                <div>
+                  {t('剩余额度')}: {renderQuota(remain)} ({percent.toFixed(0)}%)
+                </div>
+                <div>
+                  {t('总额度')}: {renderQuota(total)}
+                </div>
               </div>
             }
           >
@@ -165,36 +171,52 @@ const TokensTable = () => {
         if (text === 'auto') {
           return (
             <Tooltip
-              content={t('当前分组为 auto，会自动选择最优分组，当一个组不可用时自动降级到下一个组（熔断机制）')}
-              position='top'
+              content={t(
+                '当前分组为 auto，会自动选择最优分组，当一个组不可用时自动降级到下一个组（熔断机制）'
+              )}
+              position="top"
             >
-              <Tag color='white' shape='circle'> {t('智能熔断')} </Tag>
+              <Tag color="white" shape="circle">
+                {' '}
+                {t('智能熔断')}{' '}
+              </Tag>
             </Tooltip>
           );
         }
-        
+
         // 处理多分组模式
-        if (record.group_info && record.group_info.is_multi_group && record.group_info.multi_group_list) {
+        if (
+          record.group_info &&
+          record.group_info.is_multi_group &&
+          record.group_info.multi_group_list
+        ) {
           const groups = record.group_info.multi_group_list;
           const tagColors = {
             vip: 'yellow',
-            pro: 'yellow', 
+            pro: 'yellow',
             svip: 'red',
             premium: 'red',
           };
-          
+
           return (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxWidth: '150px' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '4px',
+                maxWidth: '150px',
+              }}
+            >
               {groups.map((group, index) => (
                 <Tooltip
                   key={group}
                   content={`优先级: ${index + 1}`}
-                  position='top'
+                  position="top"
                 >
                   <Tag
                     color={tagColors[group] || 'blue'}
-                    shape='circle'
-                    size='small'
+                    shape="circle"
+                    size="small"
                     onClick={async (event) => {
                       event.stopPropagation();
                       if (await copy(group)) {
@@ -210,29 +232,39 @@ const TokensTable = () => {
             </div>
           );
         }
-        
+
         // 兼容逗号分隔的group字段（历史数据或手动修改的数据）
         if (text && text.includes(',')) {
-          const groups = text.split(',').map(g => g.trim()).filter(g => g);
+          const groups = text
+            .split(',')
+            .map((g) => g.trim())
+            .filter((g) => g);
           const tagColors = {
             vip: 'yellow',
-            pro: 'yellow', 
+            pro: 'yellow',
             svip: 'red',
             premium: 'red',
           };
-          
+
           return (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxWidth: '150px' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '4px',
+                maxWidth: '150px',
+              }}
+            >
               {groups.map((group, index) => (
                 <Tooltip
                   key={group}
                   content={`优先级: ${index + 1}`}
-                  position='top'
+                  position="top"
                 >
                   <Tag
                     color={tagColors[group] || 'blue'}
-                    shape='circle'
-                    size='small'
+                    shape="circle"
+                    size="small"
                     onClick={async (event) => {
                       event.stopPropagation();
                       if (await copy(group)) {
@@ -248,7 +280,7 @@ const TokensTable = () => {
             </div>
           );
         }
-        
+
         // 处理单分组模式
         return renderGroup(text);
       },
@@ -258,34 +290,38 @@ const TokensTable = () => {
       key: 'token_key',
       render: (text, record) => {
         const fullKey = 'sk-' + record.key;
-        const maskedKey = 'sk-' + record.key.slice(0, 4) + '**********' + record.key.slice(-4);
+        const maskedKey =
+          'sk-' + record.key.slice(0, 4) + '**********' + record.key.slice(-4);
         const revealed = !!showKeys[record.id];
 
         return (
-          <div className='w-[200px]'>
+          <div className="w-[200px]">
             <Input
               readOnly
               value={revealed ? fullKey : maskedKey}
-              size='small'
+              size="small"
               suffix={
-                <div className='flex items-center'>
+                <div className="flex items-center">
                   <Button
-                    theme='borderless'
-                    size='small'
-                    type='tertiary'
+                    theme="borderless"
+                    size="small"
+                    type="tertiary"
                     icon={revealed ? <IconEyeClosed /> : <IconEyeOpened />}
-                    aria-label='toggle token visibility'
+                    aria-label="toggle token visibility"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setShowKeys(prev => ({ ...prev, [record.id]: !revealed }));
+                      setShowKeys((prev) => ({
+                        ...prev,
+                        [record.id]: !revealed,
+                      }));
                     }}
                   />
                   <Button
-                    theme='borderless'
-                    size='small'
-                    type='tertiary'
+                    theme="borderless"
+                    size="small"
+                    type="tertiary"
                     icon={<IconCopy />}
-                    aria-label='copy token key'
+                    aria-label="copy token key"
                     onClick={async (e) => {
                       e.stopPropagation();
                       await copyText(fullKey);
@@ -311,11 +347,22 @@ const TokensTable = () => {
           Object.entries(categories).forEach(([key, category]) => {
             if (key === 'all') return;
             if (!category.icon || !category.filter) return;
-            const vendorModels = models.filter((m) => category.filter({ model_name: m }));
+            const vendorModels = models.filter((m) =>
+              category.filter({ model_name: m })
+            );
             if (vendorModels.length > 0) {
               vendorAvatars.push(
-                <Tooltip key={key} content={vendorModels.join(', ')} position='top' showArrow>
-                  <Avatar size='extra-extra-small' alt={category.label} color='transparent'>
+                <Tooltip
+                  key={key}
+                  content={vendorModels.join(', ')}
+                  position="top"
+                  showArrow
+                >
+                  <Avatar
+                    size="extra-extra-small"
+                    alt={category.label}
+                    color="transparent"
+                  >
                     {category.icon}
                   </Avatar>
                 </Tooltip>
@@ -327,8 +374,13 @@ const TokensTable = () => {
           const unmatchedModels = models.filter((m) => !matchedModels.has(m));
           if (unmatchedModels.length > 0) {
             vendorAvatars.push(
-              <Tooltip key='unknown' content={unmatchedModels.join(', ')} position='top' showArrow>
-                <Avatar size='extra-extra-small' alt='unknown'>
+              <Tooltip
+                key="unknown"
+                content={unmatchedModels.join(', ')}
+                position="top"
+                showArrow
+              >
+                <Avatar size="extra-extra-small" alt="unknown">
                   {t('其他')}
                 </Avatar>
               </Tooltip>
@@ -336,13 +388,11 @@ const TokensTable = () => {
           }
 
           return (
-            <AvatarGroup size='extra-extra-small'>
-              {vendorAvatars}
-            </AvatarGroup>
+            <AvatarGroup size="extra-extra-small">{vendorAvatars}</AvatarGroup>
           );
         } else {
           return (
-            <Tag color='white' shape='circle'>
+            <Tag color="white" shape="circle">
               {t('无限制')}
             </Tag>
           );
@@ -355,7 +405,7 @@ const TokensTable = () => {
       render: (text) => {
         if (!text || text.trim() === '') {
           return (
-            <Tag color='white' shape='circle'>
+            <Tag color="white" shape="circle">
               {t('无限制')}
             </Tag>
           );
@@ -370,7 +420,7 @@ const TokensTable = () => {
         const extraCount = ips.length - displayIps.length;
 
         const ipTags = displayIps.map((ip, idx) => (
-          <Tag key={idx} shape='circle'>
+          <Tag key={idx} shape="circle">
             {ip}
           </Tag>
         ));
@@ -378,14 +428,12 @@ const TokensTable = () => {
         if (extraCount > 0) {
           ipTags.push(
             <Tooltip
-              key='extra'
+              key="extra"
               content={ips.slice(1).join(', ')}
-              position='top'
+              position="top"
               showArrow
             >
-              <Tag shape='circle'>
-                {'+' + extraCount}
-              </Tag>
+              <Tag shape="circle">{'+' + extraCount}</Tag>
             </Tooltip>
           );
         }
@@ -453,7 +501,7 @@ const TokensTable = () => {
             >
               <Button
                 size="small"
-                type='tertiary'
+                type="tertiary"
                 onClick={() => {
                   if (chatsArray.length === 0) {
                     showError(t('请联系管理员配置聊天链接'));
@@ -461,7 +509,7 @@ const TokensTable = () => {
                     onOpenLink(
                       'default',
                       chats[0][Object.keys(chats[0])[0]],
-                      record,
+                      record
                     );
                   }
                 }}
@@ -469,12 +517,12 @@ const TokensTable = () => {
                 {t('聊天')}
               </Button>
               <Dropdown
-                trigger='click'
-                position='bottomRight'
+                trigger="click"
+                position="bottomRight"
                 menu={chatsArray}
               >
                 <Button
-                  type='tertiary'
+                  type="tertiary"
                   icon={<IconTreeTriangleDown />}
                   size="small"
                 ></Button>
@@ -482,7 +530,7 @@ const TokensTable = () => {
             </SplitButtonGroup>
 
             <Button
-              type='tertiary'
+              type="tertiary"
               size="small"
               onClick={() => {
                 setEditingToken(record);
@@ -493,7 +541,7 @@ const TokensTable = () => {
             </Button>
 
             <Button
-              type='danger'
+              type="danger"
               size="small"
               onClick={() => {
                 Modal.confirm({
@@ -609,7 +657,7 @@ const TokensTable = () => {
         id: 'new-api',
         baseUrl: serverAddress,
         apiKey: 'sk-' + record.key,
-      }
+      };
       // 替换 {cherryConfig} 为base64编码的JSON字符串
       let encodedConfig = encodeURIComponent(
         btoa(JSON.stringify(cherryConfig))
@@ -685,7 +733,7 @@ const TokensTable = () => {
     }
     setSearching(true);
     const res = await API.get(
-      `/api/token/search?keyword=${searchKeyword}&token=${searchToken}`,
+      `/api/token/search?keyword=${searchKeyword}&token=${searchToken}`
     );
     const { success, message, data } = res.data;
     if (success) {
@@ -722,8 +770,8 @@ const TokensTable = () => {
   };
 
   const rowSelection = {
-    onSelect: (record, selected) => { },
-    onSelectAll: (selected, selectedRows) => { },
+    onSelect: (record, selected) => {},
+    onSelectAll: (selected, selectedRows) => {},
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectedKeys(selectedRows);
     },
@@ -775,7 +823,9 @@ const TokensTable = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 w-full">
           <div className="flex items-center text-blue-500">
             <Key size={16} className="mr-2" />
-            <Text>{t('令牌用于API访问认证，可以设置额度限制和模型权限。')}</Text>
+            <Text>
+              {t('令牌用于API访问认证，可以设置额度限制和模型权限。')}
+            </Text>
           </div>
           <Button
             type="tertiary"
@@ -806,7 +856,7 @@ const TokensTable = () => {
             {t('添加令牌')}
           </Button>
           <Button
-            type='tertiary'
+            type="tertiary"
             className="flex-1 md:flex-initial"
             onClick={() => {
               if (selectedKeys.length === 0) {
@@ -820,12 +870,15 @@ const TokensTable = () => {
                 footer: (
                   <Space>
                     <Button
-                      type='tertiary'
+                      type="tertiary"
                       onClick={async () => {
                         let content = '';
                         for (let i = 0; i < selectedKeys.length; i++) {
                           content +=
-                            selectedKeys[i].name + '    sk-' + selectedKeys[i].key + '\n';
+                            selectedKeys[i].name +
+                            '    sk-' +
+                            selectedKeys[i].key +
+                            '\n';
                         }
                         await copyText(content);
                         Modal.destroyAll();
@@ -854,7 +907,7 @@ const TokensTable = () => {
             {t('复制所选令牌')}
           </Button>
           <Button
-            type='danger'
+            type="danger"
             className="w-full md:w-auto"
             onClick={() => {
               if (selectedKeys.length === 0) {
@@ -865,7 +918,9 @@ const TokensTable = () => {
                 title: t('批量删除令牌'),
                 content: (
                   <div>
-                    {t('确定要删除所选的 {{count}} 个令牌吗？', { count: selectedKeys.length })}
+                    {t('确定要删除所选的 {{count}} 个令牌吗？', {
+                      count: selectedKeys.length,
+                    })}
                   </div>
                 ),
                 onOk: () => batchDeleteTokens(),
@@ -920,7 +975,7 @@ const TokensTable = () => {
                 {t('查询')}
               </Button>
               <Button
-                type='tertiary'
+                type="tertiary"
                 onClick={() => {
                   if (formApi) {
                     formApi.reset();
@@ -954,17 +1009,21 @@ const TokensTable = () => {
       <Card
         className="!rounded-2xl"
         title={renderHeader()}
-        shadows='always'
+        shadows="always"
         bordered={false}
       >
         <Table
-          columns={compactMode ? columns.map(col => {
-            if (col.dataIndex === 'operate') {
-              const { fixed, ...rest } = col;
-              return rest;
-            }
-            return col;
-          }) : columns}
+          columns={
+            compactMode
+              ? columns.map((col) => {
+                  if (col.dataIndex === 'operate') {
+                    const { fixed, ...rest } = col;
+                    return rest;
+                  }
+                  return col;
+                })
+              : columns
+          }
           dataSource={tokens}
           scroll={compactMode ? undefined : { x: 'max-content' }}
           pagination={{
@@ -987,8 +1046,12 @@ const TokensTable = () => {
           onRow={handleRow}
           empty={
             <Empty
-              image={<IllustrationNoResult style={{ width: 150, height: 150 }} />}
-              darkModeImage={<IllustrationNoResultDark style={{ width: 150, height: 150 }} />}
+              image={
+                <IllustrationNoResult style={{ width: 150, height: 150 }} />
+              }
+              darkModeImage={
+                <IllustrationNoResultDark style={{ width: 150, height: 150 }} />
+              }
               description={t('搜索无结果')}
               style={{ padding: 30 }}
             />

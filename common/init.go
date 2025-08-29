@@ -127,4 +127,5 @@ func initConstantEnv() {
 	constant.GenerateDefaultToken = GetEnvOrDefaultBool("GENERATE_DEFAULT_TOKEN", false)
 	// 是否启用错误日志
 	constant.ErrorLogEnabled = GetEnvOrDefaultBool("ERROR_LOG_ENABLED", false)
+	constant.ErrorLogMiddlewareEnable = GetEnvOrDefaultBool("ERROR_LOG_MIDDLEWARE_ENABLE", true)
 }

@@ -1,13 +1,29 @@
 import React, { useEffect, useState, useContext, useMemo } from 'react';
-import { Button, Modal, Empty, Tabs, TabPane, Timeline } from '@douyinfe/semi-ui';
+import {
+  Button,
+  Modal,
+  Empty,
+  Tabs,
+  TabPane,
+  Timeline,
+} from '@douyinfe/semi-ui';
 import { useTranslation } from 'react-i18next';
 import { API, showError, getRelativeTime } from '../../helpers';
 import { marked } from 'marked';
-import { IllustrationNoContent, IllustrationNoContentDark } from '@douyinfe/semi-illustrations';
+import {
+  IllustrationNoContent,
+  IllustrationNoContentDark,
+} from '@douyinfe/semi-illustrations';
 import { StatusContext } from '../../context/Status/index.js';
 import { Bell, Megaphone } from 'lucide-react';
 
-const NoticeModal = ({ visible, onClose, isMobile, defaultTab = 'inApp', unreadKeys = [] }) => {
+const NoticeModal = ({
+  visible,
+  onClose,
+  isMobile,
+  defaultTab = 'inApp',
+  unreadKeys = [],
+}) => {
   const { t } = useTranslation();
   const [noticeContent, setNoticeContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,16 +35,17 @@ const NoticeModal = ({ visible, onClose, isMobile, defaultTab = 'inApp', unreadK
 
   const unreadSet = useMemo(() => new Set(unreadKeys), [unreadKeys]);
 
-  const getKeyForItem = (item) => `${item?.publishDate || ''}-${(item?.content || '').slice(0, 30)}`;
+  const getKeyForItem = (item) =>
+    `${item?.publishDate || ''}-${(item?.content || '').slice(0, 30)}`;
 
   const processedAnnouncements = useMemo(() => {
-    return (announcements || []).slice(0, 20).map(item => ({
+    return (announcements || []).slice(0, 20).map((item) => ({
       key: getKeyForItem(item),
       type: item.type || 'default',
       time: getRelativeTime(item.publishDate),
       content: item.content,
       extra: item.extra,
-      isUnread: unreadSet.has(getKeyForItem(item))
+      isUnread: unreadSet.has(getKeyForItem(item)),
     }));
   }, [announcements, unreadSet]);
 
@@ -74,15 +91,23 @@ const NoticeModal = ({ visible, onClose, isMobile, defaultTab = 'inApp', unreadK
 
   const renderMarkdownNotice = () => {
     if (loading) {
-      return <div className="py-12"><Empty description={t('加载中...')} /></div>;
+      return (
+        <div className="py-12">
+          <Empty description={t('加载中...')} />
+        </div>
+      );
     }
 
     if (!noticeContent) {
       return (
         <div className="py-12">
           <Empty
-            image={<IllustrationNoContent style={{ width: 150, height: 150 }} />}
-            darkModeImage={<IllustrationNoContentDark style={{ width: 150, height: 150 }} />}
+            image={
+              <IllustrationNoContent style={{ width: 150, height: 150 }} />
+            }
+            darkModeImage={
+              <IllustrationNoContentDark style={{ width: 150, height: 150 }} />
+            }
             description={t('暂无公告')}
           />
         </div>
@@ -102,8 +127,12 @@ const NoticeModal = ({ visible, onClose, isMobile, defaultTab = 'inApp', unreadK
       return (
         <div className="py-12">
           <Empty
-            image={<IllustrationNoContent style={{ width: 150, height: 150 }} />}
-            darkModeImage={<IllustrationNoContentDark style={{ width: 150, height: 150 }} />}
+            image={
+              <IllustrationNoContent style={{ width: 150, height: 150 }} />
+            }
+            darkModeImage={
+              <IllustrationNoContentDark style={{ width: 150, height: 150 }} />
+            }
             description={t('暂无系统公告')}
           />
         </div>
@@ -158,22 +187,40 @@ const NoticeModal = ({ visible, onClose, isMobile, defaultTab = 'inApp', unreadK
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
-            type='card'
-            size='small'
+            type="card"
+            size="small"
           >
-            <TabPane tab={<span className="flex items-center gap-1"><Bell size={14} /> {t('通知')}</span>} itemKey='inApp' />
-            <TabPane tab={<span className="flex items-center gap-1"><Megaphone size={14} /> {t('系统公告')}</span>} itemKey='system' />
+            <TabPane
+              tab={
+                <span className="flex items-center gap-1">
+                  <Bell size={14} /> {t('通知')}
+                </span>
+              }
+              itemKey="inApp"
+            />
+            <TabPane
+              tab={
+                <span className="flex items-center gap-1">
+                  <Megaphone size={14} /> {t('系统公告')}
+                </span>
+              }
+              itemKey="system"
+            />
           </Tabs>
         </div>
       }
       visible={visible}
       onCancel={onClose}
-      footer={(
+      footer={
         <div className="flex justify-end">
-          <Button type='secondary' onClick={handleCloseTodayNotice}>{t('今日关闭')}</Button>
-          <Button type="primary" onClick={onClose}>{t('关闭公告')}</Button>
+          <Button type="secondary" onClick={handleCloseTodayNotice}>
+            {t('今日关闭')}
+          </Button>
+          <Button type="primary" onClick={onClose}>
+            {t('关闭公告')}
+          </Button>
         </div>
-      )}
+      }
       size={isMobile ? 'full-width' : 'large'}
     >
       {renderBody()}
@@ -181,4 +228,4 @@ const NoticeModal = ({ visible, onClose, isMobile, defaultTab = 'inApp', unreadK
   );
 };
 
-export default NoticeModal; 
+export default NoticeModal;

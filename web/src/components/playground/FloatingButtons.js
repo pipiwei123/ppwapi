@@ -1,10 +1,6 @@
 import React from 'react';
 import { Button } from '@douyinfe/semi-ui';
-import {
-  Settings,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
+import { Settings, Eye, EyeOff } from 'lucide-react';
 
 const FloatingButtons = ({
   styleState,
@@ -34,8 +30,8 @@ const FloatingButtons = ({
             background: 'linear-gradient(to right, #8b5cf6, #6366f1)',
           }}
           onClick={onToggleSettings}
-          theme='solid'
-          type='primary'
+          theme="solid"
+          type="primary"
           className="lg:hidden"
         />
       )}
@@ -46,7 +42,7 @@ const FloatingButtons = ({
           icon={showDebugPanel ? <EyeOff size={18} /> : <Eye size={18} />}
           onClick={onToggleDebugPanel}
           theme="solid"
-          type={showDebugPanel ? "danger" : "primary"}
+          type={showDebugPanel ? 'danger' : 'primary'}
           style={{
             position: 'fixed',
             right: 16,
@@ -68,4 +64,4 @@ const FloatingButtons = ({
   );
 };
 
-export default FloatingButtons; 
+export default FloatingButtons;

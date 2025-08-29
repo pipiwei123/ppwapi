@@ -13,17 +13,10 @@ import {
   onGitHubOAuthClicked,
   onGoogleOAuthClicked,
   onOIDCClicked,
-  onLinuxDOOAuthClicked
+  onLinuxDOOAuthClicked,
 } from '../../helpers/index.js';
 import Turnstile from 'react-turnstile';
-import {
-  Button,
-  Card,
-  Divider,
-  Form,
-  Icon,
-  Modal,
-} from '@douyinfe/semi-ui';
+import { Button, Card, Divider, Form, Icon, Modal } from '@douyinfe/semi-ui';
 import Title from '@douyinfe/semi-ui/lib/es/typography/title';
 import Text from '@douyinfe/semi-ui/lib/es/typography/text';
 import TelegramLoginButton from 'react-telegram-login';
@@ -60,7 +53,8 @@ const LoginForm = () => {
   const [emailLoginLoading, setEmailLoginLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
-  const [otherLoginOptionsLoading, setOtherLoginOptionsLoading] = useState(false);
+  const [otherLoginOptionsLoading, setOtherLoginOptionsLoading] =
+    useState(false);
   const [wechatCodeSubmitLoading, setWechatCodeSubmitLoading] = useState(false);
 
   const logo = getLogo();
@@ -103,7 +97,7 @@ const LoginForm = () => {
     setWechatCodeSubmitLoading(true);
     try {
       const res = await API.get(
-        `/api/oauth/wechat?code=${inputs.wechat_verification_code}`,
+        `/api/oauth/wechat?code=${inputs.wechat_verification_code}`
       );
       const { success, message, data } = res.data;
       if (success) {
@@ -142,7 +136,7 @@ const LoginForm = () => {
           {
             username,
             password,
-          },
+          }
         );
         const { success, message, data } = res.data;
         if (success) {
@@ -233,10 +227,7 @@ const LoginForm = () => {
   const handleOIDCClick = () => {
     setOidcLoading(true);
     try {
-      onOIDCClicked(
-        status.oidc_authorization_endpoint,
-        status.oidc_client_id
-      );
+      onOIDCClicked(status.oidc_authorization_endpoint, status.oidc_client_id);
     } finally {
       // 由于重定向，这里不会执行到，但为了完整性添加
       setTimeout(() => setOidcLoading(false), 3000);
@@ -281,21 +272,27 @@ const LoginForm = () => {
         <div className="w-full max-w-md">
           <div className="flex items-center justify-center mb-6 gap-2">
             <img src={logo} alt="Logo" className="h-10 rounded-full" />
-            <Title heading={3} className='!text-gray-800'>{systemName}</Title>
+            <Title heading={3} className="!text-gray-800">
+              {systemName}
+            </Title>
           </div>
 
           <Card className="shadow-xl border-0 !rounded-2xl overflow-hidden">
             <div className="flex justify-center pt-6 pb-2">
-              <Title heading={3} className="text-gray-800 dark:text-gray-200">{t('登 录')}</Title>
+              <Title heading={3} className="text-gray-800 dark:text-gray-200">
+                {t('登 录')}
+              </Title>
             </div>
             <div className="px-2 py-8">
               <div className="space-y-3">
                 {status.wechat_login && (
                   <Button
-                    theme='outline'
+                    theme="outline"
                     className="w-full h-12 flex items-center justify-center !rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
                     type="tertiary"
-                    icon={<Icon svg={<WeChatIcon />} style={{ color: '#07C160' }} />}
+                    icon={
+                      <Icon svg={<WeChatIcon />} style={{ color: '#07C160' }} />
+                    }
                     size="large"
                     onClick={onWeChatLoginClicked}
                     loading={wechatLoading}
@@ -306,7 +303,7 @@ const LoginForm = () => {
 
                 {status.github_oauth && (
                   <Button
-                    theme='outline'
+                    theme="outline"
                     className="w-full h-12 flex items-center justify-center !rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
                     type="tertiary"
                     icon={<IconGithubLogo size="large" />}
@@ -320,10 +317,12 @@ const LoginForm = () => {
 
                 {status.google_oauth && (
                   <Button
-                    theme='outline'
+                    theme="outline"
                     className="w-full h-12 flex items-center justify-center !rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
                     type="tertiary"
-                    icon={<GoogleIcon style={{ width: '20px', height: '20px' }} />}
+                    icon={
+                      <GoogleIcon style={{ width: '20px', height: '20px' }} />
+                    }
                     size="large"
                     onClick={handleGoogleClick}
                     loading={googleLoading}
@@ -334,7 +333,7 @@ const LoginForm = () => {
 
                 {status.oidc_enabled && (
                   <Button
-                    theme='outline'
+                    theme="outline"
                     className="w-full h-12 flex items-center justify-center !rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
                     type="tertiary"
                     icon={<OIDCIcon style={{ color: '#1877F2' }} />}
@@ -348,10 +347,18 @@ const LoginForm = () => {
 
                 {status.linuxdo_oauth && (
                   <Button
-                    theme='outline'
+                    theme="outline"
                     className="w-full h-12 flex items-center justify-center !rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
                     type="tertiary"
-                    icon={<LinuxDoIcon style={{ color: '#E95420', width: '20px', height: '20px' }} />}
+                    icon={
+                      <LinuxDoIcon
+                        style={{
+                          color: '#E95420',
+                          width: '20px',
+                          height: '20px',
+                        }}
+                      />
+                    }
                     size="large"
                     onClick={handleLinuxDOClick}
                     loading={linuxdoLoading}
@@ -369,7 +376,7 @@ const LoginForm = () => {
                   </div>
                 )}
 
-                <Divider margin='12px' align='center'>
+                <Divider margin="12px" align="center">
                   {t('或')}
                 </Divider>
 
@@ -417,7 +424,9 @@ const LoginForm = () => {
 
           <Card className="shadow-xl border-0 !rounded-2xl overflow-hidden">
             <div className="flex justify-center pt-6 pb-2">
-              <Title heading={3} className="text-gray-800 dark:text-gray-200">{t('登 录')}</Title>
+              <Title heading={3} className="text-gray-800 dark:text-gray-200">
+                {t('登 录')}
+              </Title>
             </div>
             <div className="px-2 py-8">
               <Form className="space-y-3">
@@ -457,7 +466,7 @@ const LoginForm = () => {
 
                   <Button
                     theme="borderless"
-                    type='tertiary'
+                    type="tertiary"
                     className="w-full !rounded-full"
                     size="large"
                     onClick={handleResetPasswordClick}
@@ -468,9 +477,14 @@ const LoginForm = () => {
                 </div>
               </Form>
 
-              {(status.github_oauth || status.google_oauth || status.oidc_enabled || status.wechat_login || status.linuxdo_oauth || status.telegram_oauth) && (
+              {(status.github_oauth ||
+                status.google_oauth ||
+                status.oidc_enabled ||
+                status.wechat_login ||
+                status.linuxdo_oauth ||
+                status.telegram_oauth) && (
                 <>
-                  <Divider margin='12px' align='center'>
+                  <Divider margin="12px" align="center">
                     {t('或')}
                   </Divider>
 
@@ -530,7 +544,9 @@ const LoginForm = () => {
         </div>
 
         <div className="text-center mb-4">
-          <p>{t('微信扫码关注公众号，输入「验证码」获取验证码（三分钟内有效）')}</p>
+          <p>
+            {t('微信扫码关注公众号，输入「验证码」获取验证码（三分钟内有效）')}
+          </p>
         </div>
 
         <Form size="large">
@@ -539,7 +555,9 @@ const LoginForm = () => {
             placeholder={t('验证码')}
             label={t('验证码')}
             value={inputs.wechat_verification_code}
-            onChange={(value) => handleChange('wechat_verification_code', value)}
+            onChange={(value) =>
+              handleChange('wechat_verification_code', value)
+            }
           />
         </Form>
       </Modal>
@@ -549,10 +567,24 @@ const LoginForm = () => {
   return (
     <div className="relative overflow-hidden bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       {/* 背景模糊晕染球 */}
-      <div className="blur-ball blur-ball-indigo" style={{ top: '-80px', right: '-80px', transform: 'none' }} />
-      <div className="blur-ball blur-ball-teal" style={{ top: '50%', left: '-120px' }} />
+      <div
+        className="blur-ball blur-ball-indigo"
+        style={{ top: '-80px', right: '-80px', transform: 'none' }}
+      />
+      <div
+        className="blur-ball blur-ball-teal"
+        style={{ top: '50%', left: '-120px' }}
+      />
       <div className="w-full max-w-sm mt-[64px]">
-        {showEmailLogin || !(status.github_oauth || status.google_oauth || status.oidc_enabled || status.wechat_login || status.linuxdo_oauth || status.telegram_oauth)
+        {showEmailLogin ||
+        !(
+          status.github_oauth ||
+          status.google_oauth ||
+          status.oidc_enabled ||
+          status.wechat_login ||
+          status.linuxdo_oauth ||
+          status.telegram_oauth
+        )
           ? renderEmailLoginForm()
           : renderOAuthOptions()}
         {renderWeChatLoginModal()}

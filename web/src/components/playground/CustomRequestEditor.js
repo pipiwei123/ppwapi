@@ -6,13 +6,7 @@ import {
   Switch,
   Banner,
 } from '@douyinfe/semi-ui';
-import {
-  Code,
-  Edit,
-  Check,
-  X,
-  AlertTriangle,
-} from 'lucide-react';
+import { Code, Edit, Check, X, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const CustomRequestEditor = ({
@@ -29,12 +23,22 @@ const CustomRequestEditor = ({
 
   // 当切换到自定义模式时，用默认payload初始化
   useEffect(() => {
-    if (customRequestMode && (!customRequestBody || customRequestBody.trim() === '')) {
-      const defaultJson = defaultPayload ? JSON.stringify(defaultPayload, null, 2) : '';
+    if (
+      customRequestMode &&
+      (!customRequestBody || customRequestBody.trim() === '')
+    ) {
+      const defaultJson = defaultPayload
+        ? JSON.stringify(defaultPayload, null, 2)
+        : '';
       setLocalValue(defaultJson);
       onCustomRequestBodyChange(defaultJson);
     }
-  }, [customRequestMode, defaultPayload, customRequestBody, onCustomRequestBodyChange]);
+  }, [
+    customRequestMode,
+    defaultPayload,
+    customRequestBody,
+    onCustomRequestBodyChange,
+  ]);
 
   // 同步外部传入的customRequestBody到本地状态
   useEffect(() => {
@@ -187,4 +191,4 @@ const CustomRequestEditor = ({
   );
 };
 
-export default CustomRequestEditor; 
+export default CustomRequestEditor;

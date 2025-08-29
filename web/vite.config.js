@@ -23,8 +23,8 @@ export default defineConfig({
     },
     react(),
     vitePluginSemi({
-      cssLayer: true
-    })
+      cssLayer: true,
+    }),
   ],
   optimizeDeps: {
     force: true,

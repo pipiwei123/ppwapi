@@ -131,7 +131,7 @@ const EditTagModal = (props) => {
         res.data.data.map((group) => ({
           label: group,
           value: group,
-        })),
+        }))
       );
     } catch (error) {
       showError(error.message);
@@ -278,10 +278,12 @@ const EditTagModal = (props) => {
 
   return (
     <SideSheet
-      placement='right'
+      placement="right"
       title={
         <Space>
-          <Tag color="blue" shape="circle">{t('编辑')}</Tag>
+          <Tag color="blue" shape="circle">
+            {t('编辑')}
+          </Tag>
           <Title heading={4} className="m-0">
             {t('编辑标签')}
           </Title>
@@ -332,7 +334,9 @@ const EditTagModal = (props) => {
                   </Avatar>
                   <div>
                     <Text className="text-lg font-medium">{t('标签信息')}</Text>
-                    <div className="text-xs text-gray-600">{t('标签的基本配置')}</div>
+                    <div className="text-xs text-gray-600">
+                      {t('标签的基本配置')}
+                    </div>
                   </div>
                 </div>
 
@@ -344,7 +348,7 @@ const EditTagModal = (props) => {
 
                 <div className="space-y-4">
                   <Form.Input
-                    field='new_tag'
+                    field="new_tag"
                     label={t('标签名称')}
                     placeholder={t('请输入新标签，留空则解散标签')}
                     onChange={(value) => handleInputChange('new_tag', value)}
@@ -355,54 +359,99 @@ const EditTagModal = (props) => {
               <Card className="!rounded-2xl shadow-sm border-0 mb-6">
                 {/* Header: Model Config */}
                 <div className="flex items-center mb-2">
-                  <Avatar size="small" color="purple" className="mr-2 shadow-md">
+                  <Avatar
+                    size="small"
+                    color="purple"
+                    className="mr-2 shadow-md"
+                  >
                     <IconCode size={16} />
                   </Avatar>
                   <div>
                     <Text className="text-lg font-medium">{t('模型配置')}</Text>
-                    <div className="text-xs text-gray-600">{t('模型选择和映射设置')}</div>
+                    <div className="text-xs text-gray-600">
+                      {t('模型选择和映射设置')}
+                    </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <Banner
                     type="info"
-                    description={t('当前模型列表为该标签下所有渠道模型列表最长的一个，并非所有渠道的并集，请注意可能导致某些渠道模型丢失。')}
+                    description={t(
+                      '当前模型列表为该标签下所有渠道模型列表最长的一个，并非所有渠道的并集，请注意可能导致某些渠道模型丢失。'
+                    )}
                     className="!rounded-lg mb-4"
                   />
                   <Form.Select
-                    field='models'
+                    field="models"
                     label={t('模型')}
                     placeholder={t('请选择该渠道所支持的模型，留空则不更改')}
                     multiple
                     filter
-                    searchPosition='dropdown'
+                    searchPosition="dropdown"
                     optionList={modelOptions}
                     style={{ width: '100%' }}
                     onChange={(value) => handleInputChange('models', value)}
                   />
 
                   <Form.Input
-                    field='custom_model'
+                    field="custom_model"
                     label={t('自定义模型名称')}
                     placeholder={t('输入自定义模型名称')}
                     onChange={(value) => setCustomModel(value.trim())}
-                    suffix={<Button size='small' type='primary' onClick={addCustomModels}>{t('填入')}</Button>}
+                    suffix={
+                      <Button
+                        size="small"
+                        type="primary"
+                        onClick={addCustomModels}
+                      >
+                        {t('填入')}
+                      </Button>
+                    }
                   />
 
                   <Form.TextArea
-                    field='model_mapping'
+                    field="model_mapping"
                     label={t('模型重定向')}
-                    placeholder={t('此项可选，用于修改请求体中的模型名称，为一个 JSON 字符串，键为请求中模型名称，值为要替换的模型名称，留空则不更改')}
-                    autosize
-                    onChange={(value) => handleInputChange('model_mapping', value)}
-                    extraText={(
-                      <Space>
-                        <Text className="!text-semi-color-primary cursor-pointer" onClick={() => handleInputChange('model_mapping', JSON.stringify(MODEL_MAPPING_EXAMPLE, null, 2))}>{t('填入模板')}</Text>
-                        <Text className="!text-semi-color-primary cursor-pointer" onClick={() => handleInputChange('model_mapping', JSON.stringify({}, null, 2))}>{t('清空重定向')}</Text>
-                        <Text className="!text-semi-color-primary cursor-pointer" onClick={() => handleInputChange('model_mapping', '')}>{t('不更改')}</Text>
-                      </Space>
+                    placeholder={t(
+                      '此项可选，用于修改请求体中的模型名称，为一个 JSON 字符串，键为请求中模型名称，值为要替换的模型名称，留空则不更改'
                     )}
+                    autosize
+                    onChange={(value) =>
+                      handleInputChange('model_mapping', value)
+                    }
+                    extraText={
+                      <Space>
+                        <Text
+                          className="!text-semi-color-primary cursor-pointer"
+                          onClick={() =>
+                            handleInputChange(
+                              'model_mapping',
+                              JSON.stringify(MODEL_MAPPING_EXAMPLE, null, 2)
+                            )
+                          }
+                        >
+                          {t('填入模板')}
+                        </Text>
+                        <Text
+                          className="!text-semi-color-primary cursor-pointer"
+                          onClick={() =>
+                            handleInputChange(
+                              'model_mapping',
+                              JSON.stringify({}, null, 2)
+                            )
+                          }
+                        >
+                          {t('清空重定向')}
+                        </Text>
+                        <Text
+                          className="!text-semi-color-primary cursor-pointer"
+                          onClick={() => handleInputChange('model_mapping', '')}
+                        >
+                          {t('不更改')}
+                        </Text>
+                      </Space>
+                    }
                   />
                 </div>
               </Card>
@@ -415,18 +464,22 @@ const EditTagModal = (props) => {
                   </Avatar>
                   <div>
                     <Text className="text-lg font-medium">{t('分组设置')}</Text>
-                    <div className="text-xs text-gray-600">{t('用户分组配置')}</div>
+                    <div className="text-xs text-gray-600">
+                      {t('用户分组配置')}
+                    </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <Form.Select
-                    field='groups'
+                    field="groups"
                     label={t('分组')}
                     placeholder={t('请选择可以使用该渠道的分组，留空则不更改')}
                     multiple
                     allowAdditions
-                    additionLabel={t('请在系统设置页面编辑分组倍率以添加新的分组：')}
+                    additionLabel={t(
+                      '请在系统设置页面编辑分组倍率以添加新的分组：'
+                    )}
                     optionList={groupOptions}
                     style={{ width: '100%' }}
                     onChange={(value) => handleInputChange('groups', value)}

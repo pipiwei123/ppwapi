@@ -66,9 +66,7 @@ const EditUser = (props) => {
   const fetchGroups = async () => {
     try {
       let res = await API.get(`/api/group/`);
-      setGroupOptions(
-        res.data.data.map((g) => ({ label: g, value: g }))
-      );
+      setGroupOptions(res.data.data.map((g) => ({ label: g, value: g })));
     } catch (e) {
       showError(e.message);
     }
@@ -85,12 +83,11 @@ const EditUser = (props) => {
       data.password = '';
       formApiRef.current?.setValues({ ...getInitValues(), ...data });
 
-      console.log(res.data)
+      console.log(res.data);
 
       if (data.quota) {
-        setBalance(data.quota / 500000)
+        setBalance(data.quota / 500000);
       }
-
     } else {
       showError(message);
     }
@@ -126,20 +123,20 @@ const EditUser = (props) => {
 
   /* --------------------- quota helper -------------------- */
   const addLocalQuota = () => {
-    setBalance(b=>b+addBalance);
+    setBalance((b) => b + addBalance);
   };
 
   /* --------------------------- UI --------------------------- */
   return (
     <>
       <SideSheet
-        placement='right'
+        placement="right"
         title={
           <Space>
-            <Tag color='blue' shape='circle'>
+            <Tag color="blue" shape="circle">
               {t(isEdit ? '编辑' : '新建')}
             </Tag>
-            <Title heading={4} className='m-0'>
+            <Title heading={4} className="m-0">
               {isEdit ? t('编辑用户') : t('创建用户')}
             </Title>
           </Space>
@@ -148,10 +145,10 @@ const EditUser = (props) => {
         visible={props.visible}
         width={isMobile ? '100%' : 600}
         footer={
-          <div className='flex justify-end bg-white'>
+          <div className="flex justify-end bg-white">
             <Space>
               <Button
-                theme='solid'
+                theme="solid"
                 onClick={() => formApiRef.current?.submitForm()}
                 icon={<IconSave />}
                 loading={loading}
@@ -159,8 +156,8 @@ const EditUser = (props) => {
                 {t('提交')}
               </Button>
               <Button
-                theme='light'
-                type='primary'
+                theme="light"
+                type="primary"
                 onClick={handleCancel}
                 icon={<IconClose />}
               >
@@ -179,23 +176,31 @@ const EditUser = (props) => {
             onSubmit={submit}
           >
             {({ values }) => (
-              <div className='p-2'>
+              <div className="p-2">
                 {/* 基本信息 */}
-                <Card className='!rounded-2xl shadow-sm border-0'>
-                  <div className='flex items-center mb-2'>
-                    <Avatar size='small' color='blue' className='mr-2 shadow-md'>
+                <Card className="!rounded-2xl shadow-sm border-0">
+                  <div className="flex items-center mb-2">
+                    <Avatar
+                      size="small"
+                      color="blue"
+                      className="mr-2 shadow-md"
+                    >
                       <IconUser size={16} />
                     </Avatar>
                     <div>
-                      <Text className='text-lg font-medium'>{t('基本信息')}</Text>
-                      <div className='text-xs text-gray-600'>{t('用户的基本账户信息')}</div>
+                      <Text className="text-lg font-medium">
+                        {t('基本信息')}
+                      </Text>
+                      <div className="text-xs text-gray-600">
+                        {t('用户的基本账户信息')}
+                      </div>
                     </div>
                   </div>
 
                   <Row gutter={12}>
                     <Col span={24}>
                       <Form.Input
-                        field='username'
+                        field="username"
                         label={t('用户名')}
                         placeholder={t('请输入新的用户名')}
                         rules={[{ required: true, message: t('请输入用户名') }]}
@@ -205,17 +210,17 @@ const EditUser = (props) => {
 
                     <Col span={24}>
                       <Form.Input
-                        field='password'
+                        field="password"
                         label={t('密码')}
                         placeholder={t('请输入新的密码，最短 8 位')}
-                        mode='password'
+                        mode="password"
                         showClear
                       />
                     </Col>
 
                     <Col span={24}>
                       <Form.Input
-                        field='display_name'
+                        field="display_name"
                         label={t('显示名称')}
                         placeholder={t('请输入新的显示名称')}
                         showClear
@@ -224,7 +229,7 @@ const EditUser = (props) => {
 
                     <Col span={24}>
                       <Form.Input
-                        field='remark'
+                        field="remark"
                         label={t('备注')}
                         placeholder={t('请输入备注（仅管理员可见）')}
                         showClear
@@ -235,21 +240,29 @@ const EditUser = (props) => {
 
                 {/* 权限设置 */}
                 {userId && (
-                  <Card className='!rounded-2xl shadow-sm border-0'>
-                    <div className='flex items-center mb-2'>
-                      <Avatar size='small' color='green' className='mr-2 shadow-md'>
+                  <Card className="!rounded-2xl shadow-sm border-0">
+                    <div className="flex items-center mb-2">
+                      <Avatar
+                        size="small"
+                        color="green"
+                        className="mr-2 shadow-md"
+                      >
                         <IconUserGroup size={16} />
                       </Avatar>
                       <div>
-                        <Text className='text-lg font-medium'>{t('权限设置')}</Text>
-                        <div className='text-xs text-gray-600'>{t('用户分组和额度管理')}</div>
+                        <Text className="text-lg font-medium">
+                          {t('权限设置')}
+                        </Text>
+                        <div className="text-xs text-gray-600">
+                          {t('用户分组和额度管理')}
+                        </div>
                       </div>
                     </div>
 
                     <Row gutter={12}>
                       <Col span={24}>
                         <Form.Select
-                          field='group'
+                          field="group"
                           label={t('分组')}
                           placeholder={t('请选择分组')}
                           optionList={groupOptions}
@@ -266,11 +279,12 @@ const EditUser = (props) => {
                             onChange={setBalance}
                             label={t('剩余额度')}
                             placeholder={t('请输入新的剩余额度')}
-                            rules={[{ required: true, message: t('请输入额度') }]}
+                            rules={[
+                              { required: true, message: t('请输入额度') },
+                            ]}
                             style={{ width: '100%' }}
                           />
                         </Form.Slot>
-
                       </Col>
 
                       <Col span={14}>
@@ -286,25 +300,43 @@ const EditUser = (props) => {
                 )}
 
                 {/* 绑定信息 */}
-                <Card className='!rounded-2xl shadow-sm border-0'>
-                  <div className='flex items-center mb-2'>
-                    <Avatar size='small' color='purple' className='mr-2 shadow-md'>
+                <Card className="!rounded-2xl shadow-sm border-0">
+                  <div className="flex items-center mb-2">
+                    <Avatar
+                      size="small"
+                      color="purple"
+                      className="mr-2 shadow-md"
+                    >
                       <IconLink size={16} />
                     </Avatar>
                     <div>
-                      <Text className='text-lg font-medium'>{t('绑定信息')}</Text>
-                      <div className='text-xs text-gray-600'>{t('第三方账户绑定状态（只读）')}</div>
+                      <Text className="text-lg font-medium">
+                        {t('绑定信息')}
+                      </Text>
+                      <div className="text-xs text-gray-600">
+                        {t('第三方账户绑定状态（只读）')}
+                      </div>
                     </div>
                   </div>
 
                   <Row gutter={12}>
-                    {['github_id', 'oidc_id', 'wechat_id', 'email', 'telegram_id'].map((field) => (
+                    {[
+                      'github_id',
+                      'oidc_id',
+                      'wechat_id',
+                      'email',
+                      'telegram_id',
+                    ].map((field) => (
                       <Col span={24} key={field}>
                         <Form.Input
                           field={field}
-                          label={t(`已绑定的 ${field.replace('_id', '').toUpperCase()} 账户`)}
+                          label={t(
+                            `已绑定的 ${field.replace('_id', '').toUpperCase()} 账户`
+                          )}
                           readonly
-                          placeholder={t('此项只读，需要用户通过个人设置页面的相关绑定按钮进行绑定，不可直接修改')}
+                          placeholder={t(
+                            '此项只读，需要用户通过个人设置页面的相关绑定按钮进行绑定，不可直接修改'
+                          )}
                         />
                       </Col>
                     ))}
@@ -327,22 +359,20 @@ const EditUser = (props) => {
         onCancel={() => setIsModalOpen(false)}
         closable={null}
         title={
-          <div className='flex items-center'>
-            <IconPlus className='mr-2' />
+          <div className="flex items-center">
+            <IconPlus className="mr-2" />
             {t('添加额度')}
           </div>
         }
       >
-        <div className='mb-4'>
-          {
-            (() => {
-              return (
-                <Text type='secondary' className='block mb-2'>
-                  {`${t('新额度：')}${balance} + ${addBalance} = ${balance + addBalance}`}
-                </Text>
-              );
-            })()
-          }
+        <div className="mb-4">
+          {(() => {
+            return (
+              <Text type="secondary" className="block mb-2">
+                {`${t('新额度：')}${balance} + ${addBalance} = ${balance + addBalance}`}
+              </Text>
+            );
+          })()}
         </div>
         <InputNumber
           placeholder={t('需要添加的额度（支持负数）')}

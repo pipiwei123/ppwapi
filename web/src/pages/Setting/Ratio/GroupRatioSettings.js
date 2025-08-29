@@ -1,5 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, Col, Form, Row, Spin, Switch, Typography, Divider, Card } from '@douyinfe/semi-ui';
+import {
+  Button,
+  Col,
+  Form,
+  Row,
+  Spin,
+  Switch,
+  Typography,
+  Divider,
+  Card,
+} from '@douyinfe/semi-ui';
 import {
   compareObjects,
   API,
@@ -30,7 +40,7 @@ export default function GroupRatioSettings(props) {
   });
   const refForm = useRef();
   const [inputsRow, setInputsRow] = useState(inputs);
-  
+
   // 可视化编辑器模式状态
   const [visualMode, setVisualMode] = useState({
     GroupRatio: false,
@@ -63,7 +73,7 @@ export default function GroupRatioSettings(props) {
                 return showError(
                   requestQueue.length > 1
                     ? t('部分保存失败，请重试')
-                    : t('保存失败'),
+                    : t('保存失败')
                 );
               }
 
@@ -109,11 +119,13 @@ export default function GroupRatioSettings(props) {
     <Spin spinning={loading}>
       <div style={{ marginBottom: 24 }}>
         <Title heading={4}>{t('分组倍率设置')}</Title>
-        <Text type='secondary'>
-          {t('配置系统中各分组的价格倍率和用户可选分组，支持JSON和可视化两种编辑模式')}
+        <Text type="secondary">
+          {t(
+            '配置系统中各分组的价格倍率和用户可选分组，支持JSON和可视化两种编辑模式'
+          )}
         </Text>
       </div>
-      
+
       <Form
         values={inputs}
         getFormApi={(formAPI) => (refForm.current = formAPI)}
@@ -121,23 +133,34 @@ export default function GroupRatioSettings(props) {
       >
         {/* 分组倍率 */}
         <Card style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 16,
+            }}
+          >
             <Title heading={5}>{t('分组倍率')}</Title>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Text size='small'>{t('JSON模式')}</Text>
+              <Text size="small">{t('JSON模式')}</Text>
               <Switch
                 checked={visualMode.GroupRatio}
-                onChange={(checked) => setVisualMode({ ...visualMode, GroupRatio: checked })}
+                onChange={(checked) =>
+                  setVisualMode({ ...visualMode, GroupRatio: checked })
+                }
               />
-              <Text size='small'>{t('可视化模式')}</Text>
+              <Text size="small">{t('可视化模式')}</Text>
             </div>
           </div>
-          
+
           {visualMode.GroupRatio ? (
             <>
               <VisualGroupRatioEditor
                 value={inputs.GroupRatio}
-                onChange={(value) => setInputs({ ...inputs, GroupRatio: value })}
+                onChange={(value) =>
+                  setInputs({ ...inputs, GroupRatio: value })
+                }
                 disabled={loading}
               />
               {/* 隐藏的表单字段用于验证 */}
@@ -160,11 +183,11 @@ export default function GroupRatioSettings(props) {
                   label={t('分组倍率')}
                   placeholder={t('为一个 JSON 文本，键为分组名称，值为倍率')}
                   extraText={t(
-                    '分组倍率设置，可以在此处新增分组或修改现有分组的倍率，格式为 JSON 字符串，例如：{"vip": 0.5, "test": 1}，表示 vip 分组的倍率为 0.5，test 分组的倍率为 1',
+                    '分组倍率设置，可以在此处新增分组或修改现有分组的倍率，格式为 JSON 字符串，例如：{"vip": 0.5, "test": 1}，表示 vip 分组的倍率为 0.5，test 分组的倍率为 1'
                   )}
                   field={'GroupRatio'}
                   autosize={{ minRows: 6, maxRows: 12 }}
-                  trigger='blur'
+                  trigger="blur"
                   stopValidateWithError
                   rules={[
                     {
@@ -182,23 +205,34 @@ export default function GroupRatioSettings(props) {
         </Card>
         {/* 用户可选分组 */}
         <Card style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 16,
+            }}
+          >
             <Title heading={5}>{t('用户可选分组')}</Title>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Text size='small'>{t('JSON模式')}</Text>
+              <Text size="small">{t('JSON模式')}</Text>
               <Switch
                 checked={visualMode.UserUsableGroups}
-                onChange={(checked) => setVisualMode({ ...visualMode, UserUsableGroups: checked })}
+                onChange={(checked) =>
+                  setVisualMode({ ...visualMode, UserUsableGroups: checked })
+                }
               />
-              <Text size='small'>{t('可视化模式')}</Text>
+              <Text size="small">{t('可视化模式')}</Text>
             </div>
           </div>
-          
+
           {visualMode.UserUsableGroups ? (
             <>
               <VisualUsableGroupsEditor
                 value={inputs.UserUsableGroups}
-                onChange={(value) => setInputs({ ...inputs, UserUsableGroups: value })}
+                onChange={(value) =>
+                  setInputs({ ...inputs, UserUsableGroups: value })
+                }
                 disabled={loading}
               />
               {/* 隐藏的表单字段用于验证 */}
@@ -219,13 +253,15 @@ export default function GroupRatioSettings(props) {
               <Col xs={24} sm={16}>
                 <Form.TextArea
                   label={t('用户可选分组')}
-                  placeholder={t('为一个 JSON 文本，键为分组名称，值为分组描述')}
+                  placeholder={t(
+                    '为一个 JSON 文本，键为分组名称，值为分组描述'
+                  )}
                   extraText={t(
-                    '用户新建令牌时可选的分组，格式为 JSON 字符串，例如：{"vip": "VIP 用户", "test": "测试"}，表示用户可以选择 vip 分组和 test 分组',
+                    '用户新建令牌时可选的分组，格式为 JSON 字符串，例如：{"vip": "VIP 用户", "test": "测试"}，表示用户可以选择 vip 分组和 test 分组'
                   )}
                   field={'UserUsableGroups'}
                   autosize={{ minRows: 6, maxRows: 12 }}
-                  trigger='blur'
+                  trigger="blur"
                   stopValidateWithError
                   rules={[
                     {
@@ -243,23 +279,34 @@ export default function GroupRatioSettings(props) {
         </Card>
         {/* 分组特殊倍率 */}
         <Card style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 16,
+            }}
+          >
             <Title heading={5}>{t('分组特殊倍率')}</Title>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Text size='small'>{t('JSON模式')}</Text>
+              <Text size="small">{t('JSON模式')}</Text>
               <Switch
                 checked={visualMode.GroupGroupRatio}
-                onChange={(checked) => setVisualMode({ ...visualMode, GroupGroupRatio: checked })}
+                onChange={(checked) =>
+                  setVisualMode({ ...visualMode, GroupGroupRatio: checked })
+                }
               />
-              <Text size='small'>{t('可视化模式')}</Text>
+              <Text size="small">{t('可视化模式')}</Text>
             </div>
           </div>
-          
+
           {visualMode.GroupGroupRatio ? (
             <>
               <VisualGroupGroupRatioEditor
                 value={inputs.GroupGroupRatio}
-                onChange={(value) => setInputs({ ...inputs, GroupGroupRatio: value })}
+                onChange={(value) =>
+                  setInputs({ ...inputs, GroupGroupRatio: value })
+                }
                 disabled={loading}
               />
               {/* 隐藏的表单字段用于验证 */}
@@ -282,11 +329,11 @@ export default function GroupRatioSettings(props) {
                   label={t('分组特殊倍率')}
                   placeholder={t('为一个 JSON 文本')}
                   extraText={t(
-                    '键为分组名称，值为另一个 JSON 对象，键为分组名称，值为该分组的用户的特殊分组倍率，例如：{"vip": {"default": 0.5, "test": 1}}，表示 vip 分组的用户在使用default分组的令牌时倍率为0.5，使用test分组时倍率为1',
+                    '键为分组名称，值为另一个 JSON 对象，键为分组名称，值为该分组的用户的特殊分组倍率，例如：{"vip": {"default": 0.5, "test": 1}}，表示 vip 分组的用户在使用default分组的令牌时倍率为0.5，使用test分组时倍率为1'
                   )}
                   field={'GroupGroupRatio'}
                   autosize={{ minRows: 6, maxRows: 12 }}
-                  trigger='blur'
+                  trigger="blur"
                   stopValidateWithError
                   rules={[
                     {
@@ -305,23 +352,34 @@ export default function GroupRatioSettings(props) {
 
         {/* 自动分组 */}
         <Card style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 16,
+            }}
+          >
             <Title heading={5}>{t('自动分组降级顺序')}</Title>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Text size='small'>{t('JSON模式')}</Text>
+              <Text size="small">{t('JSON模式')}</Text>
               <Switch
                 checked={visualMode.AutoGroups}
-                onChange={(checked) => setVisualMode({ ...visualMode, AutoGroups: checked })}
+                onChange={(checked) =>
+                  setVisualMode({ ...visualMode, AutoGroups: checked })
+                }
               />
-              <Text size='small'>{t('可视化模式')}</Text>
+              <Text size="small">{t('可视化模式')}</Text>
             </div>
           </div>
-          
+
           {visualMode.AutoGroups ? (
             <>
               <VisualAutoGroupsEditor
                 value={inputs.AutoGroups}
-                onChange={(value) => setInputs({ ...inputs, AutoGroups: value })}
+                onChange={(value) =>
+                  setInputs({ ...inputs, AutoGroups: value })
+                }
                 disabled={loading}
               />
               {/* 隐藏的表单字段用于验证 */}
@@ -345,12 +403,16 @@ export default function GroupRatioSettings(props) {
                           }
 
                           // Check if every element is a string
-                          return parsed.every(item => typeof item === 'string');
+                          return parsed.every(
+                            (item) => typeof item === 'string'
+                          );
                         } catch (error) {
                           return false;
                         }
                       },
-                      message: t('必须是有效的 JSON 字符串数组，例如：["g1","g2"]'),
+                      message: t(
+                        '必须是有效的 JSON 字符串数组，例如：["g1","g2"]'
+                      ),
                     },
                   ]}
                 />
@@ -364,7 +426,7 @@ export default function GroupRatioSettings(props) {
                   placeholder={t('为一个 JSON 文本')}
                   field={'AutoGroups'}
                   autosize={{ minRows: 6, maxRows: 12 }}
-                  trigger='blur'
+                  trigger="blur"
                   stopValidateWithError
                   rules={[
                     {
@@ -383,12 +445,16 @@ export default function GroupRatioSettings(props) {
                           }
 
                           // Check if every element is a string
-                          return parsed.every(item => typeof item === 'string');
+                          return parsed.every(
+                            (item) => typeof item === 'string'
+                          );
                         } catch (error) {
                           return false;
                         }
                       },
-                      message: t('必须是有效的 JSON 字符串数组，例如：["g1","g2"]'),
+                      message: t(
+                        '必须是有效的 JSON 字符串数组，例如：["g1","g2"]'
+                      ),
                     },
                   ]}
                   onChange={(value) =>
@@ -403,7 +469,7 @@ export default function GroupRatioSettings(props) {
           <Col span={16}>
             <Form.Switch
               label={t(
-                '创建令牌默认选择auto分组，初始令牌也将设为auto（否则留空，为用户默认分组）',
+                '创建令牌默认选择auto分组，初始令牌也将设为auto（否则留空，为用户默认分组）'
               )}
               field={'DefaultUseAutoGroup'}
               onChange={(value) =>

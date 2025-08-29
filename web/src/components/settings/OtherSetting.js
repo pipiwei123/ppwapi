@@ -181,7 +181,7 @@ const OtherSetting = () => {
             // Adding User-Agent which is often required by GitHub API
             'User-Agent': 'new-api-update-checker',
           },
-        },
+        }
       ).then((response) => response.json());
 
       // Option 3: Use a local proxy endpoint
@@ -234,7 +234,7 @@ const OtherSetting = () => {
   const openGitHubRelease = () => {
     window.open(
       `https://github.com/Calcium-Ion/new-api/releases/tag/${updateData.tag_name}`,
-      '_blank',
+      '_blank'
     );
   };
 
@@ -266,7 +266,7 @@ const OtherSetting = () => {
                       {statusState?.status?.version || t('未知')}
                     </Text>
                     <Button
-                      type='primary'
+                      type="primary"
                       onClick={checkUpdate}
                       loading={loadingInput['CheckUpdate']}
                     >
@@ -295,7 +295,7 @@ const OtherSetting = () => {
               <Form.TextArea
                 label={t('公告')}
                 placeholder={t(
-                  '在此输入新的公告内容，支持 Markdown & HTML 代码',
+                  '在此输入新的公告内容，支持 Markdown & HTML 代码'
                 )}
                 field={'Notice'}
                 onChange={handleInputChange}
@@ -339,7 +339,7 @@ const OtherSetting = () => {
               <Form.TextArea
                 label={t('首页内容')}
                 placeholder={t(
-                  '在此输入首页内容，支持 Markdown & HTML 代码，设置后首页的状态信息将不再显示。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为首页',
+                  '在此输入首页内容，支持 Markdown & HTML 代码，设置后首页的状态信息将不再显示。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为首页'
                 )}
                 field={'HomePageContent'}
                 onChange={handleInputChange}
@@ -355,7 +355,7 @@ const OtherSetting = () => {
               <Form.TextArea
                 label={t('关于')}
                 placeholder={t(
-                  '在此输入新的关于内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为关于页面',
+                  '在此输入新的关于内容，支持 Markdown & HTML 代码。如果输入的是一个链接，则会使用该链接作为 iframe 的 src 属性，这允许你设置任意网页作为关于页面'
                 )}
                 field={'About'}
                 onChange={handleInputChange}
@@ -368,9 +368,9 @@ const OtherSetting = () => {
               {/*  */}
               <Banner
                 fullMode={false}
-                type='info'
+                type="info"
                 description={t(
-                  '移除 One API 的版权标识必须首先获得授权，项目维护需要花费大量精力，如果本项目对你有意义，请主动支持本项目',
+                  '移除 One API 的版权标识必须首先获得授权，项目维护需要花费大量精力，如果本项目对你有意义，请主动支持本项目'
                 )}
                 closeIcon={null}
                 style={{ marginTop: 15 }}
@@ -378,7 +378,7 @@ const OtherSetting = () => {
               <Form.Input
                 label={t('页脚')}
                 placeholder={t(
-                  '在此输入新的页脚，留空则使用默认页脚，支持 HTML 代码',
+                  '在此输入新的页脚，留空则使用默认页脚，支持 HTML 代码'
                 )}
                 field={'Footer'}
                 onChange={handleInputChange}
@@ -396,8 +396,8 @@ const OtherSetting = () => {
         onCancel={() => setShowUpdateModal(false)}
         footer={[
           <Button
-            key='details'
-            type='primary'
+            key="details"
+            type="primary"
             onClick={() => {
               setShowUpdateModal(false);
               openGitHubRelease();
