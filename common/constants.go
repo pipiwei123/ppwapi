@@ -125,7 +125,7 @@ var BatchUpdateInterval int
 
 var RelayTimeout int // unit is second
 
-var TaskTimeoutDuration = 30 * 60 // unit is second, default 30 minutes
+var TaskTimeoutDuration = 20 * 60 // unit is second, default 30 minutes
 
 var GeminiSafetySetting string
 

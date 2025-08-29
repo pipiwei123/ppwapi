@@ -64,9 +64,9 @@ func UpdateTaskBulk() {
 			timeoutTaskIds := make([]int64, 0)
 			currentTime := time.Now().Unix()
 			for _, task := range tasks {
-				// 只处理正在处理中且提交时间超过30分钟的任务
+				// 只处理正在处理中且提交时间超过20分钟的任务
 				if task.Status == model.TaskStatusInProgress {
-					// 检查提交时间是否超过30分钟
+					// 检查提交时间是否超过20分钟
 					if currentTime-task.SubmitTime > int64(common.TaskTimeoutDuration) {
 						timeoutTaskIds = append(timeoutTaskIds, task.ID)
 					}
