@@ -39,15 +39,31 @@ func UpdateTaskBulk() {
 			taskChannelM := make(map[int][]string)
 			taskM := make(map[string]*model.Task)
 			nullTaskIds := make([]int64, 0)
+			timeoutTaskIds := make([]int64, 0)
+			timeoutTasks := make([]*model.Task, 0)
+			currentTime := time.Now().Unix()
+
+			// 单次遍历处理所有任务分类
 			for _, task := range tasks {
 				if task.TaskID == "" {
 					// 统计失败的未完成任务
 					nullTaskIds = append(nullTaskIds, task.ID)
 					continue
 				}
+
+				// 检查超时任务
+				if task.Status == model.TaskStatusInProgress && currentTime-task.SubmitTime > int64(common.TaskTimeoutDuration) {
+					timeoutTaskIds = append(timeoutTaskIds, task.ID)
+					timeoutTasks = append(timeoutTasks, task)
+					continue // 超时任务不加入后续处理
+				}
+
+				// 正常任务加入处理队列
 				taskM[task.TaskID] = task
 				taskChannelM[task.ChannelId] = append(taskChannelM[task.ChannelId], task.TaskID)
 			}
+
+			// 批量处理 null TaskID 任务
 			if len(nullTaskIds) > 0 {
 				err := model.TaskBulkUpdateByID(nullTaskIds, map[string]any{
 					"status":   "FAILURE",
@@ -60,42 +76,29 @@ func UpdateTaskBulk() {
 				}
 			}
 
-			// 检查超时任务
-			timeoutTaskIds := make([]int64, 0)
-			currentTime := time.Now().Unix()
-			for _, task := range tasks {
-				// 只处理正在处理中且提交时间超过20分钟的任务
-				if task.Status == model.TaskStatusInProgress {
-					// 检查提交时间是否超过20分钟
-					if currentTime-task.SubmitTime > int64(common.TaskTimeoutDuration) {
-						timeoutTaskIds = append(timeoutTaskIds, task.ID)
-					}
-				}
-			}
-			if len(timeoutTaskIds) > 0 {
-				err := model.TaskBulkUpdateByID(timeoutTaskIds, map[string]any{
+			// 处理超时任务
+			for _, task := range timeoutTasks {
+				// 更新任务状态
+				err := model.TaskBulkUpdateByID([]int64{task.ID}, map[string]any{
 					"status":      "FAILURE",
 					"progress":    "100%",
 					"fail_reason": "任务执行超时",
 					"finish_time": currentTime,
 				})
 				if err != nil {
-					common.LogError(ctx, fmt.Sprintf("Update timeout tasks failed: %v", err))
+					common.LogError(ctx, fmt.Sprintf("Update timeout task %d failed: %v", task.ID, err))
 				} else {
-					common.LogInfo(ctx, fmt.Sprintf("Mark %d tasks as timeout failed: %v", len(timeoutTaskIds), timeoutTaskIds))
-					// 补偿用户配额
-					for _, task := range tasks {
-						for _, timeoutTaskId := range timeoutTaskIds {
-							if task.ID == timeoutTaskId && task.Quota > 0 {
-								err = model.IncreaseUserQuota(task.UserId, task.Quota, false)
-								if err != nil {
-									common.LogError(ctx, fmt.Sprintf("Failed to increase user quota for timeout task %d: %v", task.ID, err))
-								} else {
-									logContent := fmt.Sprintf("异步任务执行超时 %s，补偿 %s", task.TaskID, common.LogQuota(task.Quota))
-									model.RecordLog(task.UserId, model.LogTypeSystem, logContent)
-								}
-							}
-						}
+					common.LogInfo(ctx, fmt.Sprintf("Mark task %d as timeout failed", task.ID))
+				}
+
+				// 补偿用户配额（无论数据库更新是否成功都要补偿）
+				if task.Quota > 0 {
+					err = model.IncreaseUserQuota(task.UserId, task.Quota, false)
+					if err != nil {
+						common.LogError(ctx, fmt.Sprintf("Failed to increase user quota for timeout task %d: %v", task.ID, err))
+					} else {
+						logContent := fmt.Sprintf("异步任务执行超时 %s，补偿 %s", task.TaskID, common.LogQuota(task.Quota))
+						model.RecordLog(task.UserId, model.LogTypeSystem, logContent)
 					}
 				}
 			}
