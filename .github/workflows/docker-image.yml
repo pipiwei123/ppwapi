@@ -3,6 +3,7 @@ name: Publish Docker image (alpha)
 on:
   push:
     branches: [ "*" ]
+    tags: [ "*" ]
 
 jobs:
   push_to_registries:
