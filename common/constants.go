@@ -125,6 +125,8 @@ var BatchUpdateInterval int
 
 var RelayTimeout int // unit is second
 
+var TaskTimeoutDuration = 30 * 60 // unit is second, default 30 minutes
+
 var GeminiSafetySetting string
 
 // https://docs.cohere.com/docs/safety-modes Type; NONE/CONTEXTUAL/STRICT
