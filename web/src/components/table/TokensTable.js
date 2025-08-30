@@ -103,7 +103,9 @@ const TokensTable = () => {
         };
 
         const quotaSuffix = record.unlimited_quota ? (
-          <div className="text-xs">{t('无限额度')}</div>
+          <div className="flex flex-col items-end">
+            <span className="text-xs leading-none">{`${renderQuota(used)} / ${t('无限额度')}`}</span>
+          </div>
         ) : (
           <div className="flex flex-col items-end">
             <span className="text-xs leading-none">{`${renderQuota(remain)} / ${renderQuota(total)}`}</span>
@@ -137,7 +139,18 @@ const TokensTable = () => {
         );
 
         if (record.unlimited_quota) {
-          return content;
+          return (
+            <Tooltip
+            content={
+              <div className="text-xs">
+                <div>
+                  {t('已用额度')}: {renderQuota(used)}
+                </div>
+              </div>
+            }
+          >
+            {content}
+          </Tooltip>)
         }
 
         return (
