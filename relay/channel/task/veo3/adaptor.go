@@ -212,7 +212,7 @@ func (a *TaskAdaptor) ParseTaskResult(respBody []byte) (*relaycommon.TaskInfo, e
 	case "PROCESSING":
 		taskInfo.Status = model.TaskStatusInProgress
 		taskInfo.Code = 0
-	case "FAILED":
+	case "FAILURE":
 		taskInfo.Status = model.TaskStatusFailure
 		taskInfo.Code = -1
 		taskInfo.Reason = "Task failed"
