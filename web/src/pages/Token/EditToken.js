@@ -20,7 +20,7 @@ import {
   Avatar,
   Form,
   Col,
-  Row,
+  Row, Input,
 } from '@douyinfe/semi-ui';
 import {
   IconCreditCard,
@@ -42,6 +42,7 @@ const EditToken = (props) => {
   const formApiRef = useRef(null);
   const [models, setModels] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [balance, setBalance] = useState(0.1);
   const isEdit = props.editingToken.id !== undefined;
 
   const getInitValues = () => ({
@@ -185,6 +186,9 @@ const EditToken = (props) => {
         group_info: data.group_info,
       });
 
+      // 设置 balance 状态用于显示
+      setBalance(data.remain_quota / 500000);
+
       if (formApiRef.current) {
         // 确保所有数据都已准备就绪再设置表单值
         const formData = { ...getInitValues(), ...data };
@@ -220,6 +224,8 @@ const EditToken = (props) => {
     if (formApiRef.current) {
       if (!isEdit) {
         formApiRef.current.setValues(getInitValues());
+        // 初始化 balance 为默认值
+        setBalance(0.1);
       }
     }
     loadModels();
@@ -239,6 +245,8 @@ const EditToken = (props) => {
         loadTokenWithDelay();
       } else {
         formApiRef.current?.setValues(getInitValues());
+        // 初始化 balance 为默认值
+        setBalance(0.1);
       }
     } else {
       formApiRef.current?.reset();
@@ -261,7 +269,7 @@ const EditToken = (props) => {
     setLoading(true);
     if (isEdit) {
       let { tokenCount: _tc, ...localInputs } = values;
-      localInputs.remain_quota = parseInt(localInputs.remain_quota);
+      localInputs.remain_quota = parseInt(balance * 500000);
       if (localInputs.expired_time !== -1) {
         let time = Date.parse(localInputs.expired_time);
         if (isNaN(time)) {
@@ -324,7 +332,7 @@ const EditToken = (props) => {
         } else {
           localInputs.name = baseName;
         }
-        localInputs.remain_quota = parseInt(localInputs.remain_quota);
+        localInputs.remain_quota = parseInt(balance * 500000);
 
         if (localInputs.expired_time !== -1) {
           let time = Date.parse(localInputs.expired_time);
@@ -1036,27 +1044,29 @@ const EditToken = (props) => {
                 </div>
                 <Row gutter={12}>
                   <Col span={24}>
-                    <Form.AutoComplete
-                      field="remain_quota"
-                      label={t('额度')}
-                      placeholder={t('请输入额度')}
-                      type="number"
-                      disabled={values.unlimited_quota}
-                      extraText={renderQuotaWithPrompt(values.remain_quota)}
-                      rules={
-                        values.unlimited_quota
-                          ? []
-                          : [{ required: true, message: t('请输入额度') }]
-                      }
-                      data={[
-                        { value: 500000, label: '1$' },
-                        { value: 5000000, label: '10$' },
-                        { value: 25000000, label: '50$' },
-                        { value: 50000000, label: '100$' },
-                        { value: 250000000, label: '500$' },
-                        { value: 500000000, label: '1000$' },
-                      ]}
-                    />
+                    <Form.Slot label={t('额度')}>
+                      <Input
+                        placeholder={t('请输入额度')}
+                        type="number"
+                        disabled={values.unlimited_quota}
+                        value={balance}
+                        onChange={setBalance}
+                        style={{ width: '100%' }}
+                      />
+                      <div className="text-xs text-gray-500 mt-1">
+                        {renderQuotaWithPrompt(balance * 500000)}
+                      </div>
+                      <div className="mt-2">
+                        <Space wrap>
+                          <Button size="small" onClick={() => setBalance(1)}>1</Button>
+                          <Button size="small" onClick={() => setBalance(5)}>5</Button>
+                          <Button size="small" onClick={() => setBalance(10)}>10</Button>
+                          <Button size="small" onClick={() => setBalance(50)}>50</Button>
+                          <Button size="small" onClick={() => setBalance(100)}>100</Button>
+                          <Button size="small" onClick={() => setBalance(1000)}>1000</Button>
+                        </Space>
+                      </div>
+                    </Form.Slot>
                   </Col>
                   <Col span={24}>
                     <Form.Switch
