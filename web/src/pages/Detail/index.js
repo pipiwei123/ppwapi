@@ -1,8 +1,28 @@
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState,} from 'react';
-import {initVChartSemiTheme} from '@visactor/vchart-semi-theme';
-import {useNavigate} from 'react-router-dom';
-import {Activity, Award, Bell, ExternalLink, Gauge, HelpCircle, Medal, PieChart, Server, Trophy, Wallet, Zap,} from 'lucide-react';
-import {marked} from 'marked';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { initVChartSemiTheme } from '@visactor/vchart-semi-theme';
+import { useNavigate } from 'react-router-dom';
+import {
+  Activity,
+  Award,
+  Bell,
+  ExternalLink,
+  Gauge,
+  HelpCircle,
+  Medal,
+  PieChart,
+  Server,
+  Trophy,
+  Wallet,
+  Zap,
+} from 'lucide-react';
+import { marked } from 'marked';
 
 import {
   Avatar,
@@ -36,8 +56,11 @@ import {
   IconTextStroked,
   IconTypograph,
 } from '@douyinfe/semi-icons';
-import {IllustrationConstruction, IllustrationConstructionDark,} from '@douyinfe/semi-illustrations';
-import {VChart} from '@visactor/react-vchart';
+import {
+  IllustrationConstruction,
+  IllustrationConstructionDark,
+} from '@douyinfe/semi-illustrations';
+import { VChart } from '@visactor/react-vchart';
 import {
   API,
   copy,
@@ -54,10 +77,10 @@ import {
   timestamp2string,
   timestamp2string1,
 } from '../../helpers';
-import {useIsMobile} from '../../hooks/useIsMobile.js';
-import {UserContext} from '../../context/User/index.js';
-import {StatusContext} from '../../context/Status/index.js';
-import {useTranslation} from 'react-i18next';
+import { useIsMobile } from '../../hooks/useIsMobile.js';
+import { UserContext } from '../../context/User/index.js';
+import { StatusContext } from '../../context/Status/index.js';
+import { useTranslation } from 'react-i18next';
 
 const Detail = (props) => {
   // ========== Hooks - Context ==========
@@ -65,7 +88,7 @@ const Detail = (props) => {
   const [statusState, statusDispatch] = useContext(StatusContext);
 
   // ========== Hooks - Navigation & Translation ==========
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -75,7 +98,7 @@ const Detail = (props) => {
   const apiScrollRef = useRef(null);
 
   // ========== Constants & Shared Configurations ==========
-  const CHART_CONFIG = {mode: 'desktop-browser'};
+  const CHART_CONFIG = { mode: 'desktop-browser' };
 
   const CARD_PROPS = {
     shadows: 'always',
@@ -91,7 +114,7 @@ const Detail = (props) => {
   const ICON_BUTTON_CLASS = 'text-white hover:bg-opacity-80 !rounded-full';
   const FLEX_CENTER_GAP2 = 'flex items-center gap-2';
 
-  const ILLUSTRATION_SIZE = {width: 96, height: 96};
+  const ILLUSTRATION_SIZE = { width: 96, height: 96 };
 
   // ========== Constants ==========
   let now = new Date();
@@ -154,7 +177,7 @@ const Detail = (props) => {
     (setterFunc, newData, subtitle, newColors, dataId) => {
       setterFunc((prev) => ({
         ...prev,
-        data: [{id: dataId, values: newData}],
+        data: [{ id: dataId, values: newData }],
         title: {
           ...prev.title,
           subtext: subtitle,
@@ -170,7 +193,7 @@ const Detail = (props) => {
   const createSectionTitle = useCallback(
     (Icon, text) => (
       <div className={FLEX_CENTER_GAP2}>
-        <Icon size={16}/>
+        <Icon size={16} />
         {text}
       </div>
     ),
@@ -185,9 +208,9 @@ const Detail = (props) => {
   // ========== Time Options ==========
   const timeOptions = useMemo(
     () => [
-      {label: t('小时'), value: 'hour'},
-      {label: t('天'), value: 'day'},
-      {label: t('周'), value: 'week'},
+      { label: t('小时'), value: 'hour' },
+      { label: t('天'), value: 'day' },
+      { label: t('周'), value: 'week' },
     ],
     [t]
   );
@@ -213,7 +236,7 @@ const Detail = (props) => {
   const [consumeQuota, setConsumeQuota] = useState(0);
   const [consumeTokens, setConsumeTokens] = useState(0);
   const [times, setTimes] = useState(0);
-  const [pieData, setPieData] = useState([{type: 'null', value: '0'}]);
+  const [pieData, setPieData] = useState([{ type: 'null', value: '0' }]);
   const [lineData, setLineData] = useState([]);
 
   const [modelColors, setModelColors] = useState({});
@@ -250,7 +273,7 @@ const Detail = (props) => {
   const [activeUptimeTab, setActiveUptimeTab] = useState('');
 
   // ========== Props Destructuring ==========
-  const {username, model_name, start_timestamp, end_timestamp, channel} =
+  const { username, model_name, start_timestamp, end_timestamp, channel } =
     inputs;
 
   // ========== Chart Specs State ==========
@@ -476,7 +499,7 @@ const Detail = (props) => {
       ? '0'
       : (consumeTokens / timeDiff).toFixed(3);
 
-    return {avgRPM, avgTPM, timeDiff};
+    return { avgRPM, avgTPM, timeDiff };
   }, [times, consumeTokens, end_timestamp, start_timestamp]);
 
   const getGreeting = useMemo(() => {
@@ -502,7 +525,7 @@ const Detail = (props) => {
     (data, color) => ({
       type: 'line',
       data: [
-        {id: 'trend', values: data.map((val, idx) => ({x: idx, y: val}))},
+        { id: 'trend', values: data.map((val, idx) => ({ x: idx, y: val })) },
       ],
       xField: 'x',
       yField: 'y',
@@ -520,9 +543,9 @@ const Detail = (props) => {
       ],
       padding: 0,
       autoFit: false,
-      legends: {visible: false},
-      tooltip: {visible: false},
-      crosshair: {visible: false},
+      legends: { visible: false },
+      tooltip: { visible: false },
+      crosshair: { visible: false },
       line: {
         style: {
           stroke: color,
@@ -548,7 +571,7 @@ const Detail = (props) => {
           {
             title: t('当前余额'),
             value: renderQuota(userState?.user?.quota),
-            icon: <IconMoneyExchangeStroked/>,
+            icon: <IconMoneyExchangeStroked />,
             avatarColor: 'blue',
             onClick: () => navigate('/console/topup'),
             trendData: [],
@@ -557,7 +580,7 @@ const Detail = (props) => {
           {
             title: t('历史消耗'),
             value: renderQuota(userState?.user?.used_quota),
-            icon: <IconHistogram/>,
+            icon: <IconHistogram />,
             avatarColor: 'purple',
             trendData: [],
             trendColor: '#8b5cf6',
@@ -571,7 +594,7 @@ const Detail = (props) => {
           {
             title: t('请求次数'),
             value: userState.user?.request_count,
-            icon: <IconSend/>,
+            icon: <IconSend />,
             avatarColor: 'green',
             trendData: [],
             trendColor: '#10b981',
@@ -579,7 +602,7 @@ const Detail = (props) => {
           {
             title: t('统计次数'),
             value: times,
-            icon: <IconPulse/>,
+            icon: <IconPulse />,
             avatarColor: 'cyan',
             trendData: trendData.times,
             trendColor: '#06b6d4',
@@ -593,7 +616,7 @@ const Detail = (props) => {
           {
             title: t('统计额度'),
             value: renderQuota(consumeQuota),
-            icon: <IconCoinMoneyStroked/>,
+            icon: <IconCoinMoneyStroked />,
             avatarColor: 'yellow',
             trendData: trendData.consumeQuota,
             trendColor: '#f59e0b',
@@ -601,7 +624,7 @@ const Detail = (props) => {
           {
             title: t('统计Tokens'),
             value: isNaN(consumeTokens) ? 0 : consumeTokens,
-            icon: <IconTextStroked/>,
+            icon: <IconTextStroked />,
             avatarColor: 'pink',
             trendData: trendData.tokens,
             trendColor: '#ec4899',
@@ -615,7 +638,7 @@ const Detail = (props) => {
           {
             title: t('平均RPM'),
             value: performanceMetrics.avgRPM,
-            icon: <IconStopwatchStroked/>,
+            icon: <IconStopwatchStroked />,
             avatarColor: 'indigo',
             trendData: trendData.rpm,
             trendColor: '#6366f1',
@@ -623,7 +646,7 @@ const Detail = (props) => {
           {
             title: t('平均TPM'),
             value: performanceMetrics.avgTPM,
-            icon: <IconTypograph/>,
+            icon: <IconTypograph />,
             avatarColor: 'orange',
             trendData: trendData.tpm,
             trendColor: '#f97316',
@@ -666,7 +689,7 @@ const Detail = (props) => {
       setDataExportDefaultTime(value);
       return;
     }
-    setInputs((inputs) => ({...inputs, [name]: value}));
+    setInputs((inputs) => ({ ...inputs, [name]: value }));
   }, []);
 
   const loadQuotaData = useCallback(async () => {
@@ -682,7 +705,7 @@ const Detail = (props) => {
         url = `/api/data/self/?start_timestamp=${localStartTimestamp}&end_timestamp=${localEndTimestamp}&default_time=${dataExportDefaultTime}`;
       }
       const res = await API.get(url);
-      const {success, message, data} = res.data;
+      const { success, message, data } = res.data;
       if (success) {
         let newData = data;
         if (isAdminUser) {
@@ -724,7 +747,7 @@ const Detail = (props) => {
     setUptimeLoading(true);
     try {
       const res = await API.get('/api/uptime/status');
-      const {success, message, data} = res.data;
+      const { success, message, data } = res.data;
       if (success) {
         setUptimeData(data || []);
         if (data && data.length > 0 && !activeUptimeTab) {
@@ -819,9 +842,9 @@ const Detail = (props) => {
 
   const getUserData = async () => {
     let res = await API.get(`/api/user/self`);
-    const {success, message, data} = res.data;
+    const { success, message, data } = res.data;
     if (success) {
-      userDispatch({type: 'login', payload: data});
+      userDispatch({ type: 'login', payload: data });
     } else {
       showError(message);
     }
@@ -961,7 +984,7 @@ const Detail = (props) => {
         const lastTime = Math.max(...data.map((item) => item.created_at));
         const interval = getTimeInterval(dataExportDefaultTime, true);
 
-        chartTimePoints = Array.from({length: 7}, (_, i) =>
+        chartTimePoints = Array.from({ length: 7 }, (_, i) =>
           timestamp2string1(
             lastTime - (6 - i) * interval,
             dataExportDefaultTime
@@ -1032,7 +1055,7 @@ const Detail = (props) => {
 
         const timeSum = timeData.reduce((sum, item) => sum + item.rawQuota, 0);
         timeData.sort((a, b) => b.rawQuota - a.rawQuota);
-        timeData = timeData.map((item) => ({...item, TimeSum: timeSum}));
+        timeData = timeData.map((item) => ({ ...item, TimeSum: timeSum }));
         newLineData.push(...timeData);
       });
 
@@ -1115,21 +1138,21 @@ const Detail = (props) => {
   // ========== Status Data Management ==========
   const announcementLegendData = useMemo(
     () => [
-      {color: 'grey', label: t('默认'), type: 'default'},
-      {color: 'blue', label: t('进行中'), type: 'ongoing'},
-      {color: 'green', label: t('成功'), type: 'success'},
-      {color: 'orange', label: t('警告'), type: 'warning'},
-      {color: 'red', label: t('异常'), type: 'error'},
+      { color: 'grey', label: t('默认'), type: 'default' },
+      { color: 'blue', label: t('进行中'), type: 'ongoing' },
+      { color: 'green', label: t('成功'), type: 'success' },
+      { color: 'orange', label: t('警告'), type: 'warning' },
+      { color: 'red', label: t('异常'), type: 'error' },
     ],
     [t]
   );
 
   const uptimeStatusMap = useMemo(
     () => ({
-      1: {color: '#10b981', label: t('正常'), text: t('可用率')}, // UP
-      0: {color: '#ef4444', label: t('异常'), text: t('有异常')}, // DOWN
-      2: {color: '#f59e0b', label: t('高延迟'), text: t('高延迟')}, // PENDING
-      3: {color: '#3b82f6', label: t('维护中'), text: t('维护中')}, // MAINTENANCE
+      1: { color: '#10b981', label: t('正常'), text: t('可用率') }, // UP
+      0: { color: '#ef4444', label: t('异常'), text: t('有异常') }, // DOWN
+      2: { color: '#f59e0b', label: t('高延迟'), text: t('高延迟') }, // PENDING
+      3: { color: '#3b82f6', label: t('维护中'), text: t('维护中') }, // MAINTENANCE
     }),
     [t]
   );
@@ -1176,9 +1199,9 @@ const Detail = (props) => {
         return (
           <div className="flex justify-center items-center py-4">
             <Empty
-              image={<IllustrationConstruction style={ILLUSTRATION_SIZE}/>}
+              image={<IllustrationConstruction style={ILLUSTRATION_SIZE} />}
               darkModeImage={
-                <IllustrationConstructionDark style={ILLUSTRATION_SIZE}/>
+                <IllustrationConstructionDark style={ILLUSTRATION_SIZE} />
               }
               title={t('暂无监控数据')}
             />
@@ -1237,7 +1260,7 @@ const Detail = (props) => {
               <div className="text-md font-semibold text-gray-500 px-2 py-1">
                 {gname}
               </div>
-              <Divider/>
+              <Divider />
             </>
           )}
           {list.map(renderItem)}
@@ -1262,11 +1285,11 @@ const Detail = (props) => {
   const getRankIcon = (rank) => {
     switch (rank) {
       case 1:
-        return <Trophy className="h-5 w-5 text-yellow-500"/>;
+        return <Trophy className="h-5 w-5 text-yellow-500" />;
       case 2:
-        return <Medal className="h-5 w-5 text-gray-400"/>;
+        return <Medal className="h-5 w-5 text-gray-400" />;
       case 3:
-        return <Award className="h-5 w-5 text-amber-600"/>;
+        return <Award className="h-5 w-5 text-amber-600" />;
       default:
         return (
           <span className="text-lg font-bold text-muted-foreground">
@@ -1281,20 +1304,20 @@ const Detail = (props) => {
       <div className="flex items-center justify-between mb-4">
         <h2
           className="text-2xl font-semibold text-gray-800 transition-opacity duration-1000 ease-in-out"
-          style={{opacity: greetingVisible ? 1 : 0}}
+          style={{ opacity: greetingVisible ? 1 : 0 }}
         >
           {getGreeting}
         </h2>
         <div className="flex gap-3">
           <Button
             type="tertiary"
-            icon={<IconSearch/>}
+            icon={<IconSearch />}
             onClick={showSearchModal}
             className={`bg-green-500 hover:bg-green-600 ${ICON_BUTTON_CLASS}`}
           />
           <Button
             type="tertiary"
-            icon={<IconRefresh/>}
+            icon={<IconRefresh />}
             onClick={refresh}
             loading={loading}
             className={`bg-blue-500 hover:bg-blue-600 ${ICON_BUTTON_CLASS}`}
@@ -1432,7 +1455,7 @@ const Detail = (props) => {
             title={
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between w-full gap-3">
                 <div className={FLEX_CENTER_GAP2}>
-                  <PieChart size={16}/>
+                  <PieChart size={16} />
                   {t('模型数据分析')}
                 </div>
                 <Tabs
@@ -1444,7 +1467,7 @@ const Detail = (props) => {
                     <TabPane
                       tab={
                         <span>
-                          <IconHistogram/>
+                          <IconHistogram />
                           {t('用户消耗')}
                         </span>
                       }
@@ -1454,7 +1477,7 @@ const Detail = (props) => {
                   <TabPane
                     tab={
                       <span>
-                        <IconHistogram/>
+                        <IconHistogram />
                         {t('消耗分布')}
                       </span>
                     }
@@ -1463,7 +1486,7 @@ const Detail = (props) => {
                   <TabPane
                     tab={
                       <span>
-                        <IconPulse/>
+                        <IconPulse />
                         {t('消耗趋势')}
                       </span>
                     }
@@ -1472,7 +1495,7 @@ const Detail = (props) => {
                   <TabPane
                     tab={
                       <span>
-                        <IconPieChart2Stroked/>
+                        <IconPieChart2Stroked />
                         {t('调用次数分布')}
                       </span>
                     }
@@ -1481,7 +1504,7 @@ const Detail = (props) => {
                   <TabPane
                     tab={
                       <span>
-                        <IconHistogram/>
+                        <IconHistogram />
                         {t('调用次数排行')}
                       </span>
                     }
@@ -1490,7 +1513,7 @@ const Detail = (props) => {
                 </Tabs>
               </div>
             }
-            bodyStyle={{padding: 0}}
+            bodyStyle={{ padding: 0 }}
           >
             <div className="h-[32rem] p-2">
               {activeChartTab === '0' && (
@@ -1498,38 +1521,45 @@ const Detail = (props) => {
                   {(() => {
                     // 创建前10名的渲染项，如果数据不足则填充空项
                     const renderItems = [];
-                    
+
                     // 渲染实际数据
                     userRank.slice(0, 10).forEach((item, index) => {
                       const rank = index + 1;
                       const quotaAmount = parseInt(item.quota) / 500000;
-                      
+
                       // 定义排名样式
                       const getRankStyles = (rank) => {
                         switch (rank) {
                           case 1:
                             return {
-                              container: 'bg-gradient-to-br from-yellow-50 via-yellow-100 to-amber-50 border-2 border-yellow-200 shadow-lg transform hover:scale-[1.02]',
-                              badge: 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-md',
-                              amount: 'text-yellow-700 font-bold'
+                              container:
+                                'bg-gradient-to-br from-yellow-50 via-yellow-100 to-amber-50 border-2 border-yellow-200 shadow-lg transform hover:scale-[1.02]',
+                              badge:
+                                'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-md',
+                              amount: 'text-yellow-700 font-bold',
                             };
                           case 2:
                             return {
-                              container: 'bg-gradient-to-br from-gray-50 via-gray-100 to-slate-50 border-2 border-gray-200 shadow-lg transform hover:scale-[1.02]',
-                              badge: 'bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-md',
-                              amount: 'text-gray-700 font-bold'
+                              container:
+                                'bg-gradient-to-br from-gray-50 via-gray-100 to-slate-50 border-2 border-gray-200 shadow-lg transform hover:scale-[1.02]',
+                              badge:
+                                'bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-md',
+                              amount: 'text-gray-700 font-bold',
                             };
                           case 3:
                             return {
-                              container: 'bg-gradient-to-br from-orange-50 via-orange-100 to-amber-50 border-2 border-orange-200 shadow-lg transform hover:scale-[1.02]',
-                              badge: 'bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md',
-                              amount: 'text-orange-700 font-bold'
+                              container:
+                                'bg-gradient-to-br from-orange-50 via-orange-100 to-amber-50 border-2 border-orange-200 shadow-lg transform hover:scale-[1.02]',
+                              badge:
+                                'bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md',
+                              amount: 'text-orange-700 font-bold',
                             };
                           default:
                             return {
-                              container: 'bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transform hover:scale-[1.01]',
+                              container:
+                                'bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transform hover:scale-[1.01]',
                               badge: 'bg-gray-100 text-gray-700',
-                              amount: 'text-gray-900 font-semibold'
+                              amount: 'text-gray-900 font-semibold',
                             };
                         }
                       };
@@ -1546,7 +1576,7 @@ const Detail = (props) => {
                             <div className="flex-shrink-0 flex items-center justify-center w-8 h-8">
                               {getRankIcon(rank)}
                             </div>
-                            
+
                             {/* 用户头像和姓名 */}
                             <Avatar
                               size="small"
@@ -1556,7 +1586,7 @@ const Detail = (props) => {
                               {typeof item.username === 'string' &&
                                 item.username.slice(0, 1).toUpperCase()}
                             </Avatar>
-                            
+
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-gray-900 truncate">
                                 {item.username}
@@ -1570,23 +1600,25 @@ const Detail = (props) => {
                           <div className="flex items-center gap-3 flex-shrink-0">
                             {/* 消耗金额 */}
                             <div className="text-right">
-                              <p className={`text-lg font-semibold ${styles.amount}`}>
+                              <p
+                                className={`text-lg font-semibold ${styles.amount}`}
+                              >
                                 ¥{quotaAmount.toFixed(4)}
                               </p>
-                              <p className="text-xs text-gray-500">
-                                总消耗
-                              </p>
+                              <p className="text-xs text-gray-500">总消耗</p>
                             </div>
-                            
+
                             {/* 排名徽章 */}
-                            <div className={`px-3 py-1 rounded-full text-sm font-medium ${styles.badge}`}>
+                            <div
+                              className={`px-3 py-1 rounded-full text-sm font-medium ${styles.badge}`}
+                            >
                               #{rank}
                             </div>
                           </div>
                         </div>
                       );
                     });
-                    
+
                     // 如果数据不足10个，添加空白占位
                     const remainingSlots = 10 - userRank.length;
                     for (let i = 0; i < remainingSlots; i++) {
@@ -1598,9 +1630,14 @@ const Detail = (props) => {
                         >
                           <div className="flex items-center gap-4 flex-1 min-w-0">
                             <div className="flex-shrink-0 flex items-center justify-center w-8 h-8">
-                              <span className="text-lg font-bold text-gray-400">#{rank}</span>
+                              <span className="text-lg font-bold text-gray-400">
+                                #{rank}
+                              </span>
                             </div>
-                            <Avatar size="small" className="flex-shrink-0 bg-gray-200">
+                            <Avatar
+                              size="small"
+                              className="flex-shrink-0 bg-gray-200"
+                            >
                               <span className="text-gray-400">-</span>
                             </Avatar>
                             <div className="flex-1 min-w-0">
@@ -1617,9 +1654,7 @@ const Detail = (props) => {
                               <p className="text-lg font-semibold text-gray-400">
                                 ¥0.00
                               </p>
-                              <p className="text-xs text-gray-400">
-                                总消耗
-                              </p>
+                              <p className="text-xs text-gray-400">总消耗</p>
                             </div>
                             <div className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-400">
                               #{rank}
@@ -1628,23 +1663,23 @@ const Detail = (props) => {
                         </div>
                       );
                     }
-                    
+
                     return renderItems;
                   })()}
                 </div>
               )}
 
               {activeChartTab === '1' && (
-                <VChart spec={spec_line} option={CHART_CONFIG}/>
+                <VChart spec={spec_line} option={CHART_CONFIG} />
               )}
               {activeChartTab === '2' && (
-                <VChart spec={spec_model_line} option={CHART_CONFIG}/>
+                <VChart spec={spec_model_line} option={CHART_CONFIG} />
               )}
               {activeChartTab === '3' && (
-                <VChart spec={spec_pie} option={CHART_CONFIG}/>
+                <VChart spec={spec_pie} option={CHART_CONFIG} />
               )}
               {activeChartTab === '4' && (
-                <VChart spec={spec_rank_bar} option={CHART_CONFIG}/>
+                <VChart spec={spec_rank_bar} option={CHART_CONFIG} />
               )}
             </div>
           </Card>
@@ -1655,11 +1690,11 @@ const Detail = (props) => {
               className="bg-gray-50 border-0 !rounded-2xl"
               title={
                 <div className={FLEX_CENTER_GAP2}>
-                  <Server size={16}/>
+                  <Server size={16} />
                   {t('API信息')}
                 </div>
               }
-              bodyStyle={{padding: 0}}
+              bodyStyle={{ padding: 0 }}
             >
               <div className="card-content-container">
                 <div
@@ -1686,7 +1721,7 @@ const Detail = (props) => {
                               </span>
                               <div className="flex items-center gap-1 mt-1 lg:mt-0">
                                 <Tag
-                                  prefixIcon={<Gauge size={12}/>}
+                                  prefixIcon={<Gauge size={12} />}
                                   size="small"
                                   color="white"
                                   shape="circle"
@@ -1696,7 +1731,7 @@ const Detail = (props) => {
                                   {t('测速')}
                                 </Tag>
                                 <Tag
-                                  prefixIcon={<ExternalLink size={12}/>}
+                                  prefixIcon={<ExternalLink size={12} />}
                                   size="small"
                                   color="white"
                                   shape="circle"
@@ -1724,14 +1759,14 @@ const Detail = (props) => {
                             </div>
                           </div>
                         </div>
-                        <Divider/>
+                        <Divider />
                       </>
                     ))
                   ) : (
                     <div className="flex justify-center items-center py-8">
                       <Empty
                         image={
-                          <IllustrationConstruction style={ILLUSTRATION_SIZE}/>
+                          <IllustrationConstruction style={ILLUSTRATION_SIZE} />
                         }
                         darkModeImage={
                           <IllustrationConstructionDark
@@ -1746,7 +1781,7 @@ const Detail = (props) => {
                 </div>
                 <div
                   className="card-content-fade-indicator"
-                  style={{opacity: showApiScrollHint ? 1 : 0}}
+                  style={{ opacity: showApiScrollHint ? 1 : 0 }}
                 />
               </div>
             </Card>
@@ -1766,7 +1801,7 @@ const Detail = (props) => {
                 title={
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 w-full">
                     <div className="flex items-center gap-2">
-                      <Bell size={16}/>
+                      <Bell size={16} />
                       {t('系统公告')}
                       <Tag color="white" shape="circle">
                         {t('显示最新20条')}
@@ -1799,7 +1834,7 @@ const Detail = (props) => {
                     </div>
                   </div>
                 }
-                bodyStyle={{padding: 0}}
+                bodyStyle={{ padding: 0 }}
               >
                 <div className="card-content-container">
                   <div
@@ -1861,7 +1896,7 @@ const Detail = (props) => {
                   </div>
                   <div
                     className="card-content-fade-indicator"
-                    style={{opacity: showAnnouncementScrollHint ? 1 : 0}}
+                    style={{ opacity: showAnnouncementScrollHint ? 1 : 0 }}
                   />
                 </div>
               </Card>
@@ -1874,11 +1909,11 @@ const Detail = (props) => {
                 className="shadow-sm !rounded-2xl lg:col-span-1"
                 title={
                   <div className={FLEX_CENTER_GAP2}>
-                    <HelpCircle size={16}/>
+                    <HelpCircle size={16} />
                     {t('常见问答')}
                   </div>
                 }
-                bodyStyle={{padding: 0}}
+                bodyStyle={{ padding: 0 }}
               >
                 <div className="card-content-container">
                   <div
@@ -1891,8 +1926,8 @@ const Detail = (props) => {
                     {faqData.length > 0 ? (
                       <Collapse
                         accordion
-                        expandIcon={<IconPlus/>}
-                        collapseIcon={<IconMinus/>}
+                        expandIcon={<IconPlus />}
+                        collapseIcon={<IconMinus />}
                       >
                         {faqData.map((item, index) => (
                           <Collapse.Panel
@@ -1931,7 +1966,7 @@ const Detail = (props) => {
                   </div>
                   <div
                     className="card-content-fade-indicator"
-                    style={{opacity: showFaqScrollHint ? 1 : 0}}
+                    style={{ opacity: showFaqScrollHint ? 1 : 0 }}
                   />
                 </div>
               </Card>
@@ -1945,11 +1980,11 @@ const Detail = (props) => {
                 title={
                   <div className="flex items-center justify-between w-full gap-2">
                     <div className="flex items-center gap-2">
-                      <Gauge size={16}/>
+                      <Gauge size={16} />
                       {t('服务可用性')}
                     </div>
                     <Button
-                      icon={<IconRefresh/>}
+                      icon={<IconRefresh />}
                       onClick={loadUptimeData}
                       loading={uptimeLoading}
                       size="small"
@@ -1959,7 +1994,7 @@ const Detail = (props) => {
                     />
                   </div>
                 }
-                bodyStyle={{padding: 0}}
+                bodyStyle={{ padding: 0 }}
               >
                 {/* 内容区域 */}
                 <div className="relative">
@@ -1981,7 +2016,7 @@ const Detail = (props) => {
                           </div>
                           <div
                             className="card-content-fade-indicator"
-                            style={{opacity: showUptimeScrollHint ? 1 : 0}}
+                            style={{ opacity: showUptimeScrollHint ? 1 : 0 }}
                           />
                         </div>
                       ) : (
@@ -2006,7 +2041,7 @@ const Detail = (props) => {
                               <TabPane
                                 tab={
                                   <span className="flex items-center gap-2">
-                                    <Gauge size={14}/>
+                                    <Gauge size={14} />
                                     {group.categoryName}
                                     <Tag
                                       color={
@@ -2085,7 +2120,7 @@ const Detail = (props) => {
                         <div key={index} className="flex items-center gap-1">
                           <div
                             className="w-2 h-2 rounded-full"
-                            style={{backgroundColor: legend.color}}
+                            style={{ backgroundColor: legend.color }}
                           />
                           <span className="text-gray-600">{legend.label}</span>
                         </div>

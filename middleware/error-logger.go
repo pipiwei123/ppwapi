@@ -104,6 +104,8 @@ func ErrorLogMiddleware() gin.HandlerFunc {
 				other["request_params"] = requestParams
 			}
 
+			// 增加一些令牌相关的调试信息
+
 			// 添加错误响应内容
 			if responseBodyStr != "" {
 				// 尝试解析响应为JSON

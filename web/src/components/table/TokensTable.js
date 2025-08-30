@@ -141,16 +141,17 @@ const TokensTable = () => {
         if (record.unlimited_quota) {
           return (
             <Tooltip
-            content={
-              <div className="text-xs">
-                <div>
-                  {t('已用额度')}: {renderQuota(used)}
+              content={
+                <div className="text-xs">
+                  <div>
+                    {t('已用额度')}: {renderQuota(used)}
+                  </div>
                 </div>
-              </div>
-            }
-          >
-            {content}
-          </Tooltip>)
+              }
+            >
+              {content}
+            </Tooltip>
+          );
         }
 
         return (

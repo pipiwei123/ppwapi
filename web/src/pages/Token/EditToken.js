@@ -20,7 +20,8 @@ import {
   Avatar,
   Form,
   Col,
-  Row, Input,
+  Row,
+  Input,
 } from '@douyinfe/semi-ui';
 import {
   IconCreditCard,
@@ -282,12 +283,13 @@ const EditToken = (props) => {
       localInputs.model_limits = localInputs.model_limits.join(',');
       localInputs.model_limits_enabled = localInputs.model_limits.length > 0;
 
-      // 处理多分组数据
+      // 处理分组数据 - 确保 group_info 始终被正确设置
       if (
         localInputs.is_multi_group &&
         Array.isArray(localInputs.multi_group_list) &&
         localInputs.multi_group_list.length > 0
       ) {
+        // 多分组模式
         localInputs.group_info = {
           is_multi_group: true,
           multi_group_size: localInputs.multi_group_list.length,
@@ -298,6 +300,7 @@ const EditToken = (props) => {
         // 将多分组用逗号连接存储到group字段
         localInputs.group = localInputs.multi_group_list.join(',');
       } else {
+        // 单分组模式 - 无论从多分组切换还是本身就是单分组，都要重置 group_info
         localInputs.group_info = {
           is_multi_group: false,
           multi_group_size: 0,
@@ -305,7 +308,16 @@ const EditToken = (props) => {
           multi_group_status_list: {},
           current_group_index: 0,
         };
-        // 单分组模式保持原格式
+
+        console.log(values)
+        console.log(localInputs)
+
+       if (localInputs.group && localInputs.group instanceof Array) {
+          localInputs.group = localInputs.group[0];
+        } else if (localInputs.group && localInputs.group.includes(',')) {
+          localInputs.group = localInputs.group.split(',')[0];
+        }
+        // 如果 group 字段为空或未选择，保持为空字符串（使用用户默认分组）
       }
 
       let res = await API.put(`/api/token/`, {
@@ -346,12 +358,13 @@ const EditToken = (props) => {
         localInputs.model_limits = localInputs.model_limits.join(',');
         localInputs.model_limits_enabled = localInputs.model_limits.length > 0;
 
-        // 处理多分组数据
+        // 处理分组数据 - 确保 group_info 始终被正确设置
         if (
           localInputs.is_multi_group &&
           Array.isArray(localInputs.multi_group_list) &&
           localInputs.multi_group_list.length > 0
         ) {
+          // 多分组模式
           localInputs.group_info = {
             is_multi_group: true,
             multi_group_size: localInputs.multi_group_list.length,
@@ -362,6 +375,7 @@ const EditToken = (props) => {
           // 将多分组用逗号连接存储到group字段
           localInputs.group = localInputs.multi_group_list.join(',');
         } else {
+          // 单分组模式 - 确保 group_info 正确设置
           localInputs.group_info = {
             is_multi_group: false,
             multi_group_size: 0,
@@ -369,7 +383,14 @@ const EditToken = (props) => {
             multi_group_status_list: {},
             current_group_index: 0,
           };
-          // 单分组模式保持原格式
+          // 单分组模式下，确保 group 字段是单个分组而不是逗号分隔的字符串
+          // 新建模式下通常不会有这个问题，但为了保险起见还是检查一下
+
+          if (localInputs.group && localInputs.group.includes(',')) {
+            // 如果意外出现逗号分隔的情况，使用第一个分组
+            localInputs.group = localInputs.group.split(',')[0];
+          }
+          // localInputs.group 字段保持用户选择的单分组值
         }
 
         let res = await API.post(`/api/token/`, localInputs);
@@ -1058,12 +1079,24 @@ const EditToken = (props) => {
                       </div>
                       <div className="mt-2">
                         <Space wrap>
-                          <Button size="small" onClick={() => setBalance(1)}>1</Button>
-                          <Button size="small" onClick={() => setBalance(5)}>5</Button>
-                          <Button size="small" onClick={() => setBalance(10)}>10</Button>
-                          <Button size="small" onClick={() => setBalance(50)}>50</Button>
-                          <Button size="small" onClick={() => setBalance(100)}>100</Button>
-                          <Button size="small" onClick={() => setBalance(1000)}>1000</Button>
+                          <Button size="small" onClick={() => setBalance(1)}>
+                            1
+                          </Button>
+                          <Button size="small" onClick={() => setBalance(5)}>
+                            5
+                          </Button>
+                          <Button size="small" onClick={() => setBalance(10)}>
+                            10
+                          </Button>
+                          <Button size="small" onClick={() => setBalance(50)}>
+                            50
+                          </Button>
+                          <Button size="small" onClick={() => setBalance(100)}>
+                            100
+                          </Button>
+                          <Button size="small" onClick={() => setBalance(1000)}>
+                            1000
+                          </Button>
                         </Space>
                       </div>
                     </Form.Slot>
