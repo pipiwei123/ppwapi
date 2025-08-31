@@ -289,6 +289,11 @@ func preConsumeQuota(c *gin.Context, preConsumedQuota int, relayInfo *relaycommo
 	if userQuota-preConsumedQuota < 0 {
 		return 0, 0, types.NewErrorWithStatusCode(fmt.Errorf("pre-consume quota failed, user quota: %s, need quota: %s", common.FormatQuota(userQuota), common.FormatQuota(preConsumedQuota)), types.ErrorCodeInsufficientUserQuota, http.StatusForbidden)
 	}
+	// 这里针对超大Quota校验余额
+	if (preConsumedQuota > 200000 && userQuota < 20*500000) || (preConsumedQuota > 800000 && userQuota < 80*500000) || (preConsumedQuota > 5000000 && userQuota < 500*500000) {
+		return 0, 0, types.NewErrorWithStatusCode(fmt.Errorf("user quota %s is too low for large request %s, please recharge more quota", common.FormatQuota(userQuota), common.FormatQuota(preConsumedQuota)), types.ErrorCodeInsufficientUserQuota, http.StatusForbidden)
+	}
+
 	relayInfo.UserQuota = userQuota
 	if userQuota > 100*preConsumedQuota {
 		// 用户额度充足，判断令牌额度是否充足
