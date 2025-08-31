@@ -277,7 +277,15 @@ func GetUserLogs(userId int, logType int, startTimestamp int64, endTimestamp int
 	var tx *gorm.DB
 	if logType == LogTypeUnknown {
 		tx = LOG_DB.Where("logs.user_id = ?", userId)
+		// 如果配置禁用了错误日志对用户的可见性，则排除错误日志
+		if !common.LogErrorVisibleToUserEnabled {
+			tx = tx.Where("logs.type != ?", LogTypeError)
+		}
 	} else {
+		// 如果配置禁用了错误日志对用户的可见性，且用户直接查询错误日志，返回空结果
+		if !common.LogErrorVisibleToUserEnabled && logType == LogTypeError {
+			return []*Log{}, 0, nil
+		}
 		tx = LOG_DB.Where("logs.user_id = ? and logs.type = ?", userId, logType)
 	}
 
