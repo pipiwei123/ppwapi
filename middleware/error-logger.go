@@ -97,12 +97,12 @@ func ErrorLogMiddleware() gin.HandlerFunc {
 			other["middleware"] = "error_logger"
 			other["request_method"] = c.Request.Method
 			other["request_path"] = c.Request.URL.Path
-			if c.Request.URL.RawQuery != "" {
-				other["request_query"] = c.Request.URL.RawQuery
-			}
-			if requestParams != nil {
-				other["request_params"] = requestParams
-			}
+			//if c.Request.URL.RawQuery != "" {
+			//	other["request_query"] = c.Request.URL.RawQuery
+			//}
+			//if requestParams != nil {
+			//	other["request_params"] = requestParams
+			//}
 
 			// 增加一些令牌相关的调试信息
 
