@@ -573,4 +573,16 @@ func postConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo,
 		Group:            relayInfo.UsingGroup,
 		Other:            other,
 	})
+
+	// 判断是否为 DeepSeek 模型
+	isDeepSeek := strings.HasPrefix(strings.ToLower(modelName), "deepseek-") ||
+		strings.Contains(strings.ToLower(modelName), "deepseek")
+
+	if isDeepSeek {
+		frtValue := int64(0)
+		if v, ok := other["frt"].(float64); ok {
+			frtValue = int64(v)
+		}
+		model.RecordTimeoutStats(relayInfo.ChannelId, modelName, frtValue, int(useTimeSeconds))
+	}
 }

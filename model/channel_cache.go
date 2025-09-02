@@ -138,6 +138,11 @@ func getRandomSatisfiedChannel(group string, model string, retry int) (*Channel,
 
 	if len(channels) == 1 {
 		if channel, ok := channelsIDM[channels[0]]; ok {
+			// 即使是单个渠道，也要检查是否被临时禁用
+			// 但如果被禁用了，仍然返回该渠道（因为没有其他选择）
+			if IsChannelTempDisabled(channel.Id, model) && common.DebugEnabled {
+				common.SysLog(fmt.Sprintf("唯一可用渠道 #%d 被临时禁用，但仍然使用，分组: %s, 模型: %s", channel.Id, group, model))
+			}
 			return channel, nil
 		}
 		return nil, fmt.Errorf("数据库一致性错误，渠道# %d 不存在，请联系管理员修复", channels[0])
@@ -174,18 +179,35 @@ func getRandomSatisfiedChannel(group string, model string, retry int) (*Channel,
 		}
 	}
 
+	// 先尝试从未被临时禁用的渠道中选择
+	var enabledChannels []*Channel
+	for _, channel := range targetChannels {
+		if !IsChannelTempDisabled(channel.Id, model) {
+			enabledChannels = append(enabledChannels, channel)
+		}
+	}
+
+	// 如果所有渠道都被禁用，则使用原始列表（忽略禁用状态）
+	channelsToUse := enabledChannels
+	if len(enabledChannels) == 0 {
+		channelsToUse = targetChannels
+		if common.DebugEnabled {
+			common.SysLog(fmt.Sprintf("所有渠道都被临时禁用，忽略禁用状态进行选择，分组: %s, 模型: %s", group, model))
+		}
+	}
+
 	// 平滑系数
 	smoothingFactor := 10
 	// Calculate the total weight of all channels up to endIdx
 	totalWeight := 0
-	for _, channel := range targetChannels {
+	for _, channel := range channelsToUse {
 		totalWeight += channel.GetWeight() + smoothingFactor
 	}
 	// Generate a random value in the range [0, totalWeight)
 	randomWeight := rand.Intn(totalWeight)
 
 	// Find a channel based on its weight
-	for _, channel := range targetChannels {
+	for _, channel := range channelsToUse {
 		randomWeight -= channel.GetWeight() + smoothingFactor
 		if randomWeight < 0 {
 			return channel, nil

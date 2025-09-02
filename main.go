@@ -218,5 +218,9 @@ func InitResources() error {
 	if err != nil {
 		return err
 	}
+
+	// Initialize timeout monitor
+	model.InitTimeoutMonitor()
+
 	return nil
 }

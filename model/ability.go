@@ -120,14 +120,31 @@ func GetRandomSatisfiedChannel(group string, model string, retry int) (*Channel,
 	}
 	channel := Channel{}
 	if len(abilities) > 0 {
+		// 先尝试从未被临时禁用的渠道中选择
+		var enabledAbilities []Ability
+		for _, ability_ := range abilities {
+			if !IsChannelTempDisabled(ability_.ChannelId, model) {
+				enabledAbilities = append(enabledAbilities, ability_)
+			}
+		}
+
+		// 如果所有渠道都被禁用，则使用原始列表（忽略禁用状态）
+		abilitiesToUse := enabledAbilities
+		if len(enabledAbilities) == 0 {
+			abilitiesToUse = abilities
+			if common.DebugEnabled {
+				common.SysLog(fmt.Sprintf("所有渠道都被临时禁用，忽略禁用状态进行选择，分组: %s, 模型: %s", group, model))
+			}
+		}
+
 		// Randomly choose one
 		weightSum := uint(0)
-		for _, ability_ := range abilities {
+		for _, ability_ := range abilitiesToUse {
 			weightSum += ability_.Weight + 10
 		}
 		// Randomly choose one
 		weight := common.GetRandomInt(int(weightSum))
-		for _, ability_ := range abilities {
+		for _, ability_ := range abilitiesToUse {
 			weight -= int(ability_.Weight) + 10
 			//log.Printf("weight: %d, ability weight: %d", weight, *ability_.Weight)
 			if weight <= 0 {
