@@ -448,6 +448,8 @@ export function getChannelIcon(channelType) {
       return <Kling />;
     case 51: // 即梦 Jimeng
       return <Jimeng.Color size={iconSize} />;
+    case 53: // Flux
+      return <Flux size={iconSize} />;
     case 8: // 自定义渠道
     case 22: // 知识库：FastGPT
       return <FastGPT.Color size={iconSize} />;

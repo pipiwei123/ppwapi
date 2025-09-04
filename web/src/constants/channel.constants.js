@@ -140,6 +140,11 @@ export const CHANNEL_OPTIONS = [
     color: 'purple',
     label: 'Veo3',
   },
+  {
+    value: 53,
+    color: 'purple',
+    label: 'Flux',
+  },
 ];
 
 export const MODEL_TABLE_PAGE_SIZE = 10;

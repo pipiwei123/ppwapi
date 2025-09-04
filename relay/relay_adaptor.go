@@ -14,6 +14,7 @@ import (
 	"one-api/relay/channel/coze"
 	"one-api/relay/channel/deepseek"
 	"one-api/relay/channel/dify"
+	"one-api/relay/channel/flux"
 	"one-api/relay/channel/gemini"
 	"one-api/relay/channel/jimeng"
 	"one-api/relay/channel/jina"
@@ -97,6 +98,8 @@ func GetAdaptor(apiType int) channel.Adaptor {
 		return &coze.Adaptor{}
 	case constant.APITypeJimeng:
 		return &jimeng.Adaptor{}
+	case constant.APITypeFlux:
+		return &flux.Adaptor{}
 	}
 	return nil
 }
