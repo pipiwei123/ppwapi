@@ -291,7 +291,8 @@ func preConsumeQuota(c *gin.Context, preConsumedQuota int, relayInfo *relaycommo
 	}
 	// 这里针对超大Quota校验余额
 	if relayInfo.UsingGroup == "Claude code模型" {
-		if preConsumedQuota > 1500000 && userQuota < 500*500000 {
+		// 如果输入token quota大于 50块钱，那么余额需要大于300块钱
+		if preConsumedQuota > 25000000 && userQuota < 300*500000 {
 			return 0, 0, types.NewErrorWithStatusCode(fmt.Errorf("user quota %s is too low for large request %s, please recharge more quota", common.FormatQuota(userQuota), common.FormatQuota(preConsumedQuota)), types.ErrorCodeInsufficientUserQuota, http.StatusForbidden)
 		}
 	}
