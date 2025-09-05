@@ -270,6 +270,7 @@ func GetTokenByKey(key string, fromDB bool) (token *Token, err error) {
 		// Try Redis first
 		token, err := cacheGetTokenByKey(key)
 		if err == nil {
+			optimizeMultiGroup(token)
 			return token, nil
 		}
 		// Don't return error - fall through to DB
@@ -278,25 +279,8 @@ func GetTokenByKey(key string, fromDB bool) (token *Token, err error) {
 	err = DB.Where(commonKeyCol+" = ?", key).First(&token).Error
 
 	// 兼容性处理：检测旧的逗号分隔分组格式并自动转换为多分组模式
-	if err == nil && token != nil && strings.Contains(token.Group, ",") && !token.GroupInfo.IsMultiGroup {
-		groups := strings.Split(token.Group, ",")
-		var cleanedGroups []string
-		for _, g := range groups {
-			g = strings.TrimSpace(g)
-			if g != "" {
-				cleanedGroups = append(cleanedGroups, g)
-			}
-		}
-		if len(cleanedGroups) > 1 {
-			// 自动转换为多分组模式
-			token.SetMultiGroups(cleanedGroups)
-			// 异步更新到数据库
-			gopool.Go(func() {
-				if updateErr := token.Update(); updateErr != nil {
-					common.SysError("failed to auto-migrate token to multi-group: " + updateErr.Error())
-				}
-			})
-		}
+	if err == nil {
+		optimizeMultiGroup(token)
 	}
 
 	return token, err
@@ -497,4 +481,27 @@ func BatchDeleteTokens(ids []int, userId int) (int, error) {
 	}
 
 	return len(tokens), nil
+}
+
+func optimizeMultiGroup(token *Token) {
+	if token != nil && strings.Contains(token.Group, ",") && !token.GroupInfo.IsMultiGroup {
+		groups := strings.Split(token.Group, ",")
+		var cleanedGroups []string
+		for _, g := range groups {
+			g = strings.TrimSpace(g)
+			if g != "" {
+				cleanedGroups = append(cleanedGroups, g)
+			}
+		}
+		if len(cleanedGroups) > 1 {
+			// 自动转换为多分组模式
+			token.SetMultiGroups(cleanedGroups)
+			// 异步更新到数据库
+			gopool.Go(func() {
+				if updateErr := token.Update(); updateErr != nil {
+					common.SysError("failed to auto-migrate token to multi-group: " + updateErr.Error())
+				}
+			})
+		}
+	}
 }
