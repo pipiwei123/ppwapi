@@ -56,6 +56,9 @@ type Token struct {
 	Group              string         `json:"group" gorm:"default:''"`     // 单分组模式（向后兼容）
 	GroupInfo          TokenGroupInfo `json:"group_info" gorm:"type:json"` // 多分组信息
 	DeletedAt          gorm.DeletedAt `gorm:"index"`
+
+	// 附加信息，不存入数据库
+	GroupInfoJson []byte `json:"-"`
 }
 
 func (token *Token) Clean() {

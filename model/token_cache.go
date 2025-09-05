@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
 	"one-api/common"
 	"one-api/constant"
@@ -10,6 +11,16 @@ import (
 func cacheSetToken(token Token) error {
 	key := common.GenerateHMAC(token.Key)
 	token.Clean()
+
+	// 将GroupInfo 转为json
+
+	if len(token.GroupInfo.MultiGroupList) > 0 {
+		groupInfoJson, err := json.Marshal(token.GroupInfoJson)
+		if err == nil {
+			token.GroupInfoJson = groupInfoJson
+		}
+	}
+
 	err := common.RedisHSetObj(fmt.Sprintf("token:%s", key), &token, time.Duration(common.RedisKeyCacheSeconds())*time.Second)
 	if err != nil {
 		return err
@@ -60,5 +71,12 @@ func cacheGetTokenByKey(key string) (*Token, error) {
 		return nil, err
 	}
 	token.Key = key
+
+	if token.GroupInfoJson != nil {
+		if err = json.Unmarshal(token.GroupInfoJson, &token.GroupInfo); err != nil {
+			return nil, err
+		}
+	}
+
 	return &token, nil
 }
