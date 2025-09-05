@@ -15,9 +15,9 @@ func cacheSetToken(token Token) error {
 	// 将GroupInfo 转为json
 
 	if len(token.GroupInfo.MultiGroupList) > 0 {
-		groupInfoJson, err := json.Marshal(token.GroupInfoJson)
+		groupInfoSerialization, err := json.Marshal(token.GroupInfo)
 		if err == nil {
-			token.GroupInfoJson = groupInfoJson
+			token.GroupInfoSerialization = string(groupInfoSerialization)
 		}
 	}
 
@@ -72,8 +72,8 @@ func cacheGetTokenByKey(key string) (*Token, error) {
 	}
 	token.Key = key
 
-	if token.GroupInfoJson != nil {
-		if err = json.Unmarshal(token.GroupInfoJson, &token.GroupInfo); err != nil {
+	if token.GroupInfoSerialization != "" {
+		if err = json.Unmarshal([]byte(token.GroupInfoSerialization), &token.GroupInfo); err != nil {
 			return nil, err
 		}
 	}

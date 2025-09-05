@@ -58,7 +58,7 @@ type Token struct {
 	DeletedAt          gorm.DeletedAt `gorm:"index"`
 
 	// 附加信息，不存入数据库
-	GroupInfoJson []byte `json:"-"`
+	GroupInfoSerialization string `json:"-"`
 }
 
 func (token *Token) Clean() {
