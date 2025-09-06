@@ -290,7 +290,7 @@ func preConsumeQuota(c *gin.Context, preConsumedQuota int, relayInfo *relaycommo
 		return 0, 0, types.NewErrorWithStatusCode(fmt.Errorf("pre-consume quota failed, user quota: %s, need quota: %s", common.FormatQuota(userQuota), common.FormatQuota(preConsumedQuota)), types.ErrorCodeInsufficientUserQuota, http.StatusForbidden)
 	}
 	// 这里针对超大Quota校验余额
-	if relayInfo.UsingGroup == "Claude code模型" {
+	if relayInfo.UsingGroup == "Anthropic模型" || relayInfo.UsingGroup == "Openai模型" {
 		// 如果输入token quota大于 50块钱，那么余额需要大于300块钱
 		if preConsumedQuota > 25000000 && userQuota < 300*500000 {
 			return 0, 0, types.NewErrorWithStatusCode(fmt.Errorf("user quota %s is too low for large request %s, please recharge more quota", common.FormatQuota(userQuota), common.FormatQuota(preConsumedQuota)), types.ErrorCodeInsufficientUserQuota, http.StatusForbidden)
