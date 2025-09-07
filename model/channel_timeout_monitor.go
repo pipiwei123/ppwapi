@@ -21,9 +21,9 @@ type ChannelModelTimeout struct {
 // ChannelTimeoutConfig 多渠道超时配置结构
 type ChannelTimeoutConfig map[string]map[string]ChannelModelTimeout // modelName -> channelId -> config
 
-// MinuteStats 每分钟统计数据
-type MinuteStats struct {
-	Timestamp    time.Time // 分钟时间戳
+// IntervalStats 每30秒间隔统计数据
+type IntervalStats struct {
+	Timestamp    time.Time // 30秒间隔时间戳
 	TotalCount   int64     // 总请求次数（用于UseTime统计）
 	FRTCount     int64     // 有效FRT次数（负数FRT不计入）
 	TotalFRT     int64     // 总FRT时间(毫秒)
@@ -32,12 +32,12 @@ type MinuteStats struct {
 
 // ChannelTimeoutMonitor 渠道超时监控
 type ChannelTimeoutMonitor struct {
-	ChannelId     int
-	ModelName     string        // 模型名称
-	Stats         []MinuteStats // 滑动窗口，最多5个元素(5分钟)
-	CurrentMinute time.Time     // 当前统计分钟
-	mu            sync.RWMutex
-	LastDisabled  time.Time // 上次被禁用的时间
+	ChannelId       int
+	ModelName       string          // 模型名称
+	Stats           []IntervalStats // 滑动窗口，最多10个元素(5分钟)
+	CurrentInterval time.Time       // 当前统计30秒间隔
+	mu              sync.RWMutex
+	LastDisabled    time.Time // 上次被禁用的时间
 }
 
 // DisabledChannelInfo 临时禁用的渠道信息
@@ -110,15 +110,16 @@ func (m *ChannelTimeoutMonitor) AddRequest(frtMs int64, useTimeSeconds int, chan
 	defer m.mu.Unlock()
 
 	now := time.Now()
-	minute := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 0, 0, now.Location())
+	// 截断到30秒间隔
+	second30 := now.Truncate(30 * time.Second)
 
-	// 如果是新的分钟，滑动窗口
-	if minute.After(m.CurrentMinute) {
-		m.slideWindow(minute, channel.TimeWindow)
-		m.CurrentMinute = minute
+	// 如果是新的30秒间隔，滑动窗口
+	if second30.After(m.CurrentInterval) {
+		m.slideWindow(second30, channel.TimeWindow)
+		m.CurrentInterval = second30
 	}
 
-	// 更新当前分钟统计
+	// 更新当前30秒间隔统计
 	if len(m.Stats) > 0 {
 		current := &m.Stats[len(m.Stats)-1]
 		current.TotalCount++
@@ -133,15 +134,15 @@ func (m *ChannelTimeoutMonitor) AddRequest(frtMs int64, useTimeSeconds int, chan
 }
 
 // slideWindow 滑动窗口管理
-func (m *ChannelTimeoutMonitor) slideWindow(newMinute time.Time, windowSeconds int) {
-	maxMinutes := (windowSeconds + 59) / 60 // 向上取整到分钟数
-	if maxMinutes > 5 {                     // 限制最大5分钟
-		maxMinutes = 5
+func (m *ChannelTimeoutMonitor) slideWindow(newInterval time.Time, windowSeconds int) {
+	maxIntervals := (windowSeconds + 29) / 30 // 向上取整到30秒间隔数
+	if maxIntervals > 10 {                    // 限制最多10个30秒间隔(5分钟)
+		maxIntervals = 10
 	}
 
 	// 创建新的统计条目
-	newStat := MinuteStats{
-		Timestamp: newMinute,
+	newStat := IntervalStats{
+		Timestamp: newInterval,
 	}
 
 	// 如果还没有统计或者是第一次
@@ -151,10 +152,10 @@ func (m *ChannelTimeoutMonitor) slideWindow(newMinute time.Time, windowSeconds i
 	}
 
 	// 滑动窗口：移除过期数据，添加新数据
-	cutoff := newMinute.Add(-time.Duration(windowSeconds) * time.Second)
+	cutoff := newInterval.Add(-time.Duration(windowSeconds) * time.Second)
 
 	// 过滤保留有效数据
-	validStats := make([]MinuteStats, 0, maxMinutes)
+	validStats := make([]IntervalStats, 0, maxIntervals)
 	for _, stat := range m.Stats {
 		if stat.Timestamp.After(cutoff) {
 			validStats = append(validStats, stat)
@@ -165,8 +166,8 @@ func (m *ChannelTimeoutMonitor) slideWindow(newMinute time.Time, windowSeconds i
 	validStats = append(validStats, newStat)
 
 	// 如果超过最大长度，移除最旧的
-	if len(validStats) > maxMinutes {
-		validStats = validStats[len(validStats)-maxMinutes:]
+	if len(validStats) > maxIntervals {
+		validStats = validStats[len(validStats)-maxIntervals:]
 	}
 
 	m.Stats = validStats
@@ -210,7 +211,7 @@ func RecordTimeoutStats(channelId int, modelName string, frtMs int64, useTimeSec
 	value, _ := channelMonitors.LoadOrStore(key, &ChannelTimeoutMonitor{
 		ChannelId: channelId,
 		ModelName: modelName,
-		Stats:     make([]MinuteStats, 0, 5),
+		Stats:     make([]IntervalStats, 0, 10),
 	})
 	monitor := value.(*ChannelTimeoutMonitor)
 
@@ -248,7 +249,7 @@ func scanAndDisableTimeoutChannels() {
 
 		// 检查是否有足够的数据进行判断
 		monitor.mu.RLock()
-		hasValidData := len(monitor.Stats) > 0 && !monitor.CurrentMinute.IsZero()
+		hasValidData := len(monitor.Stats) > 0 && !monitor.CurrentInterval.IsZero()
 
 		// 获取该渠道的特定配置
 		channelConfig := getChannelTimeoutConfig(monitor.ChannelId, monitor.ModelName)
@@ -306,10 +307,11 @@ func scanAndDisableTimeoutChannels() {
 			// 记录禁用时间并清除统计
 			monitor.mu.Lock()
 			monitor.LastDisabled = time.Now()
-			monitor.Stats = make([]MinuteStats, 0, 5)
+			monitor.Stats = make([]IntervalStats, 0, 10)
 			monitor.mu.Unlock()
 
 			disabledCount++
+			RecordLog(0, LogTypeSystem, fmt.Sprintf("渠道 #%d 的模型 %s 因响应超时被临时禁用: %s (恢复时间: %v)", monitor.ChannelId, monitor.ModelName, reason, disabledInfo.Duration))
 			common.SysLog(fmt.Sprintf("渠道 #%d 的模型 %s 因响应超时被临时禁用: %s (恢复时间: %v)", monitor.ChannelId, monitor.ModelName, reason, disabledInfo.Duration))
 		}
 
@@ -323,7 +325,7 @@ func scanAndDisableTimeoutChannels() {
 
 // startTimeoutScanner 启动超时扫描器
 func startTimeoutScanner() {
-	ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {
@@ -370,7 +372,7 @@ func startMonitorCleaner() {
 
 // cleanInactiveMonitors 清理无活动的监控器
 func cleanInactiveMonitors() {
-	cutoff := time.Now().Add(-15 * time.Minute)
+	cutoff := time.Now().Add(-15 * time.Minute) // 15分钟无活动后清理
 	cleanedCount := 0
 
 	channelMonitors.Range(func(key, value interface{}) bool {
@@ -415,6 +417,7 @@ func IsChannelTempDisabled(channelId int, modelName string) bool {
 		// 已过期，移除并返回false
 		disabledChannels.Delete(key)
 		common.SysLog(fmt.Sprintf("渠道 #%d 的模型 %s 临时禁用已过期，恢复可用", channelId, modelName))
+		RecordLog(0, LogTypeSystem, fmt.Sprintf("渠道 #%d 的模型 %s 临时禁用已过期，恢复可用", channelId, modelName))
 		return false
 	}
 
@@ -423,7 +426,7 @@ func IsChannelTempDisabled(channelId int, modelName string) bool {
 
 // startRecoveryChecker 启动恢复检查器
 func startRecoveryChecker() {
-	ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {
@@ -441,6 +444,7 @@ func checkExpiredDisabledChannels() {
 			disabledChannels.Delete(key)
 			expiredCount++
 			common.SysLog(fmt.Sprintf("渠道 #%d 的模型 %s 临时禁用已过期，自动恢复可用", info.ChannelId, info.ModelName))
+			RecordLog(0, LogTypeSystem, fmt.Sprintf("渠道 #%d 的模型 %s 临时禁用已过期，恢复可用", info.ChannelId, info.ModelName))
 		}
 		return true
 	})
