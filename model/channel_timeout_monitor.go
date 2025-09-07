@@ -3,7 +3,6 @@ package model
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
@@ -13,16 +12,20 @@ import (
 // ChannelModelTimeout 渠道超时配置
 type ChannelModelTimeout struct {
 	Enable                  bool  `json:"enable"`
-	TimeWindow              int   `json:"time_window"`
+	TimeWindow              int   `json:"timeout_window"`
 	TimeoutFRTTimeThreshold int64 `json:"timeout_frt_time_ms"` // 毫秒
 	TimeoutUseTimeThreshold int   `json:"timeout_use_time"`
 	DisableRecoveryTime     int   `json:"disable_recovery_time"`
 }
 
+// ChannelTimeoutConfig 多渠道超时配置结构
+type ChannelTimeoutConfig map[string]map[string]ChannelModelTimeout // modelName -> channelId -> config
+
 // MinuteStats 每分钟统计数据
 type MinuteStats struct {
 	Timestamp    time.Time // 分钟时间戳
-	TotalCount   int64     // 总请求次数
+	TotalCount   int64     // 总请求次数（用于UseTime统计）
+	FRTCount     int64     // 有效FRT次数（负数FRT不计入）
 	TotalFRT     int64     // 总FRT时间(毫秒)
 	TotalUseTime int64     // 总use_time(秒)
 }
@@ -51,9 +54,9 @@ var (
 	channelMonitors  sync.Map // map[channelId:modelName]*ChannelTimeoutMonitor
 	disabledChannels sync.Map // map[channelId:modelName]*DisabledChannelInfo
 
-	// 全局超时配置
-	globalTimeoutConfig *ChannelModelTimeout
-	timeoutConfigMu     sync.RWMutex
+	// 多渠道超时配置
+	globalMultiChannelConfig *ChannelTimeoutConfig
+	timeoutConfigMu          sync.RWMutex
 )
 
 // getMonitorKey 生成监控器的键
@@ -61,55 +64,44 @@ func getMonitorKey(channelId int, modelName string) string {
 	return fmt.Sprintf("%d:%s", channelId, modelName)
 }
 
-// updateTimeoutConfig 更新全局超时配置
+// updateTimeoutConfig 更新多渠道超时配置
 func updateTimeoutConfig() {
 	timeoutConfigMu.Lock()
 	defer timeoutConfigMu.Unlock()
 
-	var timeoutCtl ChannelModelTimeout
-	if common.DeepSeekTimeoutControl != "" {
-		if err := json.Unmarshal([]byte(common.DeepSeekTimeoutControl), &timeoutCtl); err != nil {
+	if common.ChannelTimeoutControl != "" {
+		var multiChannelConfig ChannelTimeoutConfig
+		if err := json.Unmarshal([]byte(common.ChannelTimeoutControl), &multiChannelConfig); err == nil {
+			globalMultiChannelConfig = &multiChannelConfig
+		} else {
 			common.SysError(fmt.Sprintf("解析超时配置失败: %v", err))
-			return
+			globalMultiChannelConfig = nil
 		}
+	} else {
+		globalMultiChannelConfig = nil
 	}
-
-	// 设置默认值
-	if timeoutCtl.TimeWindow <= 0 {
-		timeoutCtl.TimeWindow = 300 // 默认5分钟
-	}
-	if timeoutCtl.TimeoutFRTTimeThreshold <= 0 {
-		timeoutCtl.TimeoutFRTTimeThreshold = 10000 // 默认10秒
-	}
-	if timeoutCtl.TimeoutUseTimeThreshold <= 0 {
-		timeoutCtl.TimeoutUseTimeThreshold = 60 // 默认60秒
-	}
-	if timeoutCtl.DisableRecoveryTime <= 0 {
-		timeoutCtl.DisableRecoveryTime = 300 // 默认5分钟
-	}
-
-	globalTimeoutConfig = &timeoutCtl
 }
 
-// getCurrentTimeoutConfig 获取当前超时配置
-func getCurrentTimeoutConfig() *ChannelModelTimeout {
+// getChannelTimeoutConfig 根据渠道ID和模型名称获取特定的超时配置
+func getChannelTimeoutConfig(channelId int, modelName string) *ChannelModelTimeout {
 	timeoutConfigMu.RLock()
 	defer timeoutConfigMu.RUnlock()
 
-	if globalTimeoutConfig == nil {
-		// 返回默认配置
-		return &ChannelModelTimeout{
-			Enable:                  false,
-			TimeWindow:              300,
-			TimeoutFRTTimeThreshold: 10000,
-			TimeoutUseTimeThreshold: 60,
-			DisableRecoveryTime:     300,
+	// 如果有新格式的多渠道配置，优先使用
+	if globalMultiChannelConfig != nil {
+		// 直接使用模型名称作为配置键
+		if modelConfig, ok := (*globalMultiChannelConfig)[modelName]; ok {
+			channelIdStr := fmt.Sprintf("%d", channelId)
+			if config, ok := modelConfig[channelIdStr]; ok {
+				// 返回配置的副本以避免并发问题
+				configCopy := config
+				return &configCopy
+			}
 		}
 	}
 
-	// 返回配置的副本以避免并发问题
-	config := *globalTimeoutConfig
-	return &config
+	// 如果没有找到特定配置，返回 nil（不进行超时监控）
+	return nil
 }
 
 // AddRequest 添加一次请求记录
@@ -130,8 +122,13 @@ func (m *ChannelTimeoutMonitor) AddRequest(frtMs int64, useTimeSeconds int, chan
 	if len(m.Stats) > 0 {
 		current := &m.Stats[len(m.Stats)-1]
 		current.TotalCount++
-		current.TotalFRT += frtMs
 		current.TotalUseTime += int64(useTimeSeconds)
+
+		// 只有当FRT为非负数时才统计
+		if frtMs >= 0 {
+			current.FRTCount++
+			current.TotalFRT += frtMs
+		}
 	}
 }
 
@@ -176,18 +173,22 @@ func (m *ChannelTimeoutMonitor) slideWindow(newMinute time.Time, windowSeconds i
 }
 
 // GetWindowStats 获取时间窗口内的统计信息
-func (m *ChannelTimeoutMonitor) GetWindowStats() (totalRequests, totalFRT, totalUseTime int64, avgFRT, avgUseTime float64) {
+func (m *ChannelTimeoutMonitor) GetWindowStats() (totalRequests, totalFRTCount, totalFRT, totalUseTime int64, avgFRT, avgUseTime float64) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
 	for _, stat := range m.Stats {
 		totalRequests += stat.TotalCount
+		totalFRTCount += stat.FRTCount
 		totalFRT += stat.TotalFRT
 		totalUseTime += stat.TotalUseTime
 	}
 
+	if totalFRTCount > 0 {
+		avgFRT = float64(totalFRT) / float64(totalFRTCount)
+	}
+
 	if totalRequests > 0 {
-		avgFRT = float64(totalFRT) / float64(totalRequests)
 		avgUseTime = float64(totalUseTime) / float64(totalRequests)
 	}
 
@@ -196,9 +197,9 @@ func (m *ChannelTimeoutMonitor) GetWindowStats() (totalRequests, totalFRT, total
 
 // RecordTimeoutStats 记录超时统计（导出函数，供其他包调用）
 func RecordTimeoutStats(channelId int, modelName string, frtMs int64, useTimeSeconds int) {
-	// 获取全局超时配置
-	config := getCurrentTimeoutConfig()
-	if !config.Enable {
+	// 获取针对该渠道的超时配置
+	config := getChannelTimeoutConfig(channelId, modelName)
+	if config == nil || !config.Enable {
 		return
 	}
 
@@ -219,8 +220,25 @@ func RecordTimeoutStats(channelId int, modelName string, frtMs int64, useTimeSec
 
 // scanAndDisableTimeoutChannels 扫描所有监控器并禁用超时的渠道
 func scanAndDisableTimeoutChannels() {
-	config := getCurrentTimeoutConfig()
-	if !config.Enable {
+	// 检查是否有任何渠道启用了超时监控
+	hasEnabledConfig := false
+	timeoutConfigMu.RLock()
+	if globalMultiChannelConfig != nil {
+		for _, providerConfig := range *globalMultiChannelConfig {
+			for _, channelConfig := range providerConfig {
+				if channelConfig.Enable {
+					hasEnabledConfig = true
+					break
+				}
+			}
+			if hasEnabledConfig {
+				break
+			}
+		}
+	}
+	timeoutConfigMu.RUnlock()
+
+	if !hasEnabledConfig {
 		return
 	}
 
@@ -232,9 +250,16 @@ func scanAndDisableTimeoutChannels() {
 		monitor.mu.RLock()
 		hasValidData := len(monitor.Stats) > 0 && !monitor.CurrentMinute.IsZero()
 
+		// 获取该渠道的特定配置
+		channelConfig := getChannelTimeoutConfig(monitor.ChannelId, monitor.ModelName)
+		if channelConfig == nil || !channelConfig.Enable {
+			monitor.mu.RUnlock()
+			return true // 该渠道未启用超时监控，继续下一个
+		}
+
 		// 检查恢复冷却期
 		if !monitor.LastDisabled.IsZero() {
-			cooldown := time.Duration(config.DisableRecoveryTime) * time.Second
+			cooldown := time.Duration(channelConfig.DisableRecoveryTime) * time.Second
 			if time.Since(monitor.LastDisabled) < cooldown {
 				monitor.mu.RUnlock()
 				return true // 继续下一个
@@ -247,7 +272,7 @@ func scanAndDisableTimeoutChannels() {
 		}
 
 		// 检查是否需要禁用
-		totalRequests, _, _, avgFRT, avgUseTime := monitor.GetWindowStats()
+		totalRequests, totalFRTCount, _, _, avgFRT, avgUseTime := monitor.GetWindowStats()
 		if totalRequests == 0 {
 			return true // 继续下一个
 		}
@@ -255,13 +280,14 @@ func scanAndDisableTimeoutChannels() {
 		shouldDisable := false
 		reason := ""
 
-		if avgFRT > float64(config.TimeoutFRTTimeThreshold) {
+		// 只有当有有效FRT数据时才检查FRT阈值
+		if totalFRTCount > 0 && avgFRT > float64(channelConfig.TimeoutFRTTimeThreshold) {
 			// 平均FRT过长
-			reason = fmt.Sprintf("平均FRT过长: %.0fms，超过阈值%dms", avgFRT, config.TimeoutFRTTimeThreshold)
+			reason = fmt.Sprintf("平均FRT过长: %.0fms，超过阈值%dms", avgFRT, channelConfig.TimeoutFRTTimeThreshold)
 			shouldDisable = true
-		} else if avgUseTime > float64(config.TimeoutUseTimeThreshold) {
+		} else if avgUseTime > float64(channelConfig.TimeoutUseTimeThreshold) {
 			// 平均use_time过长
-			reason = fmt.Sprintf("平均use_time过长: %.2fs，超过阈值%ds", avgUseTime, config.TimeoutUseTimeThreshold)
+			reason = fmt.Sprintf("平均use_time过长: %.2fs，超过阈值%ds", avgUseTime, channelConfig.TimeoutUseTimeThreshold)
 			shouldDisable = true
 		}
 
@@ -273,7 +299,7 @@ func scanAndDisableTimeoutChannels() {
 				ModelName:    monitor.ModelName,
 				DisabledTime: time.Now(),
 				Reason:       reason,
-				Duration:     time.Duration(config.DisableRecoveryTime) * time.Second,
+				Duration:     time.Duration(channelConfig.DisableRecoveryTime) * time.Second,
 			}
 			disabledChannels.Store(keyStr, disabledInfo)
 
@@ -371,7 +397,9 @@ func cleanInactiveMonitors() {
 
 // IsChannelTempDisabled 检查渠道+模型是否临时禁用
 func IsChannelTempDisabled(channelId int, modelName string) bool {
-	if !strings.Contains(modelName, "deepseek") {
+	// 检查该渠道是否启用了超时监控
+	config := getChannelTimeoutConfig(channelId, modelName)
+	if config == nil || !config.Enable {
 		return false
 	}
 

@@ -130,7 +130,7 @@ var TaskTimeoutDuration = 20 * 60 // unit is second, default 20 minutes
 
 var GeminiSafetySetting string
 
-var DeepSeekTimeoutControl string
+var ChannelTimeoutControl string
 
 // https://docs.cohere.com/docs/safety-modes Type; NONE/CONTEXTUAL/STRICT
 var CohereSafetySetting string

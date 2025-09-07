@@ -435,8 +435,8 @@ func updateOptionMap(key string, value string) (err error) {
 		setting.StreamCacheQueueLength, _ = strconv.Atoi(value)
 	case "PayMethods":
 		err = setting.UpdatePayMethodsByJsonString(value)
-	case "deepseek.timeout_disable_config":
-		common.DeepSeekTimeoutControl = value
+	case "channel.timeout_disable_config":
+		common.ChannelTimeoutControl = value
 	}
 	return err
 }

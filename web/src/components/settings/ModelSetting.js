@@ -23,7 +23,7 @@ const ModelSetting = () => {
     'general_setting.ping_interval_seconds': 60,
     'gemini.thinking_adapter_enabled': false,
     'gemini.thinking_adapter_budget_tokens_percentage': 0.6,
-    'deepseek.timeout_disable_config': '',
+    'channel.timeout_disable_config': '',
   });
 
   let [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ const ModelSetting = () => {
           item.key === 'claude.model_headers_settings' ||
           item.key === 'claude.default_max_tokens' ||
           item.key === 'gemini.supported_imagine_models' ||
-          item.key === 'deepseek.timeout_disable_config'
+          item.key === 'channel.timeout_disable_config'
         ) {
           if (item.value !== '') {
             item.value = JSON.stringify(JSON.parse(item.value), null, 2);

@@ -10,12 +10,41 @@ import {
 } from '../../../helpers';
 import { useTranslation } from 'react-i18next';
 
-const DEEPSEEK_TIMEOUT_EXAMPLE = {
-  "enable": false,
-  "timeout_window": 600,
-  "timeout_frt_time_ms": 6000,
-  "timeout_use_time": -1,
-  "disable_recovery_time": 600
+const CHANNEL_TIMEOUT_EXAMPLE = {
+  "deepseek-chat": {
+    "100": {
+      "enable": false,
+      "timeout_window": 300,
+      "timeout_frt_time_ms": 2000,
+      "timeout_use_time": 6000,
+      "disable_recovery_time": 600
+    },
+    "101": {
+      "enable": false,
+      "timeout_window": 300,
+      "timeout_frt_time_ms": 2000,
+      "timeout_use_time": 6000,
+      "disable_recovery_time": 600
+    }
+  },
+  "deepseek-coder": {
+    "100": {
+      "enable": false,
+      "timeout_window": 300,
+      "timeout_frt_time_ms": 3000,
+      "timeout_use_time": 8000,
+      "disable_recovery_time": 600
+    }
+  },
+  "claude-3-opus": {
+    "200": {
+      "enable": false,
+      "timeout_window": 300,
+      "timeout_frt_time_ms": 3000,
+      "timeout_use_time": 8000,
+      "disable_recovery_time": 600
+    }
+  }
 }
 
 export default function SettingDeepSeekModel(props) {
@@ -23,7 +52,7 @@ export default function SettingDeepSeekModel(props) {
 
   const [loading, setLoading] = useState(false);
   const [inputs, setInputs] = useState({
-    'deepseek.timeout_disable_config': '',
+    'channel.timeout_disable_config': '',
   });
   const refForm = useRef();
   const [inputsRow, setInputsRow] = useState(inputs);
@@ -90,17 +119,17 @@ export default function SettingDeepSeekModel(props) {
           getFormApi={(formAPI) => (refForm.current = formAPI)}
           style={{ marginBottom: 15 }}
         >
-          <Form.Section text={t('DeepSeek设置')}>
+          <Form.Section text={t('渠道超时设置')}>
             <Row>
               <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                 <Form.TextArea
-                  label={t('DeepSeek超时禁用配置')}
+                  label={t('渠道超时禁用配置')}
                   placeholder={
                     t('为一个 JSON 文本，例如：') +
                     '\n' +
-                    JSON.stringify(DEEPSEEK_TIMEOUT_EXAMPLE, null, 2)
+                    JSON.stringify(CHANNEL_TIMEOUT_EXAMPLE, null, 2)
                   }
-                  field={'deepseek.timeout_disable_config'}
+                  field={'channel.timeout_disable_config'}
                   extraText={t(
                     ''
                   )}
@@ -114,7 +143,7 @@ export default function SettingDeepSeekModel(props) {
                     },
                   ]}
                   onChange={(value) =>
-                    setInputs({ ...inputs, 'deepseek.timeout_disable_config': value })
+                    setInputs({ ...inputs, 'channel.timeout_disable_config': value })
                   }
                 />
               </Col>
