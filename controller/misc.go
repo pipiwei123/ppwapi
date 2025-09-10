@@ -84,6 +84,12 @@ func GetStatus(c *gin.Context) {
 		"pay_methods":              setting.PayMethods,
 		"usd_exchange_rate":        setting.USDExchangeRate,
 
+		// 邀请返现相关配置
+		"invite_cashback_enabled": common.InviteCashbackEnabled,
+		"invite_cashback_ratio":   common.InviteCashbackRatio,
+		"max_invite_rewards":      common.MaxInviteRewards,
+		"quota_for_inviter":       common.QuotaForInviter,
+
 		// 面板启用开关
 		"api_info_enabled":      cs.ApiInfoEnabled,
 		"uptime_kuma_enabled":   cs.UptimeKumaEnabled,

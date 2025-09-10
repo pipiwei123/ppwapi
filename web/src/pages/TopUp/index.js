@@ -1166,6 +1166,41 @@ const TopUp = () => {
               </div>
 
               <div className="space-y-4">
+                {/* 返现规则信息 */}
+                {(statusState?.status?.invite_cashback_enabled || statusState?.status?.quota_for_inviter > 0) && (
+                  <Card className="!rounded-2xl">
+                    <div className="space-y-3">
+                      <Title heading={6} className="mb-3">
+                        {t('返现规则')}
+                      </Title>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <Text type="tertiary">{t('返现奖励')}</Text>
+                          <Text strong>
+                            {statusState?.status?.invite_cashback_enabled 
+                              ? `${statusState?.status?.invite_cashback_ratio}% ${t('返现比例')}` 
+                              : renderQuota(statusState?.status?.quota_for_inviter || 0)}
+                          </Text>
+                        </div>
+                        {statusState?.status?.max_invite_rewards > 0 && (
+                          <div className="flex justify-between items-center">
+                            <Text type="tertiary">{t('返现次数')}</Text>
+                            <Text strong>
+                              {userState?.user?.invite_reward_count || 0} / {statusState?.status?.max_invite_rewards}
+                            </Text>
+                          </div>
+                        )}
+                        {!statusState?.status?.max_invite_rewards && (
+                          <div className="flex justify-between items-center">
+                            <Text type="tertiary">{t('返现次数')}</Text>
+                            <Text strong>{t('无限制')}</Text>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                )}
+
                 <Title heading={6}>{t('邀请链接')}</Title>
                 <Input
                   value={affLink}
