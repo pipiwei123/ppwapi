@@ -710,7 +710,8 @@ const LogsTable = () => {
             <Button
               size="small"
               onClick={() => {
-                setModalImageUrl(text);
+                setModalImageUrl([text]);  // 包装成数组格式
+                setCurrentImageIndex(0);   // 设置索引为0
                 setIsMultiImageModal(false);
                 setIsModalOpenurl(true);
               }}
@@ -833,6 +834,7 @@ const LogsTable = () => {
   const [modalImageUrl, setModalImageUrl] = useState('');
   const [modalImageUrls, setModalImageUrls] = useState([]);
   const [isMultiImageModal, setIsMultiImageModal] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   let now = new Date();
 
   // Form 初始值
@@ -1258,8 +1260,12 @@ const LogsTable = () => {
                         transition: 'opacity 0.2s',
                       }}
                       onClick={() => {
-                        // 点击单张图片时切换到单图预览
-                        setModalImageUrl(imageUrl);
+                        // 点击单张图片时，传递所有图片URL和当前索引
+                        const allImageUrls = modalImageUrls.map(item => 
+                          typeof item === 'string' ? item : item.url
+                        ).filter(Boolean);
+                        setModalImageUrl(allImageUrls);  // 设置为图片数组
+                        setCurrentImageIndex(index);     // 设置当前索引
                         setIsMultiImageModal(false);
                       }}
                       onMouseOver={(e) => {
@@ -1302,7 +1308,9 @@ const LogsTable = () => {
           <ImagePreview
             src={modalImageUrl}
             visible={isModalOpenurl}
+            currentIndex={currentImageIndex}
             onVisibleChange={(visible) => setIsModalOpenurl(visible)}
+            onChange={(index) => setCurrentImageIndex(index)}
           />
         )}
       </Layout>
