@@ -23,7 +23,7 @@ type ImageRequest struct {
 	WebhookSecret    string `json:"webhook_secret,omitempty"`    // Webhook密钥
 	PromptUpsampling *bool  `json:"prompt_upsampling,omitempty"` // 是否启用提示词优化
 	SafetyTolerance  *int   `json:"safety_tolerance,omitempty"`  // 安全容忍度 0-6
-	Image            string `json:"image,omitempty"`
+	Image            any    `json:"image,omitempty"`
 }
 
 type ImageResponse struct {
