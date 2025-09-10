@@ -1175,27 +1175,14 @@ const TopUp = () => {
                       </Title>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <Text type="tertiary">{t('返现奖励')}</Text>
+                          <Text type="tertiary">{t('返现比例')}</Text>
                           <Text strong>
-                            {statusState?.status?.invite_cashback_enabled 
-                              ? `${statusState?.status?.invite_cashback_ratio}% ${t('返现比例')}` 
-                              : renderQuota(statusState?.status?.quota_for_inviter || 0)}
+                            {`${statusState?.status?.invite_cashback_ratio}%`}
                           </Text>
                         </div>
-                        {statusState?.status?.max_invite_rewards > 0 && (
                           <div className="flex justify-between items-center">
-                            <Text type="tertiary">{t('返现次数')}</Text>
-                            <Text strong>
-                              {userState?.user?.invite_reward_count || 0} / {statusState?.status?.max_invite_rewards}
-                            </Text>
+                            <Text type="tertiary">{t(`邀请好友注册，好友注册前: ${statusState?.status?.max_invite_rewards}次，您可获得返现`)}</Text>
                           </div>
-                        )}
-                        {!statusState?.status?.max_invite_rewards && (
-                          <div className="flex justify-between items-center">
-                            <Text type="tertiary">{t('返现次数')}</Text>
-                            <Text strong>{t('无限制')}</Text>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </Card>

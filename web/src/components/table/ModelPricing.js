@@ -250,6 +250,30 @@ const ModelPricing = () => {
       },
     },
     {
+      title: t('模型描述'),
+      dataIndex: 'description',
+      render: (text, record, index) => {
+        if (!text || text.trim() === '') {
+          return (
+            <span className="text-gray-400 italic">{t('暂无描述')}</span>
+          );
+        }
+        if (text.length > 50) {
+          return (
+            <Tooltip content={text} position="top" className="max-w-md">
+              <span className="cursor-help">
+                {text.substring(0, 50)}...
+              </span>
+            </Tooltip>
+          );
+        }
+        return <span>{text}</span>;
+      },
+      onFilter: (value, record) =>
+        record.description?.toLowerCase().includes(value.toLowerCase()),
+      width: 200,
+    },
+    {
       title: () => (
         <div className="flex items-center space-x-1">
           <span>{t('倍率')}</span>

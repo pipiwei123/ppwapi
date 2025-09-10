@@ -870,6 +870,7 @@
   "返现比例": "Cashback ratio",
   "被邀请用户充值时的返现比例": "Cashback ratio when invited user recharges",
   "最大返现次数": "Max cashback times",
+  "邀请好友注册，好友注册前: %d次，您可获得返现": "",
   "每个被邀请用户最多可以触发多少次返现，0表示不限制": "Maximum cashback times each invited user can trigger, 0 means no limit",
   "在线充值": "Online recharge",
   "充值数量，最低 ": "Recharge quantity, minimum",

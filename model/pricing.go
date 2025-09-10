@@ -17,6 +17,7 @@ type Pricing struct {
 	ModelPrice             float64                 `json:"model_price"`
 	OwnerBy                string                  `json:"owner_by"`
 	CompletionRatio        float64                 `json:"completion_ratio"`
+	Description            string                  `json:"description"`
 	EnableGroup            []string                `json:"enable_groups"`
 	SupportedEndpointTypes []constant.EndpointType `json:"supported_endpoint_types"`
 }
@@ -121,6 +122,10 @@ func updatePricing() {
 			pricing.CompletionRatio = ratio_setting.GetCompletionRatio(model)
 			pricing.QuotaType = 0
 		}
+		// 获取模型描述
+		description, _ := ratio_setting.GetModelDescription(model)
+		pricing.Description = description
+
 		pricingMap = append(pricingMap, pricing)
 	}
 	lastGetPricingTime = time.Now()

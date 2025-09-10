@@ -265,6 +265,11 @@ var (
 	CompletionRatioMutex                    = sync.RWMutex{}
 )
 
+var (
+	ModelDescription      map[string]string = nil
+	ModelDescriptionMutex                   = sync.RWMutex{}
+)
+
 var defaultCompletionRatio = map[string]float64{
 	"gpt-4-gizmo-*":  2,
 	"gpt-4o-gizmo-*": 3,
@@ -659,6 +664,51 @@ func GetCompletionRatioCopy() map[string]float64 {
 	defer CompletionRatioMutex.RUnlock()
 	copyMap := make(map[string]float64, len(CompletionRatio))
 	for k, v := range CompletionRatio {
+		copyMap[k] = v
+	}
+	return copyMap
+}
+
+// ModelDescription functions
+func ModelDescription2JSONString() string {
+	ModelDescriptionMutex.RLock()
+	defer ModelDescriptionMutex.RUnlock()
+	if ModelDescription == nil {
+		return "{}"
+	}
+	jsonBytes, err := json.Marshal(ModelDescription)
+	if err != nil {
+		common.SysError("error marshalling model description: " + err.Error())
+		return "{}"
+	}
+	return string(jsonBytes)
+}
+
+func UpdateModelDescriptionByJSONString(jsonStr string) error {
+	ModelDescriptionMutex.Lock()
+	defer ModelDescriptionMutex.Unlock()
+	ModelDescription = make(map[string]string)
+	return json.Unmarshal([]byte(jsonStr), &ModelDescription)
+}
+
+func GetModelDescription(name string) (string, bool) {
+	ModelDescriptionMutex.RLock()
+	defer ModelDescriptionMutex.RUnlock()
+	if ModelDescription == nil {
+		return "", false
+	}
+	desc, ok := ModelDescription[name]
+	return desc, ok
+}
+
+func GetModelDescriptionCopy() map[string]string {
+	ModelDescriptionMutex.RLock()
+	defer ModelDescriptionMutex.RUnlock()
+	if ModelDescription == nil {
+		return make(map[string]string)
+	}
+	copyMap := make(map[string]string, len(ModelDescription))
+	for k, v := range ModelDescription {
 		copyMap[k] = v
 	}
 	return copyMap

@@ -42,12 +42,14 @@ export default function ModelSettingsVisualEditor(props) {
       const modelPrice = JSON.parse(props.options.ModelPrice || '{}');
       const modelRatio = JSON.parse(props.options.ModelRatio || '{}');
       const completionRatio = JSON.parse(props.options.CompletionRatio || '{}');
+      const modelDescription = JSON.parse(props.options.ModelDescription || '{}');
 
       // 合并所有模型名称
       const modelNames = new Set([
         ...Object.keys(modelPrice),
         ...Object.keys(modelRatio),
         ...Object.keys(completionRatio),
+        ...Object.keys(modelDescription),
       ]);
 
       const modelData = Array.from(modelNames).map((name) => {
@@ -55,12 +57,14 @@ export default function ModelSettingsVisualEditor(props) {
         const ratio = modelRatio[name] === undefined ? '' : modelRatio[name];
         const comp =
           completionRatio[name] === undefined ? '' : completionRatio[name];
+        const desc = modelDescription[name] === undefined ? '' : modelDescription[name];
 
         return {
           name,
           price,
           ratio,
           completionRatio: comp,
+          description: desc,
           hasConflict: price !== '' && (ratio !== '' || comp !== ''),
         };
       });
@@ -96,6 +100,7 @@ export default function ModelSettingsVisualEditor(props) {
       ModelPrice: {},
       ModelRatio: {},
       CompletionRatio: {},
+      ModelDescription: {},
     };
     let currentConvertModelName = '';
 
@@ -114,6 +119,10 @@ export default function ModelSettingsVisualEditor(props) {
               model.completionRatio
             );
         }
+        // 处理模型描述
+        if (model.description !== '') {
+          output.ModelDescription[model.name] = model.description;
+        }
       });
 
       // 准备API请求数组
@@ -121,6 +130,7 @@ export default function ModelSettingsVisualEditor(props) {
         ModelPrice: JSON.stringify(output.ModelPrice, null, 2),
         ModelRatio: JSON.stringify(output.ModelRatio, null, 2),
         CompletionRatio: JSON.stringify(output.CompletionRatio, null, 2),
+        ModelDescription: JSON.stringify(output.ModelDescription, null, 2),
       };
 
       const requestQueue = Object.entries(finalOutput).map(([key, value]) => {
@@ -216,6 +226,20 @@ export default function ModelSettingsVisualEditor(props) {
       ),
     },
     {
+      title: t('模型描述'),
+      dataIndex: 'description',
+      key: 'description',
+      render: (text, record) => (
+        <Input
+          value={text}
+          placeholder={t('模型描述')}
+          onChange={(value) =>
+            updateModel(record.name, 'description', value)
+          }
+        />
+      ),
+    },
+    {
       title: t('操作'),
       key: 'action',
       render: (_, record) => (
@@ -236,7 +260,8 @@ export default function ModelSettingsVisualEditor(props) {
   ];
 
   const updateModel = (name, field, value) => {
-    if (isNaN(value)) {
+    // 只对数字字段进行验证，描述字段不需要验证
+    if (field !== 'description' && isNaN(value)) {
       showError('请输入数字');
       return;
     }
@@ -330,6 +355,7 @@ export default function ModelSettingsVisualEditor(props) {
             price: values.price || '',
             ratio: values.ratio || '',
             completionRatio: values.completionRatio || '',
+            description: values.description || '',
           };
           updated.hasConflict =
             updated.price !== '' &&
@@ -353,6 +379,7 @@ export default function ModelSettingsVisualEditor(props) {
           price: values.price || '',
           ratio: values.ratio || '',
           completionRatio: values.completionRatio || '',
+          description: values.description || '',
         };
         newModel.hasConflict =
           newModel.price !== '' &&
