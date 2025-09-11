@@ -23,7 +23,11 @@ type ImageRequest struct {
 	WebhookSecret    string `json:"webhook_secret,omitempty"`    // Webhook密钥
 	PromptUpsampling *bool  `json:"prompt_upsampling,omitempty"` // 是否启用提示词优化
 	SafetyTolerance  *int   `json:"safety_tolerance,omitempty"`  // 安全容忍度 0-6
-	Image            any    `json:"image,omitempty"`
+
+	// 火山相关参数
+	Image                            any    `json:"image,omitempty"`
+	SequentialImageGeneration        string `json:"sequential_image_generation,omitempty"`
+	SequentialImageGenerationOptions any    `json:"sequential_image_generation_options,omitempty"`
 }
 
 type ImageResponse struct {
