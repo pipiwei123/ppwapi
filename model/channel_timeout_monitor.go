@@ -21,9 +21,9 @@ type ChannelModelTimeout struct {
 // ChannelTimeoutConfig 多渠道超时配置结构
 type ChannelTimeoutConfig map[string]map[string]ChannelModelTimeout // modelName -> channelId -> config
 
-// IntervalStats 每30秒间隔统计数据
+// IntervalStats 每10秒间隔统计数据
 type IntervalStats struct {
-	Timestamp    time.Time // 30秒间隔时间戳
+	Timestamp    time.Time // 10秒间隔时间戳
 	TotalCount   int64     // 总请求次数（用于UseTime统计）
 	FRTCount     int64     // 有效FRT次数（负数FRT不计入）
 	TotalFRT     int64     // 总FRT时间(毫秒)
@@ -34,8 +34,8 @@ type IntervalStats struct {
 type ChannelTimeoutMonitor struct {
 	ChannelId       int
 	ModelName       string          // 模型名称
-	Stats           []IntervalStats // 滑动窗口，最多10个元素(5分钟)
-	CurrentInterval time.Time       // 当前统计30秒间隔
+	Stats           []IntervalStats // 滑动窗口，最多30个元素(5分钟)
+	CurrentInterval time.Time       // 当前统计10秒间隔
 	mu              sync.RWMutex
 	LastDisabled    time.Time // 上次被禁用的时间
 }
@@ -110,16 +110,16 @@ func (m *ChannelTimeoutMonitor) AddRequest(frtMs int64, useTimeSeconds int, chan
 	defer m.mu.Unlock()
 
 	now := time.Now()
-	// 截断到30秒间隔
-	second30 := now.Truncate(30 * time.Second)
+	// 截断到10秒间隔
+	second10 := now.Truncate(10 * time.Second)
 
-	// 如果是新的30秒间隔，滑动窗口
-	if second30.After(m.CurrentInterval) {
-		m.slideWindow(second30, channel.TimeWindow)
-		m.CurrentInterval = second30
+	// 如果是新的10秒间隔，滑动窗口
+	if second10.After(m.CurrentInterval) {
+		m.slideWindow(second10, channel.TimeWindow)
+		m.CurrentInterval = second10
 	}
 
-	// 更新当前30秒间隔统计
+	// 更新当前10秒间隔统计
 	if len(m.Stats) > 0 {
 		current := &m.Stats[len(m.Stats)-1]
 		current.TotalCount++
@@ -135,9 +135,9 @@ func (m *ChannelTimeoutMonitor) AddRequest(frtMs int64, useTimeSeconds int, chan
 
 // slideWindow 滑动窗口管理
 func (m *ChannelTimeoutMonitor) slideWindow(newInterval time.Time, windowSeconds int) {
-	maxIntervals := (windowSeconds + 29) / 30 // 向上取整到30秒间隔数
-	if maxIntervals > 10 {                    // 限制最多10个30秒间隔(5分钟)
-		maxIntervals = 10
+	maxIntervals := (windowSeconds + 9) / 10 // 向上取整到10秒间隔数
+	if maxIntervals > 30 {                   // 限制最多30个10秒间隔(5分钟)
+		maxIntervals = 30
 	}
 
 	// 创建新的统计条目
@@ -179,6 +179,38 @@ func (m *ChannelTimeoutMonitor) GetWindowStats() (totalRequests, totalFRTCount, 
 	defer m.mu.RUnlock()
 
 	for _, stat := range m.Stats {
+		totalRequests += stat.TotalCount
+		totalFRTCount += stat.FRTCount
+		totalFRT += stat.TotalFRT
+		totalUseTime += stat.TotalUseTime
+	}
+
+	if totalFRTCount > 0 {
+		avgFRT = float64(totalFRT) / float64(totalFRTCount)
+	}
+
+	if totalRequests > 0 {
+		avgUseTime = float64(totalUseTime) / float64(totalRequests)
+	}
+
+	return
+}
+
+// GetCompletedWindowStats 获取已完成区间的统计信息（排除当前正在进行的区间）
+func (m *ChannelTimeoutMonitor) GetCompletedWindowStats() (totalRequests, totalFRTCount, totalFRT, totalUseTime int64, avgFRT, avgUseTime float64) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	now := time.Now()
+	currentInterval := now.Truncate(10 * time.Second)
+
+	// 遍历所有统计，但排除当前正在进行的区间
+	for _, stat := range m.Stats {
+		// 跳过当前正在进行的区间
+		if stat.Timestamp.Equal(currentInterval) {
+			continue
+		}
+
 		totalRequests += stat.TotalCount
 		totalFRTCount += stat.FRTCount
 		totalFRT += stat.TotalFRT
@@ -273,7 +305,7 @@ func scanAndDisableTimeoutChannels() {
 		}
 
 		// 检查是否需要禁用
-		totalRequests, totalFRTCount, _, _, avgFRT, avgUseTime := monitor.GetWindowStats()
+		totalRequests, totalFRTCount, _, _, avgFRT, avgUseTime := monitor.GetCompletedWindowStats()
 		if totalRequests == 0 {
 			return true // 继续下一个
 		}
@@ -325,7 +357,7 @@ func scanAndDisableTimeoutChannels() {
 
 // startTimeoutScanner 启动超时扫描器
 func startTimeoutScanner() {
-	ticker := time.NewTicker(30 * time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {
@@ -426,7 +458,7 @@ func IsChannelTempDisabled(channelId int, modelName string) bool {
 
 // startRecoveryChecker 启动恢复检查器
 func startRecoveryChecker() {
-	ticker := time.NewTicker(30 * time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {
