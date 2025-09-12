@@ -177,6 +177,12 @@ func Distribute() func(c *gin.Context) {
 		}
 		common.SetContextKey(c, constant.ContextKeyRequestStartTime, time.Now())
 		SetupContextForSelectedChannel(c, channel, modelRequest.Model)
+		// 执行渠道RPM限流检查
+		ChannelRateLimit()(c)
+		// 如果限流检查失败，请求已被中止
+		if c.IsAborted() {
+			return
+		}
 		c.Next()
 	}
 }
