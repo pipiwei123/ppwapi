@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import GroupRatioSettings from '../../pages/Setting/Ratio/GroupRatioSettings.js';
 import ModelRatioSettings from '../../pages/Setting/Ratio/ModelRatioSettings.js';
-import ModelDescriptionSettings from '../../pages/Setting/Ratio/ModelDescriptionSettings.js';
 import ModelSettingsVisualEditor from '../../pages/Setting/Ratio/ModelSettingsVisualEditor.js';
 import ModelRatioNotSetEditor from '../../pages/Setting/Ratio/ModelRationNotSetEditor.js';
 import UpstreamRatioSync from '../../pages/Setting/Ratio/UpstreamRatioSync.js';
@@ -17,7 +16,6 @@ const RatioSetting = () => {
   let [inputs, setInputs] = useState({
     ModelPrice: '',
     ModelRatio: '',
-    ModelDescription: '',
     CacheRatio: '',
     CompletionRatio: '',
     GroupRatio: '',
@@ -44,7 +42,6 @@ const RatioSetting = () => {
           item.key === 'UserUsableGroups' ||
           item.key === 'CompletionRatio' ||
           item.key === 'ModelPrice' ||
-          item.key === 'ModelDescription' ||
           item.key === 'CacheRatio'
         ) {
           try {
@@ -88,9 +85,6 @@ const RatioSetting = () => {
         <Tabs type="card">
           <Tabs.TabPane tab={t('模型倍率设置')} itemKey="model">
             <ModelRatioSettings options={inputs} refresh={onRefresh} />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab={t('模型描述设置')} itemKey="description">
-            <ModelDescriptionSettings options={inputs} refresh={onRefresh} />
           </Tabs.TabPane>
           <Tabs.TabPane tab={t('分组倍率设置')} itemKey="group">
             <GroupRatioSettings options={inputs} refresh={onRefresh} />

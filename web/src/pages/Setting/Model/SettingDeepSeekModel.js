@@ -11,41 +11,41 @@ import {
 import { useTranslation } from 'react-i18next';
 
 const CHANNEL_TIMEOUT_EXAMPLE = {
-  "deepseek-chat": {
-    "100": {
-      "enable": false,
-      "timeout_window": 300,
-      "timeout_frt_time_ms": 2000,
-      "timeout_use_time": 6000,
-      "disable_recovery_time": 600
+  'deepseek-chat': {
+    100: {
+      enable: false,
+      timeout_window: 300,
+      timeout_frt_time_ms: 2000,
+      timeout_use_time: 6000,
+      disable_recovery_time: 600,
     },
-    "101": {
-      "enable": false,
-      "timeout_window": 300,
-      "timeout_frt_time_ms": 2000,
-      "timeout_use_time": 6000,
-      "disable_recovery_time": 600
-    }
+    101: {
+      enable: false,
+      timeout_window: 300,
+      timeout_frt_time_ms: 2000,
+      timeout_use_time: 6000,
+      disable_recovery_time: 600,
+    },
   },
-  "deepseek-coder": {
-    "100": {
-      "enable": false,
-      "timeout_window": 300,
-      "timeout_frt_time_ms": 3000,
-      "timeout_use_time": 8000,
-      "disable_recovery_time": 600
-    }
+  'deepseek-coder': {
+    100: {
+      enable: false,
+      timeout_window: 300,
+      timeout_frt_time_ms: 3000,
+      timeout_use_time: 8000,
+      disable_recovery_time: 600,
+    },
   },
-  "claude-3-opus": {
-    "200": {
-      "enable": false,
-      "timeout_window": 300,
-      "timeout_frt_time_ms": 3000,
-      "timeout_use_time": 8000,
-      "disable_recovery_time": 600
-    }
-  }
-}
+  'claude-3-opus': {
+    200: {
+      enable: false,
+      timeout_window: 300,
+      timeout_frt_time_ms: 3000,
+      timeout_use_time: 8000,
+      disable_recovery_time: 600,
+    },
+  },
+};
 
 export default function SettingDeepSeekModel(props) {
   const { t } = useTranslation();
@@ -130,9 +130,7 @@ export default function SettingDeepSeekModel(props) {
                     JSON.stringify(CHANNEL_TIMEOUT_EXAMPLE, null, 2)
                   }
                   field={'channel.timeout_disable_config'}
-                  extraText={t(
-                    ''
-                  )}
+                  extraText={t('')}
                   autosize={{ minRows: 6, maxRows: 12 }}
                   trigger="blur"
                   stopValidateWithError
@@ -143,7 +141,10 @@ export default function SettingDeepSeekModel(props) {
                     },
                   ]}
                   onChange={(value) =>
-                    setInputs({ ...inputs, 'channel.timeout_disable_config': value })
+                    setInputs({
+                      ...inputs,
+                      'channel.timeout_disable_config': value,
+                    })
                   }
                 />
               </Col>

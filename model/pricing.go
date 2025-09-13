@@ -18,6 +18,7 @@ type Pricing struct {
 	OwnerBy                string                  `json:"owner_by"`
 	CompletionRatio        float64                 `json:"completion_ratio"`
 	Description            string                  `json:"description"`
+	DocumentationURL       string                  `json:"documentation_url"`
 	EnableGroup            []string                `json:"enable_groups"`
 	SupportedEndpointTypes []constant.EndpointType `json:"supported_endpoint_types"`
 }
@@ -125,6 +126,10 @@ func updatePricing() {
 		// 获取模型描述
 		description, _ := ratio_setting.GetModelDescription(model)
 		pricing.Description = description
+
+		// 获取模型文档URL
+		documentationURL, _ := ratio_setting.GetModelDocumentationURL(model)
+		pricing.DocumentationURL = documentationURL
 
 		pricingMap = append(pricingMap, pricing)
 	}

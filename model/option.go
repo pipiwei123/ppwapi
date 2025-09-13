@@ -121,6 +121,7 @@ func InitOptionMap() {
 	common.OptionMap["UserUsableGroups"] = setting.UserUsableGroups2JSONString()
 	common.OptionMap["CompletionRatio"] = ratio_setting.CompletionRatio2JSONString()
 	common.OptionMap["ModelDescription"] = ratio_setting.ModelDescription2JSONString()
+	common.OptionMap["ModelDocumentationURL"] = ratio_setting.ModelDocumentationURL2JSONString()
 	common.OptionMap["TopUpLink"] = common.TopUpLink
 	//common.OptionMap["ChatLink"] = common.ChatLink
 	//common.OptionMap["ChatLink2"] = common.ChatLink2
@@ -420,6 +421,8 @@ func updateOptionMap(key string, value string) (err error) {
 		err = ratio_setting.UpdateCacheRatioByJSONString(value)
 	case "ModelDescription":
 		err = ratio_setting.UpdateModelDescriptionByJSONString(value)
+	case "ModelDocumentationURL":
+		err = ratio_setting.UpdateModelDocumentationURLByJSONString(value)
 	case "TopUpLink":
 		common.TopUpLink = value
 	//case "ChatLink":

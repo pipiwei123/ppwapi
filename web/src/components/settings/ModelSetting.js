@@ -7,6 +7,7 @@ import SettingGeminiModel from '../../pages/Setting/Model/SettingGeminiModel.js'
 import SettingClaudeModel from '../../pages/Setting/Model/SettingClaudeModel.js';
 import SettingGlobalModel from '../../pages/Setting/Model/SettingGlobalModel.js';
 import SettingDeepSeekModel from '../../pages/Setting/Model/SettingDeepSeekModel.js';
+import ModelDescriptionSettings from '../../pages/Setting/Model/ModelDescriptionSettings.js';
 
 const ModelSetting = () => {
   const { t } = useTranslation();
@@ -24,6 +25,8 @@ const ModelSetting = () => {
     'gemini.thinking_adapter_enabled': false,
     'gemini.thinking_adapter_budget_tokens_percentage': 0.6,
     'channel.timeout_disable_config': '',
+    'ModelDescription': '',
+    'ModelDocumentationURL': '',
   });
 
   let [loading, setLoading] = useState(false);
@@ -93,6 +96,10 @@ const ModelSetting = () => {
         {/* DeepSeek */}
         <Card style={{ marginTop: '10px' }}>
           <SettingDeepSeekModel options={inputs} refresh={onRefresh} />
+        </Card>
+        {/* 模型列表设置 */}
+        <Card style={{ marginTop: '10px' }}>
+          <ModelDescriptionSettings options={inputs} refresh={onRefresh} />
         </Card>
       </Spin>
     </>

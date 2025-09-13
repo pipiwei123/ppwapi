@@ -710,8 +710,8 @@ const LogsTable = () => {
             <Button
               size="small"
               onClick={() => {
-                setModalImageUrl([text]);  // 包装成数组格式
-                setCurrentImageIndex(0);   // 设置索引为0
+                setModalImageUrl([text]); // 包装成数组格式
+                setCurrentImageIndex(0); // 设置索引为0
                 setIsMultiImageModal(false);
                 setIsModalOpenurl(true);
               }}
@@ -1261,11 +1261,13 @@ const LogsTable = () => {
                       }}
                       onClick={() => {
                         // 点击单张图片时，传递所有图片URL和当前索引
-                        const allImageUrls = modalImageUrls.map(item => 
-                          typeof item === 'string' ? item : item.url
-                        ).filter(Boolean);
-                        setModalImageUrl(allImageUrls);  // 设置为图片数组
-                        setCurrentImageIndex(index);     // 设置当前索引
+                        const allImageUrls = modalImageUrls
+                          .map((item) =>
+                            typeof item === 'string' ? item : item.url
+                          )
+                          .filter(Boolean);
+                        setModalImageUrl(allImageUrls); // 设置为图片数组
+                        setCurrentImageIndex(index); // 设置当前索引
                         setIsMultiImageModal(false);
                       }}
                       onMouseOver={(e) => {

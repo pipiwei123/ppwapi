@@ -22,6 +22,7 @@ export default function ModelDescriptionSettings(props) {
   const [loading, setLoading] = useState(false);
   const [inputs, setInputs] = useState({
     ModelDescription: '',
+    ModelDocumentationURL: '',
   });
   const refForm = useRef();
   const [inputsRow, setInputsRow] = useState(inputs);
@@ -83,15 +84,26 @@ export default function ModelDescriptionSettings(props) {
 
   async function resetModelDescription() {
     try {
-      let res = await API.put('/api/option/', {
-        key: 'ModelDescription',
-        value: '{}',
-      });
-      if (res.data.success) {
+      const resetQueue = [
+        API.put('/api/option/', {
+          key: 'ModelDescription',
+          value: '{}',
+        }),
+        API.put('/api/option/', {
+          key: 'ModelDocumentationURL',
+          value: '{}',
+        }),
+      ];
+
+      const results = await Promise.all(resetQueue);
+      const allSuccess = results.every((res) => res.data.success);
+
+      if (allSuccess) {
         showSuccess(t('重置成功'));
         props.refresh();
       } else {
-        showError(res.data.message);
+        const failedResult = results.find((res) => !res.data.success);
+        showError(failedResult?.data.message || t('重置失败'));
       }
     } catch (error) {
       showError(error);
@@ -100,10 +112,8 @@ export default function ModelDescriptionSettings(props) {
 
   useEffect(() => {
     const currentInputs = {};
-    for (let key in props.options) {
-      if (Object.keys(inputs).includes(key)) {
-        currentInputs[key] = props.options[key];
-      }
+    for (let key in inputs) {
+      currentInputs[key] = props.options[key] || '';
     }
     setInputs(currentInputs);
     setInputsRow(structuredClone(currentInputs));
@@ -117,39 +127,67 @@ export default function ModelDescriptionSettings(props) {
         getFormApi={(formAPI) => (refForm.current = formAPI)}
         style={{ marginBottom: 15 }}
       >
-        <Row gutter={16}>
-          <Col xs={24} sm={16}>
-            <Form.TextArea
-              label={t('模型描述')}
-              extraText={t('为一个 JSON 文本，键为模型名称，值为模型描述')}
-              placeholder={t(
-                '为一个 JSON 文本，键为模型名称，值为模型描述，比如 "gpt-4": "最强大的GPT-4模型，适合复杂任务"'
-              )}
-              field={'ModelDescription'}
-              autosize={{ minRows: 6, maxRows: 12 }}
-              trigger="blur"
-              stopValidateWithError
-              rules={[
-                {
-                  validator: (rule, value) => verifyJSON(value),
-                  message: '不是合法的 JSON 字符串',
-                },
-              ]}
-              onChange={(value) => setInputs({ ...inputs, ModelDescription: value })}
-            />
-          </Col>
-        </Row>
+        <Form.Section text={t('模型列表设置')}>
+          <Row gutter={16}>
+            <Col xs={24} sm={16}>
+              <Form.TextArea
+                label={t('模型描述')}
+                extraText={t('为一个 JSON 文本，键为模型名称，值为模型描述')}
+                placeholder={t(
+                  '为一个 JSON 文本，键为模型名称，值为模型描述，比如 "gpt-4": "最强大的GPT-4模型，适合复杂任务"'
+                )}
+                field={'ModelDescription'}
+                autosize={{ minRows: 6, maxRows: 12 }}
+                trigger="blur"
+                stopValidateWithError
+                rules={[
+                  {
+                    validator: (rule, value) => verifyJSON(value),
+                    message: '不是合法的 JSON 字符串',
+                  },
+                ]}
+                onChange={(value) =>
+                  setInputs({ ...inputs, ModelDescription: value })
+                }
+              />
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col xs={24} sm={16}>
+              <Form.TextArea
+                label={t('模型文档地址')}
+                extraText={t('为一个 JSON 文本，键为模型名称，值为文档URL地址')}
+                placeholder={t(
+                  '为一个 JSON 文本，键为模型名称，值为文档URL，比如 "gpt-4": "https://platform.openai.com/docs/models/gpt-4"'
+                )}
+                field={'ModelDocumentationURL'}
+                autosize={{ minRows: 6, maxRows: 12 }}
+                trigger="blur"
+                stopValidateWithError
+                rules={[
+                  {
+                    validator: (rule, value) => verifyJSON(value),
+                    message: '不是合法的 JSON 字符串',
+                  },
+                ]}
+                onChange={(value) =>
+                  setInputs({ ...inputs, ModelDocumentationURL: value })
+                }
+              />
+            </Col>
+          </Row>
+        </Form.Section>
       </Form>
       <Space>
-        <Button onClick={onSubmit}>{t('保存模型描述设置')}</Button>
+        <Button onClick={onSubmit}>{t('保存模型列表设置')}</Button>
         <Popconfirm
-          title={t('确定重置模型描述吗？')}
+          title={t('确定重置模型列表设置吗？')}
           content={t('此修改将不可逆')}
           okType={'danger'}
           position={'top'}
           onConfirm={resetModelDescription}
         >
-          <Button type={'danger'}>{t('重置模型描述')}</Button>
+          <Button type={'danger'}>{t('重置模型列表设置')}</Button>
         </Popconfirm>
       </Space>
     </Spin>

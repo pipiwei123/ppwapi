@@ -42,7 +42,9 @@ export default function ModelSettingsVisualEditor(props) {
       const modelPrice = JSON.parse(props.options.ModelPrice || '{}');
       const modelRatio = JSON.parse(props.options.ModelRatio || '{}');
       const completionRatio = JSON.parse(props.options.CompletionRatio || '{}');
-      const modelDescription = JSON.parse(props.options.ModelDescription || '{}');
+      const modelDescription = JSON.parse(
+        props.options.ModelDescription || '{}'
+      );
 
       // 合并所有模型名称
       const modelNames = new Set([
@@ -57,7 +59,8 @@ export default function ModelSettingsVisualEditor(props) {
         const ratio = modelRatio[name] === undefined ? '' : modelRatio[name];
         const comp =
           completionRatio[name] === undefined ? '' : completionRatio[name];
-        const desc = modelDescription[name] === undefined ? '' : modelDescription[name];
+        const desc =
+          modelDescription[name] === undefined ? '' : modelDescription[name];
 
         return {
           name,
@@ -233,9 +236,7 @@ export default function ModelSettingsVisualEditor(props) {
         <Input
           value={text}
           placeholder={t('模型描述')}
-          onChange={(value) =>
-            updateModel(record.name, 'description', value)
-          }
+          onChange={(value) => updateModel(record.name, 'description', value)}
         />
       ),
     },

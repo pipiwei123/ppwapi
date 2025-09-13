@@ -309,7 +309,7 @@ const EditToken = (props) => {
           current_group_index: 0,
         };
 
-       if (localInputs.group && localInputs.group instanceof Array) {
+        if (localInputs.group && localInputs.group instanceof Array) {
           localInputs.group = localInputs.group[0];
         } else if (localInputs.group && localInputs.group.includes(',')) {
           localInputs.group = localInputs.group.split(',')[0];

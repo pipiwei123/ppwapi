@@ -1167,7 +1167,8 @@ const TopUp = () => {
 
               <div className="space-y-4">
                 {/* 返现规则信息 */}
-                {(statusState?.status?.invite_cashback_enabled || statusState?.status?.quota_for_inviter > 0) && (
+                {(statusState?.status?.invite_cashback_enabled ||
+                  statusState?.status?.quota_for_inviter > 0) && (
                   <Card className="!rounded-2xl">
                     <div className="space-y-3">
                       <Title heading={6} className="mb-3">
@@ -1180,9 +1181,13 @@ const TopUp = () => {
                             {`${statusState?.status?.invite_cashback_ratio}%`}
                           </Text>
                         </div>
-                          <div className="flex justify-between items-center">
-                            <Text type="tertiary">{t(`邀请好友注册，好友注册前: ${statusState?.status?.max_invite_rewards}次，您可获得返现`)}</Text>
-                          </div>
+                        <div className="flex justify-between items-center">
+                          <Text type="tertiary">
+                            {t(
+                              `邀请好友注册，好友注册前: ${statusState?.status?.max_invite_rewards}次，您可获得返现`
+                            )}
+                          </Text>
+                        </div>
                       </div>
                     </div>
                   </Card>

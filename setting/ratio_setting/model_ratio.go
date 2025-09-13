@@ -270,6 +270,11 @@ var (
 	ModelDescriptionMutex                   = sync.RWMutex{}
 )
 
+var (
+	ModelDocumentationURL      map[string]string = nil
+	ModelDocumentationURLMutex                   = sync.RWMutex{}
+)
+
 var defaultCompletionRatio = map[string]float64{
 	"gpt-4-gizmo-*":  2,
 	"gpt-4o-gizmo-*": 3,
@@ -709,6 +714,51 @@ func GetModelDescriptionCopy() map[string]string {
 	}
 	copyMap := make(map[string]string, len(ModelDescription))
 	for k, v := range ModelDescription {
+		copyMap[k] = v
+	}
+	return copyMap
+}
+
+// ModelDocumentationURL functions
+func ModelDocumentationURL2JSONString() string {
+	ModelDocumentationURLMutex.RLock()
+	defer ModelDocumentationURLMutex.RUnlock()
+	if ModelDocumentationURL == nil {
+		return "{}"
+	}
+	jsonBytes, err := json.Marshal(ModelDocumentationURL)
+	if err != nil {
+		common.SysError("error marshalling model documentation URL: " + err.Error())
+		return "{}"
+	}
+	return string(jsonBytes)
+}
+
+func UpdateModelDocumentationURLByJSONString(jsonStr string) error {
+	ModelDocumentationURLMutex.Lock()
+	defer ModelDocumentationURLMutex.Unlock()
+	ModelDocumentationURL = make(map[string]string)
+	return json.Unmarshal([]byte(jsonStr), &ModelDocumentationURL)
+}
+
+func GetModelDocumentationURL(name string) (string, bool) {
+	ModelDocumentationURLMutex.RLock()
+	defer ModelDocumentationURLMutex.RUnlock()
+	if ModelDocumentationURL == nil {
+		return "", false
+	}
+	url, ok := ModelDocumentationURL[name]
+	return url, ok
+}
+
+func GetModelDocumentationURLCopy() map[string]string {
+	ModelDocumentationURLMutex.RLock()
+	defer ModelDocumentationURLMutex.RUnlock()
+	if ModelDocumentationURL == nil {
+		return make(map[string]string)
+	}
+	copyMap := make(map[string]string, len(ModelDocumentationURL))
+	for k, v := range ModelDocumentationURL {
 		copyMap[k] = v
 	}
 	return copyMap
