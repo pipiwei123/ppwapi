@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"one-api/common"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -201,7 +202,7 @@ func RecordConsumeLog(c *gin.Context, userId int, params RecordConsumeLogParams)
 	}
 }
 
-func GetAllLogs(logType int, startTimestamp int64, endTimestamp int64, modelName string, username string, tokenName string, startIdx int, num int, channel int, group string, requestId string) (logs []*Log, total int64, err error) {
+func GetAllLogs(logType int, startTimestamp int64, endTimestamp int64, modelName string, username string, tokenName string, startIdx int, num int, channelStr string, group string, requestId string) (logs []*Log, total int64, err error) {
 	var tx *gorm.DB
 	if logType == LogTypeUnknown {
 		tx = LOG_DB
@@ -210,13 +211,25 @@ func GetAllLogs(logType int, startTimestamp int64, endTimestamp int64, modelName
 	}
 
 	if modelName != "" {
-		tx = tx.Where("logs.model_name = ?", modelName)
+		if strings.HasPrefix(modelName, "!") {
+			tx = tx.Where("logs.model_name != ?", strings.TrimPrefix(modelName, "!"))
+		} else {
+			tx = tx.Where("logs.model_name = ?", modelName)
+		}
 	}
 	if username != "" {
-		tx = tx.Where("logs.username = ?", username)
+		if strings.HasPrefix(username, "!") {
+			tx = tx.Where("logs.username != ?", strings.TrimPrefix(username, "!"))
+		} else {
+			tx = tx.Where("logs.username = ?", username)
+		}
 	}
 	if tokenName != "" {
-		tx = tx.Where("logs.token_name = ?", tokenName)
+		if strings.HasPrefix(tokenName, "!") {
+			tx = tx.Where("logs.token_name != ?", strings.TrimPrefix(tokenName, "!"))
+		} else {
+			tx = tx.Where("logs.token_name = ?", tokenName)
+		}
 	}
 	if startTimestamp != 0 {
 		tx = tx.Where("logs.created_at >= ?", startTimestamp)
@@ -224,11 +237,25 @@ func GetAllLogs(logType int, startTimestamp int64, endTimestamp int64, modelName
 	if endTimestamp != 0 {
 		tx = tx.Where("logs.created_at <= ?", endTimestamp)
 	}
-	if channel != 0 {
-		tx = tx.Where("logs.channel_id = ?", channel)
+	if channelStr != "" {
+		if strings.HasPrefix(channelStr, "!") {
+			channelId, err := strconv.Atoi(strings.TrimPrefix(channelStr, "!"))
+			if err == nil {
+				tx = tx.Where("logs.channel_id != ?", channelId)
+			}
+		} else {
+			channelId, err := strconv.Atoi(channelStr)
+			if err == nil && channelId != 0 {
+				tx = tx.Where("logs.channel_id = ?", channelId)
+			}
+		}
 	}
 	if group != "" {
-		tx = tx.Where("logs."+logGroupCol+" = ?", group)
+		if strings.HasPrefix(group, "!") {
+			tx = tx.Where("logs."+logGroupCol+" != ?", strings.TrimPrefix(group, "!"))
+		} else {
+			tx = tx.Where("logs."+logGroupCol+" = ?", group)
+		}
 	}
 	if requestId != "" {
 		tx = tx.Where("logs.request_id = ?", requestId)
@@ -290,10 +317,18 @@ func GetUserLogs(userId int, logType int, startTimestamp int64, endTimestamp int
 	}
 
 	if modelName != "" {
-		tx = tx.Where("logs.model_name like ?", modelName)
+		if strings.HasPrefix(modelName, "!") {
+			tx = tx.Where("logs.model_name != ?", strings.TrimPrefix(modelName, "!"))
+		} else {
+			tx = tx.Where("logs.model_name like ?", modelName)
+		}
 	}
 	if tokenName != "" {
-		tx = tx.Where("logs.token_name = ?", tokenName)
+		if strings.HasPrefix(tokenName, "!") {
+			tx = tx.Where("logs.token_name != ?", strings.TrimPrefix(tokenName, "!"))
+		} else {
+			tx = tx.Where("logs.token_name = ?", tokenName)
+		}
 	}
 	if startTimestamp != 0 {
 		tx = tx.Where("logs.created_at >= ?", startTimestamp)
@@ -302,7 +337,11 @@ func GetUserLogs(userId int, logType int, startTimestamp int64, endTimestamp int
 		tx = tx.Where("logs.created_at <= ?", endTimestamp)
 	}
 	if group != "" {
-		tx = tx.Where("logs."+logGroupCol+" = ?", group)
+		if strings.HasPrefix(group, "!") {
+			tx = tx.Where("logs."+logGroupCol+" != ?", strings.TrimPrefix(group, "!"))
+		} else {
+			tx = tx.Where("logs."+logGroupCol+" = ?", group)
+		}
 	}
 	if requestId != "" {
 		tx = tx.Where("logs.request_id = ?", requestId)
@@ -337,7 +376,7 @@ type Stat struct {
 	Tpm   int `json:"tpm"`
 }
 
-func SumUsedQuota(logType int, startTimestamp int64, endTimestamp int64, modelName string, username string, tokenName string, channel int, group string) (stat Stat) {
+func SumUsedQuota(logType int, startTimestamp int64, endTimestamp int64, modelName string, username string, tokenName string, channelStr string, group string) (stat Stat) {
 	tx := LOG_DB.Table("logs").Select("sum(quota) quota")
 
 	// 为rpm和tpm创建单独的查询
@@ -361,9 +400,20 @@ func SumUsedQuota(logType int, startTimestamp int64, endTimestamp int64, modelNa
 		tx = tx.Where("model_name like ?", modelName)
 		rpmTpmQuery = rpmTpmQuery.Where("model_name like ?", modelName)
 	}
-	if channel != 0 {
-		tx = tx.Where("channel_id = ?", channel)
-		rpmTpmQuery = rpmTpmQuery.Where("channel_id = ?", channel)
+	if channelStr != "" {
+		if strings.HasPrefix(channelStr, "!") {
+			channelId, err := strconv.Atoi(strings.TrimPrefix(channelStr, "!"))
+			if err == nil {
+				tx = tx.Where("channel_id != ?", channelId)
+				rpmTpmQuery = rpmTpmQuery.Where("channel_id != ?", channelId)
+			}
+		} else {
+			channelId, err := strconv.Atoi(channelStr)
+			if err == nil && channelId != 0 {
+				tx = tx.Where("channel_id = ?", channelId)
+				rpmTpmQuery = rpmTpmQuery.Where("channel_id = ?", channelId)
+			}
+		}
 	}
 	if group != "" {
 		tx = tx.Where(logGroupCol+" = ?", group)
