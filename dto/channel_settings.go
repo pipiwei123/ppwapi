@@ -5,4 +5,5 @@ type ChannelSettings struct {
 	ThinkingToContent bool   `json:"thinking_to_content,omitempty"`
 	Proxy             string `json:"proxy"`
 	RPMLimit          int    `json:"rpm_limit"`
+	UserRPMLimit      int    `json:"user_rpm_limit"`
 }
