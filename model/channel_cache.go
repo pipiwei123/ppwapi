@@ -138,15 +138,29 @@ func getRandomSatisfiedChannel(group string, model string, retry int) (*Channel,
 
 	if len(channels) == 1 {
 		if channel, ok := channelsIDM[channels[0]]; ok {
-			// 即使是单个渠道，也要检查是否被临时禁用
-			// 但如果被禁用了，仍然返回该渠道（因为没有其他选择）
-			if IsChannelTempDisabled(channel.Id, model) && common.DebugEnabled {
-				common.SysLog(fmt.Sprintf("唯一可用渠道 #%d 被临时禁用，但仍然使用，分组: %s, 模型: %s", channel.Id, group, model))
-			}
 			return channel, nil
 		}
 		return nil, fmt.Errorf("数据库一致性错误，渠道# %d 不存在，请联系管理员修复", channels[0])
 	}
+
+	// 过滤掉被临时禁用的渠道
+	var enabledChannels []int
+	for _, channelId := range channels {
+		if !IsChannelTempDisabled(channelId, model) {
+			enabledChannels = append(enabledChannels, channelId)
+		}
+	}
+
+	// 如果所有渠道都被禁用，使用原始列表（保持兜底逻辑）
+	if len(enabledChannels) == 0 {
+		if common.DebugEnabled {
+			common.SysLog(fmt.Sprintf("所有渠道都被临时禁用，忽略禁用状态，分组: %s, 模型: %s", group, model))
+		}
+		enabledChannels = channels
+	}
+
+	// 使用过滤后的列表进行后续处理
+	channels = enabledChannels
 
 	uniquePriorities := make(map[int]bool)
 	for _, channelId := range channels {
@@ -179,22 +193,8 @@ func getRandomSatisfiedChannel(group string, model string, retry int) (*Channel,
 		}
 	}
 
-	// 先尝试从未被临时禁用的渠道中选择
-	var enabledChannels []*Channel
-	for _, channel := range targetChannels {
-		if !IsChannelTempDisabled(channel.Id, model) {
-			enabledChannels = append(enabledChannels, channel)
-		}
-	}
-
-	// 如果所有渠道都被禁用，则使用原始列表（忽略禁用状态）
-	channelsToUse := enabledChannels
-	if len(enabledChannels) == 0 {
-		channelsToUse = targetChannels
-		if common.DebugEnabled {
-			common.SysLog(fmt.Sprintf("所有渠道都被临时禁用，忽略禁用状态进行选择，分组: %s, 模型: %s", group, model))
-		}
-	}
+	// 使用目标优先级的所有渠道（已经在前面过滤了禁用的渠道）
+	channelsToUse := targetChannels
 
 	// 平滑系数
 	smoothingFactor := 10
