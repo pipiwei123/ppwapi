@@ -40,6 +40,7 @@ import {
   IconCopy,
   IconEyeOpened,
   IconEyeClosed,
+  IconHelpCircle,
 } from '@douyinfe/semi-icons';
 import { Key } from 'lucide-react';
 import EditToken from '../../pages/Token/EditToken';
@@ -944,16 +945,18 @@ const TokensTable = () => {
           >
             {t('删除所选令牌')}
           </Button>
-          <Button
-            type="tertiary"
-            className="w-full md:w-auto"
+          <div
+            className="flex items-center cursor-pointer transition-colors"
+            style={{ color: '#ff8c00' }}
             onClick={() => {
               window.open('https://doc.apicore.ai/doc-7387853', '_blank');
             }}
-            size="small"
+            onMouseEnter={(e) => { e.target.style.color = '#ff7700'; }}
+            onMouseLeave={(e) => { e.target.style.color = '#ff8c00'; }}
           >
-            {t('令牌使用说明')}
-          </Button>
+            <IconHelpCircle className="mr-1" size={14} />
+            <span className="text-sm">{t('令牌使用说明')}</span>
+          </div>
         </div>
 
         <Form
