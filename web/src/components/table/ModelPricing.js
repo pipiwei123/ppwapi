@@ -272,6 +272,34 @@ const ModelPricing = () => {
       width: 200,
     },
     {
+      title: t('使用文档'),
+      dataIndex: 'documentation_url',
+      width: 100,
+      align: 'center',
+      render: (text, record, index) => {
+        const documentationURL = record.documentation_url;
+        if (!documentationURL || documentationURL.trim() === '') {
+          return <div className="text-center"><span className="text-gray-400 italic">{t('暂无')}</span></div>;
+        }
+        return (
+          <div className="flex justify-center">
+            <Tooltip content={t('查看文档')} position="top">
+              <Button
+                type="primary"
+                theme="light"
+                size="small"
+                icon={<IconArticle />}
+                onClick={() => window.open(documentationURL, '_blank')}
+                className="!bg-green-50 hover:!bg-green-100 !text-green-600 hover:!text-green-700 !border-green-200"
+              >
+                {t('查看')}
+              </Button>
+            </Tooltip>
+          </div>
+        );
+      },
+    },
+    {
       title: () => (
         <div className="flex items-center space-x-1">
           <span>{t('倍率')}</span>
@@ -366,34 +394,6 @@ const ModelPricing = () => {
           );
         }
         return content;
-      },
-    },
-    {
-      title: t('文档'),
-      dataIndex: 'documentation_url',
-      width: 100,
-      align: 'center',
-      render: (text, record, index) => {
-        const documentationURL = record.documentation_url;
-        if (!documentationURL || documentationURL.trim() === '') {
-          return <div className="text-center"><span className="text-gray-400 italic">{t('暂无')}</span></div>;
-        }
-        return (
-          <div className="flex justify-center">
-            <Tooltip content={t('查看文档')} position="top">
-              <Button
-                type="primary"
-                theme="light"
-                size="small"
-                icon={<IconArticle />}
-                onClick={() => window.open(documentationURL, '_blank')}
-                className="!bg-green-50 hover:!bg-green-100 !text-green-600 hover:!text-green-700 !border-green-200"
-              >
-                {t('查看')}
-              </Button>
-            </Tooltip>
-          </div>
-        );
       },
     },
     {
