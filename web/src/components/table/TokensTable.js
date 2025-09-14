@@ -944,6 +944,16 @@ const TokensTable = () => {
           >
             {t('删除所选令牌')}
           </Button>
+          <Button
+            type="tertiary"
+            className="w-full md:w-auto"
+            onClick={() => {
+              window.open('https://doc.apicore.ai/doc-7387853', '_blank');
+            }}
+            size="small"
+          >
+            {t('令牌使用说明')}
+          </Button>
         </div>
 
         <Form
