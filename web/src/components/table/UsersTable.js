@@ -41,7 +41,7 @@ import {
   IllustrationNoResult,
   IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
-import { IconSearch, IconUserAdd, IconMore } from '@douyinfe/semi-icons';
+import { IconSearch, IconUserAdd, IconMore, IconDownload } from '@douyinfe/semi-icons';
 import { ITEMS_PER_PAGE } from '../../constants';
 import AddUser from '../../pages/User/AddUser';
 import EditUser from '../../pages/User/EditUser';
@@ -379,6 +379,7 @@ const UsersTable = () => {
   const [activePage, setActivePage] = useState(1);
   const [pageSize, setPageSize] = useState(ITEMS_PER_PAGE);
   const [searching, setSearching] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [groupOptions, setGroupOptions] = useState([]);
   const [userCount, setUserCount] = useState(ITEMS_PER_PAGE);
   const [showAddUser, setShowAddUser] = useState(false);
@@ -575,6 +576,72 @@ const UsersTable = () => {
     }
   };
 
+  const handleExportUsers = async () => {
+    const { searchKeyword, searchGroup } = getFormValues();
+
+    setExporting(true);
+    try {
+      // 构建导出参数
+      const params = {};
+      if (searchKeyword) {
+        params.keyword = searchKeyword;
+      }
+      if (searchGroup) {
+        params.group = searchGroup;
+      }
+
+      // 使用API实例进行调用，自动携带New-API-User头和认证信息
+      const response = await API.get('/api/user/export', {
+        params: params,
+        responseType: 'blob', // 重要：指定响应类型为blob
+      });
+
+      // 创建下载链接
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+
+      // 从响应头获取文件名，或使用默认文件名
+      const contentDisposition = response.headers['content-disposition'];
+      let filename = 'users_export.csv';
+      if (contentDisposition) {
+        const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
+        if (matches != null && matches[1]) {
+          filename = matches[1].replace(/['"]/g, '');
+        }
+      }
+
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+
+      // 清理
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      showSuccess(t('用户数据导出成功'));
+    } catch (error) {
+      console.error('导出失败:', error);
+
+      // 处理不同类型的错误
+      if (error.response) {
+        if (error.response.status === 401) {
+          showError(t('请先登录再进行导出操作'));
+          return;
+        }
+        if (error.response.status === 403) {
+          showError(t('权限不足，只有管理员可以导出用户信息'));
+          return;
+        }
+        showError(t('导出失败：服务器错误'));
+      } else {
+        showError(t('导出失败：') + error.message);
+      }
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const renderHeader = () => (
     <div className="flex flex-col w-full">
       <div className="mb-2">
@@ -610,6 +677,17 @@ const UsersTable = () => {
             size="small"
           >
             {t('添加用户')}
+          </Button>
+          <Button
+            className="w-full md:w-auto"
+            type="tertiary"
+            icon={<IconDownload />}
+            onClick={handleExportUsers}
+            size="small"
+            loading={exporting}
+            disabled={exporting}
+          >
+            {exporting ? t('导出中...') : t('导出')}
           </Button>
         </div>
 

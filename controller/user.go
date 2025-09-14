@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"one-api/constant"
 
@@ -953,4 +954,126 @@ func UpdateUserSetting(c *gin.Context) {
 		"success": true,
 		"message": "设置已更新",
 	})
+}
+
+func ExportUsers(c *gin.Context) {
+	keyword := c.Query("keyword")
+	group := c.Query("group")
+
+	var users []*model.User
+	var err error
+
+	// 根据搜索条件获取用户数据
+	if keyword != "" || group != "" {
+		users, _, err = model.SearchUsers(keyword, group, 0, 999999) // 导出所有匹配的用户
+	} else {
+		pageInfo := &common.PageInfo{
+			Page:     1,
+			PageSize: 999999, // 导出所有用户
+		}
+		users, _, err = model.GetAllUsers(pageInfo)
+	}
+
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
+
+	// 设置响应头为CSV下载
+	c.Header("Content-Type", "text/csv")
+	c.Header("Content-Disposition", "attachment; filename=users_export.csv")
+
+	// 写CSV头部
+	_, err = c.Writer.WriteString("用户ID,用户名,分组,注册时间,角色,状态,邮箱,GitHub账户,Google账户,微信账户,Telegram账户,LinuxDO账户\n")
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
+
+	// 写用户数据
+	for _, user := range users {
+		// 格式化角色
+		var roleStr string
+		switch user.Role {
+		case 1:
+			roleStr = "普通用户"
+		case 10:
+			roleStr = "管理员"
+		case 100:
+			roleStr = "超级管理员"
+		default:
+			roleStr = "未知身份"
+		}
+
+		// 格式化状态
+		var statusStr string
+		if user.DeletedAt.Valid {
+			statusStr = "已注销"
+		} else {
+			switch user.Status {
+			case 1:
+				statusStr = "已激活"
+			case 2:
+				statusStr = "已封禁"
+			default:
+				statusStr = "未知状态"
+			}
+		}
+
+		// 格式化注册时间
+		createdTime := time.Unix(user.CreatedAt, 0).Format("2006-01-02 15:04:05")
+
+		// 处理各种绑定账户信息
+		email := user.Email
+		if email == "" {
+			email = "未绑定"
+		}
+
+		githubAccount := user.GitHubId
+		if githubAccount == "" {
+			githubAccount = "未绑定"
+		}
+
+		googleAccount := user.GoogleId
+		if googleAccount == "" {
+			googleAccount = "未绑定"
+		}
+
+		wechatAccount := user.WeChatId
+		if wechatAccount == "" {
+			wechatAccount = "未绑定"
+		}
+
+		telegramAccount := user.TelegramId
+		if telegramAccount == "" {
+			telegramAccount = "未绑定"
+		}
+
+		linuxdoAccount := user.LinuxDOId
+		if linuxdoAccount == "" {
+			linuxdoAccount = "未绑定"
+		}
+
+		// 写入CSV行，处理可能包含逗号的字段
+		line := fmt.Sprintf("%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+			user.Id,
+			user.Username,
+			user.Group,
+			createdTime,
+			roleStr,
+			statusStr,
+			email,
+			githubAccount,
+			googleAccount,
+			wechatAccount,
+			telegramAccount,
+			linuxdoAccount,
+		)
+
+		_, err = c.Writer.WriteString(line)
+		if err != nil {
+			common.ApiError(c, err)
+			return
+		}
+	}
 }
