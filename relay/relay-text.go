@@ -29,6 +29,37 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// shouldRefundForEmptyCompletion 检查是否应该为空补全退款
+func shouldRefundForEmptyCompletion(modelName string, usage interface{}) bool {
+	// 从配置中获取需要退款的模型列表
+	common.OptionMapRWMutex.RLock()
+	refundModelsStr, exists := common.OptionMap["gemini.refund_on_empty_completion_models"]
+	common.OptionMapRWMutex.RUnlock()
+
+	if !exists || refundModelsStr == "" {
+		return false
+	}
+
+	// 解析配置的模型列表
+	var refundModels []string
+	err := json.Unmarshal([]byte(refundModelsStr), &refundModels)
+	if err != nil {
+		return false
+	}
+
+	// 检查当前模型是否在退款列表中
+	for _, refundModel := range refundModels {
+		if modelName == refundModel {
+			if usageDto, ok := usage.(*dto.Usage); ok && usageDto.CompletionTokens == 0 {
+				return true
+			}
+			break
+		}
+	}
+
+	return false
+}
+
 func getAndValidateTextRequest(c *gin.Context, relayInfo *relaycommon.RelayInfo) (*dto.GeneralOpenAIRequest, error) {
 	textRequest := &dto.GeneralOpenAIRequest{}
 	err := common.UnmarshalBodyReusable(c, textRequest)
@@ -231,6 +262,22 @@ func TextHelper(c *gin.Context) (newAPIError *types.NewAPIError) {
 		// reset status code 重置状态码
 		service.ResetStatusCode(newApiErr, statusCodeMappingStr)
 		return newApiErr
+	}
+
+	// 检查是否需要对空补全的模型进行退款
+	if shouldRefundForEmptyCompletion(relayInfo.OriginModelName, usage) {
+		returnPreConsumedQuota(c, relayInfo, userQuota, preConsumedQuota)
+		// 记录到数据库
+		userId := c.GetInt("id")
+		channelId := c.GetInt("channel_id")
+		tokenName := c.GetString("token_name")
+		modelName := c.GetString("original_model")
+		tokenId := c.GetInt("token_id")
+		userGroup := c.GetString("group")
+
+		model.RecordErrorLog(c, userId, channelId, modelName, tokenName, "res is empty", tokenId, 0, false, userGroup, nil)
+
+		return nil
 	}
 
 	if strings.HasPrefix(relayInfo.OriginModelName, "gpt-4o-audio") {

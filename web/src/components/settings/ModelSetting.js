@@ -15,6 +15,7 @@ const ModelSetting = () => {
     'gemini.safety_settings': '',
     'gemini.version_settings': '',
     'gemini.supported_imagine_models': '',
+    'gemini.refund_on_empty_completion_models': '',
     'claude.model_headers_settings': '',
     'claude.thinking_adapter_enabled': true,
     'claude.default_max_tokens': '',
@@ -43,6 +44,7 @@ const ModelSetting = () => {
           item.key === 'claude.model_headers_settings' ||
           item.key === 'claude.default_max_tokens' ||
           item.key === 'gemini.supported_imagine_models' ||
+          item.key === 'gemini.refund_on_empty_completion_models' ||
           item.key === 'channel.timeout_disable_config'
         ) {
           if (item.value !== '') {

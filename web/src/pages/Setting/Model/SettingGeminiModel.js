@@ -28,6 +28,7 @@ export default function SettingGeminiModel(props) {
     'gemini.safety_settings': '',
     'gemini.version_settings': '',
     'gemini.supported_imagine_models': '',
+    'gemini.refund_on_empty_completion_models': '',
     'gemini.thinking_adapter_enabled': false,
     'gemini.thinking_adapter_budget_tokens_percentage': 0.6,
   });
@@ -165,6 +166,39 @@ export default function SettingGeminiModel(props) {
                     setInputs({
                       ...inputs,
                       'gemini.supported_imagine_models': value,
+                    })
+                  }
+                  trigger="blur"
+                  stopValidateWithError
+                  rules={[
+                    {
+                      validator: (rule, value) => verifyJSON(value),
+                      message: t('不是合法的 JSON 字符串'),
+                    },
+                  ]}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+                <Form.TextArea
+                  field={'gemini.refund_on_empty_completion_models'}
+                  label={t('空补全退款模型列表')}
+                  placeholder={
+                    t('模型列表JSON数组，例如：') +
+                    '\n' +
+                    JSON.stringify(
+                      ['gemini-2.5-pro-thinking', 'gemini-2.5-pro-exp'],
+                      null,
+                      2
+                    )
+                  }
+                  extraText={t('当这些模型的补全令牌为0时，将自动退还预消费配额')}
+                  autosize={{ minRows: 6, maxRows: 12 }}
+                  onChange={(value) =>
+                    setInputs({
+                      ...inputs,
+                      'gemini.refund_on_empty_completion_models': value,
                     })
                   }
                   trigger="blur"
